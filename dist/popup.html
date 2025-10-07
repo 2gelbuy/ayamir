@@ -1,0 +1,244 @@
+<!DOCTYPE html><!DOCTYPE html><!DOCTYPE html>
+
+<html lang="en">
+
+<head><html lang="en"><html lang="en">
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><head><head>
+
+  <title>EdgeTask</title>
+
+  <style>  <meta charset="UTF-8" />  <meta charset="UTF-8" />
+
+    * {
+
+      margin: 0;  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+      padding: 0;
+
+      box-sizing: border-box;  <title>EdgeTask</title>  <title>EdgeTask</title>
+
+    }
+
+      <style>  <style>
+
+    html, body {
+
+      width: 320px;    body {    body {
+
+      min-height: 450px;
+
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;      margin: 0;      margin: 0;
+
+    }
+
+          padding: 20px;      padding: 0;
+
+    body {
+
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      color: white;
+
+      padding: 25px 20px;      width: 350px;      width: 400px;
+
+    }
+
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);      height: 600px;
+
+    .container {
+
+      width: 100%;      color: white;      overflow: hidden;
+
+    }
+
+        }    }
+
+    .header {
+
+      text-align: center;        
+
+      margin-bottom: 25px;
+
+    }    .container {    #root {
+
+    
+
+    .icon {      text-align: center;      width: 100%;
+
+      font-size: 48px;
+
+      margin-bottom: 10px;    }      height: 100%;
+
+    }
+
+            }
+
+    h1 {
+
+      font-size: 22px;    h1 {  </style>
+
+      margin-bottom: 5px;
+
+      font-weight: 700;      font-size: 24px;</head>
+
+    }
+
+          margin-bottom: 10px;<body>
+
+    .subtitle {
+
+      font-size: 13px;    }  <div id="root"></div>
+
+      opacity: 0.85;
+
+    }      <script type="module" src="../src/popup.tsx"></script>
+
+    
+
+    .buttons {    p {</body>
+
+      display: flex;
+
+      flex-direction: column;      font-size: 14px;</html>
+
+      gap: 12px;      opacity: 0.9;
+
+      margin-bottom: 20px;      margin-bottom: 20px;
+
+    }    }
+
+        
+
+    button {    .buttons {
+
+      width: 100%;      display: flex;
+
+      padding: 14px 16px;      flex-direction: column;
+
+      background: white;      gap: 10px;
+
+      color: #667eea;    }
+
+      border: none;    
+
+      border-radius: 10px;    button {
+
+      font-size: 14px;      padding: 12px 20px;
+
+      font-weight: 600;      background: white;
+
+      cursor: pointer;      color: #667eea;
+
+      transition: all 0.2s ease;      border: none;
+
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);      border-radius: 8px;
+
+    }      font-size: 14px;
+
+          font-weight: 600;
+
+    button:hover {      cursor: pointer;
+
+      transform: translateY(-2px);      transition: transform 0.2s;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);    }
+
+    }    
+
+        button:hover {
+
+    button:active {      transform: translateY(-2px);
+
+      transform: translateY(0);    }
+
+    }    
+
+        .info {
+
+    .shortcuts {      margin-top: 20px;
+
+      background: rgba(255, 255, 255, 0.15);      padding: 15px;
+
+      border-radius: 10px;      background: rgba(255, 255, 255, 0.1);
+
+      padding: 15px;      border-radius: 8px;
+
+      backdrop-filter: blur(10px);      font-size: 12px;
+
+    }      text-align: left;
+
+        }
+
+    .shortcuts-title {    
+
+      font-weight: 600;    .info strong {
+
+      font-size: 13px;      display: block;
+
+      margin-bottom: 10px;      margin-bottom: 8px;
+
+      display: block;    }
+
+    }  </style>
+
+    </head>
+
+    .shortcut-item {<body>
+
+      font-size: 11px;  <div class="container">
+
+      line-height: 1.8;    <h1>🎯 EdgeTask</h1>
+
+      opacity: 0.9;    <p>Your productivity companion</p>
+
+    }    
+
+  </style>    <div class="buttons">
+
+</head>      <button id="openPanel">Open Task Panel</button>
+
+<body>      <button id="openOptions">Open Settings</button>
+
+  <div class="container">      <button id="toggleFocus">Toggle Focus Mode</button>
+
+    <div class="header">    </div>
+
+      <div class="icon">🎯</div>    
+
+      <h1>EdgeTask</h1>    <div class="info">
+
+      <div class="subtitle">Your productivity companion</div>      <strong>Keyboard Shortcuts:</strong>
+
+    </div>      Ctrl+Shift+E - Toggle Panel<br>
+
+          Ctrl+Shift+F - Focus Mode<br>
+
+    <div class="buttons">      Ctrl+Shift+N - New Task<br>
+
+      <button id="openPanel">📋 Open Task Panel</button>      Ctrl+Shift+C - Complete Task
+
+      <button id="openOptions">⚙️ Open Settings</button>    </div>
+
+      <button id="toggleFocus">🎯 Toggle Focus Mode</button>  </div>
+
+    </div>  
+
+      <script src="popup-script.js"></script>
+
+    <div class="shortcuts"></body>
+
+      <span class="shortcuts-title">⌨️ Keyboard Shortcuts</span></html>
+
+      <div class="shortcut-item">Ctrl+Shift+E - Toggle Panel</div>
+      <div class="shortcut-item">Ctrl+Shift+F - Focus Mode</div>
+      <div class="shortcut-item">Ctrl+Shift+N - New Task</div>
+      <div class="shortcut-item">Ctrl+Shift+C - Complete Task</div>
+    </div>
+  </div>
+  
+  <script src="popup-script.js"></script>
+</body>
+</html>

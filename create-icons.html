@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Icon Generator</title>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const sizes = [16, 48, 128];
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    sizes.forEach(size => {
+      canvas.width = size;
+      canvas.height = size;
+      
+      ctx.fillStyle = '#4F46E5';
+      ctx.fillRect(0, 0, size, size);
+      
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = size / 32;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 3, 0, 2 * Math.PI);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 16, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(size / 2, size / 4);
+      ctx.lineTo(size / 2, size / 2 - size / 16);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(size * 0.625, size / 2);
+      ctx.lineTo(size / 2 + size / 16, size / 2);
+      ctx.stroke();
+      
+      console.log(`Icon ${size}x${size} created`);
+    });
+  </script>
+</body>
+</html>
