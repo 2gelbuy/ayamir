@@ -6,7 +6,18 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
+// Handle Service Worker wake-up
+chrome.runtime.onStartup.addListener(() => {
+  console.log('EdgeTask: Service Worker woke up');
+  // Re-create alarms if they don't exist
+  chrome.alarms.get('checkReminders', (alarm) => {
+    if (!alarm) {
+      chrome.alarms.create('checkReminders', { periodInMinutes: 1 });
+    }
+  });
+});
+
+chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
   if (alarm.name === 'checkReminders') {
     await checkTaskReminders();
   }
@@ -17,14 +28,39 @@ async function checkTaskReminders() {
     const response = await chrome.storage.local.get(['tasks', 'settings']);
     const tasks = response.tasks || [];
     const settings = response.settings || { humorTone: 'default' };
+    console.log('EdgeTask Debug [background]: checkTaskReminders fetched', {
+      taskCount: tasks.length,
+      settingsKeys: settings ? Object.keys(settings) : [],
+      sampleTask: tasks[0]
+    });
     const now = new Date();
 
     for (const task of tasks) {
+      if (!task || typeof task !== 'object') {
+        console.warn('EdgeTask Debug [background]: skipping invalid task entry', task);
+        continue;
+      }
       if (task.isCompleted || !task.startTime) continue;
 
       const startTime = new Date(task.startTime);
       const minutesUntil = Math.floor((startTime.getTime() - now.getTime()) / 60000);
+      if (Number.isNaN(startTime.getTime()) || Number.isNaN(minutesUntil)) {
+        console.warn('EdgeTask Debug [background]: invalid date math for task', {
+          taskId: task.id,
+          title: task.title,
+          startTime: task.startTime,
+          createdAt: task.createdAt
+        });
+      }
 
+      console.log('EdgeTask Debug [background]: evaluating reminder window', {
+        taskId: task.id,
+        title: task.title,
+        minutesUntil,
+        notifiedAt10: task.notifiedAt10,
+        notifiedAt5: task.notifiedAt5,
+        notifiedAt0: task.notifiedAt0
+      });
       if (minutesUntil === 10 && !task.notifiedAt10) {
         await showNotification(task, '10min', settings.humorTone);
         task.notifiedAt10 = true;
@@ -49,7 +85,17 @@ async function showNotification(task: any, timing: string, tone: string) {
   const message = messages[Math.floor(Math.random() * messages.length)];
   const finalMessage = message.replace('{task}', task.title);
 
-  await chrome.notifications.create({
+  console.log('EdgeTask Debug [background]: showNotification payload', {
+    taskId: task?.id,
+    title: task?.title,
+    timing,
+    tone
+  });
+
+  // Use task ID as notification ID for button handling
+  const notificationId = `task-${task.id}`;
+
+  await chrome.notifications.create(notificationId, {
     type: 'basic',
     iconUrl: 'icon-128.png',
     title: timing === '0min' ? 'Time to start!' : `Starting ${timing === '10min' ? 'in 10 minutes' : 'in 5 minutes'}`,
@@ -66,9 +112,21 @@ async function updateTaskInStorage(task: any) {
   const response = await chrome.storage.local.get(['tasks']);
   const tasks = response.tasks || [];
   const index = tasks.findIndex((t: any) => t.id === task.id);
+  console.log('EdgeTask Debug [background]: updateTaskInStorage', {
+    taskId: task.id,
+    foundIndex: index,
+    totalTasks: tasks.length
+  });
   if (index !== -1) {
     tasks[index] = task;
-    await chrome.storage.local.set({ tasks });
+    await chrome.storage.local.set({ tasks }, () => {
+      console.log('EdgeTask Debug [background]: persisted task update', {
+        taskId: task.id,
+        notifiedAt10: task.notifiedAt10,
+        notifiedAt5: task.notifiedAt5,
+        notifiedAt0: task.notifiedAt0
+      });
+    });
   }
 }
 
@@ -124,15 +182,15 @@ function getHumorMessages(timing: string, tone: string): string[] {
   return messages[timing]?.[tone] || messages[timing]?.['default'] || [];
 }
 
-chrome.commands.onCommand.addListener((command) => {
+chrome.commands.onCommand.addListener((command: string) => {
   if (command === 'toggle-panel') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, { action: 'togglePanel' });
       }
     });
   } else if (command === 'toggle-focus') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleFocus' });
       }
@@ -140,11 +198,52 @@ chrome.commands.onCommand.addListener((command) => {
   }
 });
 
-chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIndex) => {
-  if (buttonIndex === 0) {
-    console.log('Snoozed');
-  } else if (buttonIndex === 1) {
-    console.log('Marked as done');
+// Handle notification button clicks with actual functionality
+chrome.notifications.onButtonClicked.addListener(async (notificationId: string, buttonIndex: number) => {
+  // Extract task ID from notification ID (format: "task-{id}")
+  const taskIdMatch = notificationId.match(/^task-(.+)$/);
+
+  if (!taskIdMatch) {
+    console.log('EdgeTask: Unknown notification format:', notificationId);
+    chrome.notifications.clear(notificationId);
+    return;
   }
+
+  const taskId = taskIdMatch[1];
+
+  try {
+    const response = await chrome.storage.local.get(['tasks']);
+    const tasks = response.tasks || [];
+    const taskIndex = tasks.findIndex((t: any) => String(t.id) === taskId);
+
+    if (taskIndex === -1) {
+      console.log('EdgeTask: Task not found:', taskId);
+      chrome.notifications.clear(notificationId);
+      return;
+    }
+
+    if (buttonIndex === 0) {
+      // Snooze: Reschedule notification for 10 minutes
+      console.log('EdgeTask: Snoozing task:', taskId);
+      const task = tasks[taskIndex];
+      task.startTime = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+      task.notifiedAt10 = false;
+      task.notifiedAt5 = false;
+      task.notifiedAt0 = false;
+      tasks[taskIndex] = task;
+      await chrome.storage.local.set({ tasks });
+      console.log('EdgeTask: Task snoozed successfully');
+    } else if (buttonIndex === 1) {
+      // Mark as done
+      console.log('EdgeTask: Completing task:', taskId);
+      tasks[taskIndex].isCompleted = true;
+      tasks[taskIndex].completedAt = new Date().toISOString();
+      await chrome.storage.local.set({ tasks });
+      console.log('EdgeTask: Task completed successfully');
+    }
+  } catch (error) {
+    console.error('EdgeTask: Error handling notification button:', error);
+  }
+
   chrome.notifications.clear(notificationId);
 });
