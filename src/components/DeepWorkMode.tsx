@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, Square, Settings, Coffee, Brain, Volume2, VolumeX, Globe, Lock, Unlock } from 'lucide-react';
-import { 
+import { Play, Square, Settings, Coffee, Brain, Volume2, VolumeX, Lock, Unlock } from 'lucide-react';
+import {
   DeepWorkModeState,
   getDeepWorkModeState,
   getDeepWorkModeSettings,
@@ -37,7 +37,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           getDeepWorkModeState(),
           getDeepWorkModeSettings()
         ]);
-        
+
         setState(deepWorkState);
         setSettings(deepWorkSettings);
         setIsLoading(false);
@@ -46,9 +46,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
         setIsLoading(false);
       }
     };
-    
+
     loadData();
-    
+
     // Set up interval to update remaining time
     const interval = setInterval(async () => {
       if (state.isActive) {
@@ -56,7 +56,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
         setState(currentState);
       }
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [state.isActive]);
 
@@ -162,7 +162,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Break Duration
@@ -181,75 +181,67 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Block Notifications
               </span>
               <button
                 onClick={() => handleSettingChange('deepWorkModeBlockNotifications', !settings.deepWorkModeBlockNotifications)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.deepWorkModeBlockNotifications ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.deepWorkModeBlockNotifications ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.deepWorkModeBlockNotifications ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.deepWorkModeBlockNotifications ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Block Distracting Sites
               </span>
               <button
                 onClick={() => handleSettingChange('deepWorkModeBlockSites', !settings.deepWorkModeBlockSites)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.deepWorkModeBlockSites ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.deepWorkModeBlockSites ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.deepWorkModeBlockSites ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.deepWorkModeBlockSites ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Show Timer
               </span>
               <button
                 onClick={() => handleSettingChange('deepWorkModeShowTimer', !settings.deepWorkModeShowTimer)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.deepWorkModeShowTimer ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.deepWorkModeShowTimer ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.deepWorkModeShowTimer ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.deepWorkModeShowTimer ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Auto-start Next Session
               </span>
               <button
                 onClick={() => handleSettingChange('deepWorkModeAutoStart', !settings.deepWorkModeAutoStart)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings.deepWorkModeAutoStart ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.deepWorkModeAutoStart ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings.deepWorkModeAutoStart ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.deepWorkModeAutoStart ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
@@ -274,9 +266,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                 {state.isActive ? (state.isBreakTime ? 'Break Time' : 'Deep Work') : 'Deep Work Mode'}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {state.isActive 
-                  ? (state.isBreakTime 
-                    ? `Take a break and recharge` 
+                {state.isActive
+                  ? (state.isBreakTime
+                    ? `Take a break and recharge`
                     : `Stay focused and block distractions`)
                   : `Focus on what matters most`
                 }
@@ -287,8 +279,8 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           {settings.deepWorkModeShowTimer && (
             <div className="text-center">
               <div className="text-6xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">
-                {state.remainingTime !== undefined 
-                  ? formatTime(state.remainingTime) 
+                {state.remainingTime !== undefined
+                  ? formatTime(state.remainingTime)
                   : '00:00'
                 }
               </div>
@@ -330,7 +322,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                     Resume Work
                   </button>
                 )}
-                
+
                 <button
                   onClick={handleStop}
                   className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2"
@@ -355,13 +347,13 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                {settings.deepWorkModeBlockNotifications 
-                  ? 'Blocked during focus time' 
+                {settings.deepWorkModeBlockNotifications
+                  ? 'Blocked during focus time'
                   : 'Allowed during focus time'
                 }
               </p>
             </div>
-            
+
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2 mb-2">
                 {settings.deepWorkModeBlockSites ? (
@@ -374,8 +366,8 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                {settings.deepWorkModeBlockSites 
-                  ? 'Blocked during focus time' 
+                {settings.deepWorkModeBlockSites
+                  ? 'Blocked during focus time'
                   : 'Allowed during focus time'
                 }
               </p>

@@ -14,8 +14,24 @@ export default function SmartPause({ onToggle }: SmartPauseProps) {
   const [pauseEndTime, setPauseEndTime] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
 
+  // Restore persisted smart pause state
   useEffect(() => {
-    let interval: number;
+    chrome.storage.local.get(['smartPause', 'settings'], (data) => {
+      const sp = data.smartPause;
+      if (sp?.isPaused && sp.pauseEndTime) {
+        const end = new Date(sp.pauseEndTime);
+        if (!Number.isNaN(end.getTime()) && end.getTime() > Date.now()) {
+          setIsPaused(true);
+          setPauseEndTime(end);
+          const remaining = Math.max(0, Math.floor((end.getTime() - Date.now()) / 1000));
+          setTimeRemaining(remaining);
+        }
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
     
     if (isPaused && pauseEndTime) {
       interval = setInterval(() => {
@@ -33,7 +49,9 @@ export default function SmartPause({ onToggle }: SmartPauseProps) {
     }
     
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval !== undefined) {
+        clearInterval(interval);
+      }
     };
   }, [isPaused, pauseEndTime, onToggle]);
 
@@ -46,6 +64,15 @@ export default function SmartPause({ onToggle }: SmartPauseProps) {
     setPauseEndTime(endTime);
     setIsPaused(true);
     onToggle(true);
+
+    // Persist to chrome.storage.local
+    chrome.storage.local.get(['settings'], (data) => {
+      const existingSettings = data.settings && typeof data.settings === 'object' ? data.settings : {};
+      chrome.storage.local.set({
+        smartPause: { isPaused: true, pauseEndTime: endTime.toISOString() },
+        settings: { ...existingSettings, isPaused: true, pauseEndTime: endTime.toISOString() }
+      });
+    });
     
     // Store pause state in database
     await db.settings.where('id').above(0).modify(settings => {
@@ -59,6 +86,14 @@ export default function SmartPause({ onToggle }: SmartPauseProps) {
     setPauseEndTime(null);
     setTimeRemaining(0);
     onToggle(false);
+
+    chrome.storage.local.get(['settings'], (data) => {
+      const existingSettings = data.settings && typeof data.settings === 'object' ? data.settings : {};
+      chrome.storage.local.set({
+        smartPause: { isPaused: false, pauseEndTime: null },
+        settings: { ...existingSettings, isPaused: false, pauseEndTime: null }
+      });
+    });
     
     // Clear pause state in database
     await db.settings.where('id').above(0).modify(settings => {

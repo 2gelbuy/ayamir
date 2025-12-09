@@ -58,7 +58,7 @@ export class Logger {
   constructor(config: ErrorHandlingConfig = DEFAULT_ERROR_HANDLING_CONFIG) {
     this.config = config;
     this.sessionId = this.generateSessionId();
-    
+
     // Set up global error handlers
     this.setupGlobalErrorHandlers();
   }
@@ -135,7 +135,7 @@ export class Logger {
   // Log a fatal error
   fatal(message: string, error?: Error | any, context?: ErrorContext): void {
     this.error(message, error, context);
-    
+
     // In a real app, you might want to show a user-friendly error message
     // or restart the app in case of a fatal error
   }
@@ -297,22 +297,22 @@ export const retry = async <T>(
       return await fn();
     } catch (error) {
       lastError = error;
-      
+
       if (attempt === maxAttempts) {
         logger.error(`Retry failed after ${maxAttempts} attempts`, error, context);
         throw error;
       }
-      
+
       // Calculate delay with exponential backoff
       const delay = baseDelay * Math.pow(2, attempt - 1);
-      
-      logger.warn(`Attempt ${attempt} failed, retrying in ${delay}ms`, error, context);
-      
+
+      logger.warn(`Attempt ${attempt} failed, retrying in ${delay}ms`, { error, context });
+
       // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   throw lastError;
 };
 
@@ -325,7 +325,7 @@ export class CircuitBreaker {
   constructor(
     private threshold: number = 5,
     private timeout: number = 60000 // 1 minute
-  ) {}
+  ) { }
 
   async execute<T>(fn: () => Promise<T>, context?: ErrorContext): Promise<T> {
     if (this.state === 'OPEN') {
@@ -338,22 +338,22 @@ export class CircuitBreaker {
 
     try {
       const result = await fn();
-      
+
       if (this.state === 'HALF_OPEN') {
         this.state = 'CLOSED';
         this.failureCount = 0;
       }
-      
+
       return result;
     } catch (error) {
       this.failureCount++;
       this.lastFailureTime = Date.now();
-      
+
       if (this.failureCount >= this.threshold) {
         this.state = 'OPEN';
         logger.error('Circuit breaker opened', error, context);
       }
-      
+
       throw error;
     }
   }
@@ -364,7 +364,7 @@ export const initializeErrorHandling = (config?: Partial<ErrorHandlingConfig>): 
   if (config) {
     logger.updateConfig(config);
   }
-  
+
   logger.info('Error handling initialized', {
     config: logger['config'],
     sessionId: logger['sessionId']

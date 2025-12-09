@@ -4,7 +4,7 @@
 declare const document: any;
 
 // Keyboard event types
-export type KeyboardAction = 
+export type KeyboardAction =
   | 'navigate_up'
   | 'navigate_down'
   | 'navigate_left'
@@ -45,13 +45,13 @@ export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   { key: 'Enter', action: 'select', description: 'Select focused item' },
   { key: 'Space', action: 'select', description: 'Select focused item' },
   { key: 'Escape', action: 'escape', description: 'Cancel/close current view' },
-  
+
   // Task actions
   { key: 'c', ctrlKey: true, action: 'complete_task', description: 'Complete selected task' },
   { key: 'd', ctrlKey: true, action: 'delete_task', description: 'Delete selected task' },
   { key: 'e', ctrlKey: true, action: 'edit_task', description: 'Edit selected task' },
   { key: 'n', ctrlKey: true, action: 'new_task', description: 'Create new task' },
-  
+
   // App actions
   { key: 'f', ctrlKey: true, action: 'toggle_focus', description: 'Toggle focus mode' },
   { key: 'p', ctrlKey: true, action: 'toggle_pause', description: 'Toggle pause' },
@@ -60,10 +60,10 @@ export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
   { key: 'g', ctrlKey: true, action: 'open_gamification', description: 'Open gamification' },
   { key: 'c', ctrlKey: true, altKey: true, action: 'open_calendar', description: 'Open calendar' },
   { key: 'd', ctrlKey: true, altKey: true, action: 'open_deep_work', description: 'Open deep work mode' },
-  
+
   // Search
   { key: '/', action: 'search', description: 'Search tasks' },
-  
+
   // Help
   { key: '?', action: 'help', description: 'Show keyboard shortcuts' }
 ];
@@ -132,9 +132,9 @@ export const updateKeyboardNavigationState = async (state: Partial<KeyboardNavig
 export const handleKeyboardEvent = async (event: KeyboardEvent, callback: (action: KeyboardAction, event: KeyboardEvent) => void): Promise<void> => {
   try {
     const state = await getKeyboardNavigationState();
-    
+
     if (!state.enabled) return;
-    
+
     // Find matching shortcut
     const matchingShortcut = state.shortcuts.find(shortcut => {
       return (
@@ -144,7 +144,7 @@ export const handleKeyboardEvent = async (event: KeyboardEvent, callback: (actio
         !!shortcut.shiftKey === event.shiftKey
       );
     });
-    
+
     if (matchingShortcut) {
       event.preventDefault();
       callback(matchingShortcut.action, event);
@@ -159,9 +159,9 @@ export const initializeKeyboardNavigation = (callback: (action: KeyboardAction, 
   const handleKeyDown = (event: KeyboardEvent) => {
     handleKeyboardEvent(event, callback);
   };
-  
+
   document.addEventListener('keydown', handleKeyDown);
-  
+
   // Return cleanup function
   return () => {
     document.removeEventListener('keydown', handleKeyDown);
@@ -170,12 +170,12 @@ export const initializeKeyboardNavigation = (callback: (action: KeyboardAction, 
 
 // Check if an element is focusable
 export const isFocusable = (element: Element): boolean => {
-  if (!element || element.disabled) return false;
-  
+  if (!element || (element as HTMLButtonElement).disabled) return false;
+
   const tagName = element.tagName.toLowerCase();
   const tabIndex = element.getAttribute('tabindex');
   const hasTabIndex = tabIndex !== null && parseInt(tabIndex, 10) >= 0;
-  
+
   // Elements that are naturally focusable
   const isNaturallyFocusable = [
     'a',
@@ -185,13 +185,13 @@ export const isFocusable = (element: Element): boolean => {
     'select',
     'details'
   ].includes(tagName);
-  
+
   // Elements with tabindex >= 0
   const hasTabIndexAttribute = hasTabIndex;
-  
+
   // Contenteditable elements
   const isContentEditable = element.getAttribute('contenteditable') === 'true';
-  
+
   return isNaturallyFocusable || hasTabIndexAttribute || isContentEditable;
 };
 
@@ -204,19 +204,19 @@ export const getFocusableElements = (container: Element = document.body): Elemen
 // Focus the next element in a container
 export const focusNextElement = (container: Element = document.body, currentElement?: Element): Element | null => {
   const focusableElements = getFocusableElements(container);
-  
+
   if (focusableElements.length === 0) return null;
-  
+
   let currentIndex = 0;
-  
+
   if (currentElement) {
     currentIndex = focusableElements.indexOf(currentElement);
     if (currentIndex === -1) currentIndex = 0;
   }
-  
+
   const nextIndex = (currentIndex + 1) % focusableElements.length;
   const nextElement = focusableElements[nextIndex];
-  
+
   (nextElement as HTMLElement).focus();
   return nextElement;
 };
@@ -224,19 +224,19 @@ export const focusNextElement = (container: Element = document.body, currentElem
 // Focus the previous element in a container
 export const focusPreviousElement = (container: Element = document.body, currentElement?: Element): Element | null => {
   const focusableElements = getFocusableElements(container);
-  
+
   if (focusableElements.length === 0) return null;
-  
+
   let currentIndex = 0;
-  
+
   if (currentElement) {
     currentIndex = focusableElements.indexOf(currentElement);
     if (currentIndex === -1) currentIndex = 0;
   }
-  
+
   const prevIndex = currentIndex === 0 ? focusableElements.length - 1 : currentIndex - 1;
   const prevElement = focusableElements[prevIndex];
-  
+
   (prevElement as HTMLElement).focus();
   return prevElement;
 };
@@ -266,7 +266,7 @@ export const createKeyboardShortcutsHelp = (): HTMLElement => {
       </div>
     </div>
   `;
-  
+
   // Add styles
   const style = document.createElement('style');
   style.textContent = `
@@ -355,48 +355,48 @@ export const createKeyboardShortcutsHelp = (): HTMLElement => {
       font-size: 14px;
     }
   `;
-  
+
   document.head.appendChild(style);
-  
+
   // Populate shortcuts
   const populateShortcuts = async () => {
     const shortcuts = await getKeyboardShortcuts();
     const tbody = dialog.querySelector('tbody');
-    
+
     shortcuts.forEach(shortcut => {
       const row = document.createElement('tr');
-      
+
       const keyCell = document.createElement('td');
       const keyParts = [];
-      
+
       if (shortcut.ctrlKey) keyParts.push('Ctrl');
       if (shortcut.altKey) keyParts.push('Alt');
       if (shortcut.shiftKey) keyParts.push('Shift');
-      
+
       keyParts.push(shortcut.key);
-      
-      keyCell.innerHTML = keyParts.map(part => 
+
+      keyCell.innerHTML = keyParts.map(part =>
         `<span class="edgetask-keyboard-shortcut-key">${part}</span>`
       ).join(' + ');
-      
+
       const actionCell = document.createElement('td');
       actionCell.textContent = shortcut.description;
-      
+
       row.appendChild(keyCell);
       row.appendChild(actionCell);
       tbody.appendChild(row);
     });
   };
-  
+
   populateShortcuts();
-  
+
   // Add close functionality
   const closeBtn = dialog.querySelector('.edgetask-keyboard-shortcuts-help-close');
   closeBtn.addEventListener('click', () => {
     document.body.removeChild(dialog);
     document.head.removeChild(style);
   });
-  
+
   // Close on escape
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
@@ -405,18 +405,18 @@ export const createKeyboardShortcutsHelp = (): HTMLElement => {
       document.removeEventListener('keydown', handleEscape);
     }
   };
-  
+
   document.addEventListener('keydown', handleEscape);
-  
+
   // Close on background click
-  dialog.addEventListener('click', (event) => {
+  dialog.addEventListener('click', (event: MouseEvent) => {
     if (event.target === dialog) {
       document.body.removeChild(dialog);
       document.head.removeChild(style);
       document.removeEventListener('keydown', handleEscape);
     }
   });
-  
+
   return dialog;
 };
 
@@ -424,7 +424,7 @@ export const createKeyboardShortcutsHelp = (): HTMLElement => {
 export const showKeyboardShortcutsHelp = (): void => {
   const helpDialog = createKeyboardShortcutsHelp();
   document.body.appendChild(helpDialog);
-  
+
   // Focus the close button
   const closeBtn = helpDialog.querySelector('.edgetask-keyboard-shortcuts-help-close') as HTMLElement;
   if (closeBtn) {

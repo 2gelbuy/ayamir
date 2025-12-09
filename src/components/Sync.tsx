@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Cloud, CloudOff, RefreshCw, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { 
-  autoSync, 
-  manualSync, 
-  hasRemoteData, 
-  getLastSyncTime, 
-  setLastSyncTime 
+import {
+  autoSync,
+  manualSync,
+  hasRemoteData,
+  getLastSyncTime
 } from '../lib/sync';
 
 interface SyncProps {
@@ -25,16 +24,16 @@ export default function Sync({ onSyncComplete }: SyncProps) {
       try {
         const time = await getLastSyncTime();
         const remote = await hasRemoteData();
-        
+
         setLastSyncTimeState(time ? new Date(time) : null);
         setHasRemote(remote);
       } catch (error) {
         console.error('Error checking sync status:', error);
       }
     };
-    
+
     checkSyncStatus();
-    
+
     // Set up auto-sync interval
     if (autoSyncEnabled) {
       const interval = setInterval(async () => {
@@ -46,7 +45,7 @@ export default function Sync({ onSyncComplete }: SyncProps) {
           console.error('Error during auto-sync:', error);
         }
       }, 5 * 60 * 1000); // Check every 5 minutes
-      
+
       return () => clearInterval(interval);
     }
   }, [autoSyncEnabled]);
@@ -55,24 +54,24 @@ export default function Sync({ onSyncComplete }: SyncProps) {
     setIsSyncing(true);
     setSyncStatus('idle');
     setSyncMessage('');
-    
+
     try {
       const success = await manualSync(preferLocal);
-      
+
       if (success) {
         setSyncStatus('success');
-        setSyncMessage(preferLocal 
-          ? 'Your data has been uploaded to the cloud.' 
+        setSyncMessage(preferLocal
+          ? 'Your data has been uploaded to the cloud.'
           : 'Your data has been synced with the cloud.');
-        
+
         // Update last sync time
         const time = await getLastSyncTime();
         setLastSyncTimeState(time ? new Date(time) : null);
-        
+
         // Check if remote data exists now
         const remote = await hasRemoteData();
         setHasRemote(remote);
-        
+
         if (onSyncComplete) {
           onSyncComplete();
         }
@@ -86,7 +85,7 @@ export default function Sync({ onSyncComplete }: SyncProps) {
       setSyncMessage('An error occurred during sync.');
     } finally {
       setIsSyncing(false);
-      
+
       // Clear status message after 3 seconds
       setTimeout(() => {
         setSyncStatus('idle');
@@ -97,17 +96,17 @@ export default function Sync({ onSyncComplete }: SyncProps) {
 
   const formatLastSyncTime = () => {
     if (!lastSyncTime) return 'Never';
-    
+
     const now = new Date();
     const diffMs = now.getTime() - lastSyncTime.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'Just now';
     if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
   };
@@ -146,26 +145,23 @@ export default function Sync({ onSyncComplete }: SyncProps) {
           </span>
           <button
             onClick={() => setAutoSyncEnabled(!autoSyncEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              autoSyncEnabled ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-            }`}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${autoSyncEnabled ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+              }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                autoSyncEnabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${autoSyncEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
             />
           </button>
         </div>
 
         {syncMessage && (
-          <div className={`flex items-start gap-2 p-2 rounded-md ${
-            syncStatus === 'success' 
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200' 
+          <div className={`flex items-start gap-2 p-2 rounded-md ${syncStatus === 'success'
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
               : syncStatus === 'error'
-              ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-              : 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200'
-          }`}>
+                ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+                : 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200'
+            }`}>
             {syncStatus === 'success' && <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
             {syncStatus === 'error' && <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
             {syncStatus === 'idle' && <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />}

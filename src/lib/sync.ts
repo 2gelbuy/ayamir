@@ -12,12 +12,14 @@ export interface SyncData {
 }
 
 // Generate a unique device ID if not exists
-const getDeviceId = (): string => {
-  let deviceId = localStorage.getItem('edgetask-device-id');
-  if (!deviceId) {
-    deviceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('edgetask-device-id', deviceId);
+const getDeviceId = async (): Promise<string> => {
+  const result = await chrome.storage.local.get(['deviceId']);
+  if (result.deviceId) {
+    return result.deviceId;
   }
+  
+  const deviceId = `device-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  await chrome.storage.local.set({ deviceId });
   return deviceId;
 };
 
@@ -25,12 +27,13 @@ const getDeviceId = (): string => {
 const getCurrentSyncData = async (): Promise<SyncData> => {
   const tasks = await db.tasks.toArray();
   const settings = await db.settings.toArray();
+  const deviceId = await getDeviceId();
   
   return {
     tasks,
     settings,
     lastSyncTime: Date.now(),
-    deviceId: getDeviceId()
+    deviceId
   };
 };
 
@@ -103,7 +106,7 @@ const mergeSyncData = async (localData: SyncData, remoteData: SyncData): Promise
     tasks: mergedTasks,
     settings: mergedSettings,
     lastSyncTime: Date.now(),
-    deviceId: getDeviceId()
+    deviceId: await getDeviceId()
   };
 };
 

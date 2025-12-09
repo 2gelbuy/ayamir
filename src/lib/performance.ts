@@ -1,7 +1,8 @@
 // Performance optimization service for EdgeTask
 
-// Type declarations for Chrome APIs
-declare const chrome: any;
+import { useRef } from 'react';
+
+// chrome is available globally via @types/chrome
 
 // Performance metrics
 export interface PerformanceMetrics {
@@ -37,21 +38,21 @@ export class LRUCache<T> {
 
   get(key: string): T | null {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return null;
     }
-    
+
     // Check if item has expired
     if (Date.now() - item.timestamp > this.ttl) {
       this.cache.delete(key);
       return null;
     }
-    
+
     // Move item to the end (most recently used)
     this.cache.delete(key);
     this.cache.set(key, item);
-    
+
     return item.value;
   }
 
@@ -60,17 +61,17 @@ export class LRUCache<T> {
     if (this.cache.has(key)) {
       this.cache.delete(key);
     }
-    
+
     // Add new item
     this.cache.set(key, {
       value,
       timestamp: Date.now()
     });
-    
+
     // Remove oldest items if cache is too large
     while (this.cache.size > this.maxSize) {
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) this.cache.delete(firstKey);
     }
   }
 
@@ -140,8 +141,9 @@ export class PerformanceMonitor {
   }
 
   updateMemoryUsage(): void {
-    if (performance.memory) {
-      this.metrics.memoryUsage = performance.memory.usedJSHeapSize;
+    const perf = performance as Performance & { memory?: { usedJSHeapSize: number } };
+    if (perf.memory) {
+      this.metrics.memoryUsage = perf.memory.usedJSHeapSize;
     }
   }
 
@@ -176,13 +178,13 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: number | null = null;
-  
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
   return function (...args: Parameters<T>) {
     if (timeout !== null) {
       clearTimeout(timeout);
     }
-    
+
     timeout = setTimeout(() => {
       func(...args);
     }, wait);
@@ -195,7 +197,7 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle = false;
-  
+
   return function (...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
@@ -213,19 +215,19 @@ export function memoize<T extends (...args: any[]) => any>(
   keyGenerator?: (...args: Parameters<T>) => string
 ): T {
   const cache = new Map<string, ReturnType<T>>();
-  
+
   return function (...args: Parameters<T>): ReturnType<T> {
     const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
-    
+
     if (cache.has(key)) {
       performanceMonitor.recordCacheHit();
       return cache.get(key) as ReturnType<T>;
     }
-    
+
     performanceMonitor.recordCacheMiss();
     const result = func(...args);
     cache.set(key, result);
-    
+
     return result;
   } as T;
 }
@@ -239,20 +241,20 @@ export function lazyLoad<T>(
     // Try to load from cache first
     const cacheKey = loader.toString();
     const cached = taskCache.get(cacheKey);
-    
+
     if (cached) {
       performanceMonitor.recordCacheHit();
       resolve(cached);
       return;
     }
-    
+
     performanceMonitor.recordCacheMiss();
-    
+
     // If fallback is provided, resolve with it immediately
     if (fallback !== undefined) {
       resolve(fallback);
     }
-    
+
     // Load the component
     loader()
       .then((module) => {
@@ -274,30 +276,30 @@ export function optimizeDbOperations<T>(
   return new Promise((resolve, reject) => {
     const results: T[] = [];
     let currentIndex = 0;
-    
+
     const processBatch = async () => {
       const batch = operations.slice(currentIndex, currentIndex + batchSize);
-      
+
       if (batch.length === 0) {
         resolve(results);
         return;
       }
-      
+
       try {
         performanceMonitor.startDbOperation();
         const batchResults = await Promise.all(batch.map(op => op()));
         performanceMonitor.endDbOperation();
-        
+
         results.push(...batchResults);
         currentIndex += batchSize;
-        
+
         // Process next batch after a short delay to avoid blocking the UI
         setTimeout(processBatch, 0);
       } catch (error) {
         reject(error);
       }
     };
-    
+
     processBatch();
   });
 }
@@ -319,7 +321,7 @@ export function preloadResources(resources: string[]): Promise<void[]> {
         const link = document.createElement('link');
         link.rel = 'preload';
         link.href = resource;
-        
+
         // Determine resource type
         if (resource.endsWith('.js')) {
           link.as = 'script';
@@ -330,10 +332,10 @@ export function preloadResources(resources: string[]): Promise<void[]> {
         } else {
           link.as = 'fetch';
         }
-        
+
         link.onload = () => resolve();
         link.onerror = () => reject(new Error(`Failed to preload ${resource}`));
-        
+
         document.head.appendChild(link);
       });
     })
@@ -345,12 +347,12 @@ export function optimizeImageSrc(src: string): string {
   // Check if WebP is supported
   const canvas = document.createElement('canvas');
   const webpSupported = canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-  
+
   if (webpSupported && src.match(/\.(png|jpg|jpeg|gif)$/)) {
     // Replace extension with WebP
     return src.replace(/\.(png|jpg|jpeg|gif)$/, '.webp');
   }
-  
+
   return src;
 }
 
@@ -358,7 +360,7 @@ export function optimizeImageSrc(src: string): string {
 export function useStableCallback<T extends (...args: any[]) => any>(callback: T): T {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
-  
+
   return useRef((...args: any[]) => callbackRef.current(...args)).current as T;
 }
 
@@ -368,13 +370,13 @@ export function createVirtualScrollContainer(
   itemHeight: number,
   renderItem: (index: number, item: any) => HTMLElement,
   getItems: () => any[]
-): void {
+): (() => void) {
   let scrollTop = 0;
   let containerHeight = 0;
   let visibleStartIndex = 0;
   let visibleEndIndex = 0;
   let items: any[] = [];
-  
+
   const updateVisibleRange = () => {
     visibleStartIndex = Math.floor(scrollTop / itemHeight);
     visibleEndIndex = Math.min(
@@ -382,56 +384,56 @@ export function createVirtualScrollContainer(
       items.length - 1
     );
   };
-  
+
   const renderItems = () => {
     // Clear container
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
-    
+
     // Add spacer for items above visible range
     const topSpacer = document.createElement('div');
     topSpacer.style.height = `${visibleStartIndex * itemHeight}px`;
     container.appendChild(topSpacer);
-    
+
     // Render visible items
     for (let i = visibleStartIndex; i <= visibleEndIndex; i++) {
       const itemElement = renderItem(i, items[i]);
       container.appendChild(itemElement);
     }
-    
+
     // Add spacer for items below visible range
     const bottomSpacer = document.createElement('div');
     bottomSpacer.style.height = `${(items.length - visibleEndIndex - 1) * itemHeight}px`;
     container.appendChild(bottomSpacer);
   };
-  
+
   const handleScroll = throttle(() => {
     scrollTop = container.scrollTop;
     updateVisibleRange();
     renderItems();
   }, 16); // Throttle to ~60fps
-  
+
   const handleResize = debounce(() => {
     containerHeight = container.clientHeight;
     updateVisibleRange();
     renderItems();
   }, 100);
-  
+
   // Initial setup
   const updateItems = () => {
     items = getItems();
     updateVisibleRange();
     renderItems();
   };
-  
+
   container.addEventListener('scroll', handleScroll);
   window.addEventListener('resize', handleResize);
-  
+
   // Initial render
   containerHeight = container.clientHeight;
   updateItems();
-  
+
   // Return cleanup function
   return () => {
     container.removeEventListener('scroll', handleScroll);
@@ -442,9 +444,9 @@ export function createVirtualScrollContainer(
 // Performance monitoring and reporting
 export function reportPerformanceMetrics(): void {
   const metrics = performanceMonitor.getMetrics();
-  
+
   console.log('Performance Metrics:', metrics);
-  
+
   // Report to analytics service if available
   if (chrome.runtime && chrome.runtime.sendMessage) {
     chrome.runtime.sendMessage({
@@ -458,7 +460,7 @@ export function reportPerformanceMetrics(): void {
 export function initializePerformanceOptimizations(): void {
   // Report metrics every 30 seconds
   setInterval(reportPerformanceMetrics, 30000);
-  
+
   // Preload critical resources
   preloadResources([
     'icon-128.png',
@@ -466,7 +468,7 @@ export function initializePerformanceOptimizations(): void {
   ]).catch(error => {
     console.error('Error preloading resources:', error);
   });
-  
+
   // Optimize images on the page
   const images = document.querySelectorAll('img');
   images.forEach(img => {

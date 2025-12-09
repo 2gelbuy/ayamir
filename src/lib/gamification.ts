@@ -1,5 +1,5 @@
-import { Task, Settings, db } from './db';
-import { startOfDay, endOfDay, isToday, isYesterday, subDays } from 'date-fns';
+import { Task, db } from './db';
+import { startOfDay, endOfDay, subDays } from 'date-fns';
 
 // Achievement definitions
 export interface Achievement {
@@ -113,25 +113,25 @@ export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
 // Calculate points for a task based on various factors
 export const calculateTaskPoints = (task: Task): number => {
   let points = 10; // Base points for completing any task
-  
+
   // Bonus points for completing on time
   if (task.completedOnTime) {
     points += 5;
   }
-  
+
   // Bonus points for completing quickly (within 30 minutes of start time)
   if (task.startTime && task.completedAt) {
     const startTime = new Date(task.startTime);
     const completedTime = new Date(task.completedAt);
     const diffMinutes = (completedTime.getTime() - startTime.getTime()) / 60000;
-    
+
     if (diffMinutes <= 10) {
       points += 10; // Speed bonus
     } else if (diffMinutes <= 30) {
       points += 5; // Quick completion bonus
     }
   }
-  
+
   // Bonus points for completing tasks during off-hours
   if (task.completedAt) {
     const hour = new Date(task.completedAt).getHours();
@@ -141,7 +141,7 @@ export const calculateTaskPoints = (task: Task): number => {
       points += 5; // Night owl bonus
     }
   }
-  
+
   return points;
 };
 
@@ -158,14 +158,14 @@ export const getUserLevel = (totalPoints: number): typeof LEVEL_THRESHOLDS[0] =>
 // Get points needed to reach next level
 export const getPointsToNextLevel = (totalPoints: number): number => {
   const currentLevel = getUserLevel(totalPoints);
-  const nextLevelIndex = currentLevel.level < LEVEL_THRESHOLDS.length 
-    ? currentLevel.level 
+  const nextLevelIndex = currentLevel.level < LEVEL_THRESHOLDS.length
+    ? currentLevel.level
     : LEVEL_THRESHOLDS.length - 1;
-  
+
   if (nextLevelIndex >= LEVEL_THRESHOLDS.length - 1) {
     return 0; // Already at max level
   }
-  
+
   const nextLevel = LEVEL_THRESHOLDS[nextLevelIndex + 1];
   return nextLevel.pointsRequired - totalPoints;
 };
@@ -175,28 +175,28 @@ export const calculateStreak = async (): Promise<number> => {
   const today = startOfDay(new Date());
   let streak = 0;
   let currentDate = today;
-  
+
   // Check if any tasks were completed today
   const todayTasks = await db.tasks
     .where('completedAt')
     .between(startOfDay(today), endOfDay(today))
     .toArray();
-    
+
   if (todayTasks.length === 0) {
     // No tasks completed today, check yesterday
     currentDate = subDays(today, 1);
   }
-  
+
   // Count consecutive days with completed tasks
   while (true) {
     const dayStart = startOfDay(currentDate);
     const dayEnd = endOfDay(currentDate);
-    
+
     const tasksCompletedOnDay = await db.tasks
       .where('completedAt')
       .between(dayStart, dayEnd)
       .toArray();
-      
+
     if (tasksCompletedOnDay.length > 0) {
       streak++;
       currentDate = subDays(currentDate, 1);
@@ -204,7 +204,7 @@ export const calculateStreak = async (): Promise<number> => {
       break;
     }
   }
-  
+
   return streak;
 };
 
@@ -216,7 +216,7 @@ export const checkAchievements = async (
   tasksCompletedToday: number
 ): Promise<Achievement[]> => {
   const updatedAchievements = [...achievements];
-  
+
   // Check first task achievement
   if (totalPoints >= 10) {
     const firstTaskAchievement = updatedAchievements.find(a => a.id === 'first-task');
@@ -225,7 +225,7 @@ export const checkAchievements = async (
       firstTaskAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check streak achievements
   if (streak >= 3) {
     const streakAchievement = updatedAchievements.find(a => a.id === 'streak-3');
@@ -234,7 +234,7 @@ export const checkAchievements = async (
       streakAchievement.unlockedAt = new Date();
     }
   }
-  
+
   if (streak >= 7) {
     const streakAchievement = updatedAchievements.find(a => a.id === 'streak-7');
     if (streakAchievement && !streakAchievement.unlocked) {
@@ -242,7 +242,7 @@ export const checkAchievements = async (
       streakAchievement.unlockedAt = new Date();
     }
   }
-  
+
   if (streak >= 30) {
     const streakAchievement = updatedAchievements.find(a => a.id === 'streak-30');
     if (streakAchievement && !streakAchievement.unlocked) {
@@ -250,7 +250,7 @@ export const checkAchievements = async (
       streakAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check task marathon achievement
   if (tasksCompletedToday >= 10) {
     const marathonAchievement = updatedAchievements.find(a => a.id === 'task-marathon');
@@ -259,24 +259,24 @@ export const checkAchievements = async (
       marathonAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check time-based achievements
   const today = new Date();
   const todayStart = startOfDay(today);
   const todayEnd = endOfDay(today);
-  
+
   const todayTasks = await db.tasks
     .where('completedAt')
     .between(todayStart, todayEnd)
     .toArray();
-    
+
   // Check early bird achievement
   const earlyMorningTasks = todayTasks.filter(task => {
     if (!task.completedAt) return false;
     const hour = new Date(task.completedAt).getHours();
     return hour < 9;
   });
-  
+
   if (earlyMorningTasks.length > 0) {
     const earlyBirdAchievement = updatedAchievements.find(a => a.id === 'early-bird');
     if (earlyBirdAchievement && !earlyBirdAchievement.unlocked) {
@@ -284,14 +284,14 @@ export const checkAchievements = async (
       earlyBirdAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check night owl achievement
   const nightTasks = todayTasks.filter(task => {
     if (!task.completedAt) return false;
     const hour = new Date(task.completedAt).getHours();
     return hour >= 22;
   });
-  
+
   if (nightTasks.length > 0) {
     const nightOwlAchievement = updatedAchievements.find(a => a.id === 'night-owl');
     if (nightOwlAchievement && !nightOwlAchievement.unlocked) {
@@ -299,7 +299,7 @@ export const checkAchievements = async (
       nightOwlAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check speed demon achievement
   const speedTasks = todayTasks.filter(task => {
     if (!task.startTime || !task.completedAt) return false;
@@ -308,7 +308,7 @@ export const checkAchievements = async (
     const diffMinutes = (completedTime.getTime() - startTime.getTime()) / 60000;
     return diffMinutes <= 10;
   });
-  
+
   if (speedTasks.length > 0) {
     const speedAchievement = updatedAchievements.find(a => a.id === 'speed-demon');
     if (speedAchievement && !speedAchievement.unlocked) {
@@ -316,7 +316,7 @@ export const checkAchievements = async (
       speedAchievement.unlockedAt = new Date();
     }
   }
-  
+
   // Check perfect timing achievement
   const perfectTasks = todayTasks.filter(task => {
     if (!task.startTime || !task.completedAt) return false;
@@ -325,7 +325,7 @@ export const checkAchievements = async (
     const diffMinutes = Math.abs((completedTime.getTime() - startTime.getTime()) / 60000);
     return diffMinutes <= 1; // Within 1 minute of scheduled time
   });
-  
+
   if (perfectTasks.length > 0) {
     const perfectAchievement = updatedAchievements.find(a => a.id === 'perfect-timing');
     if (perfectAchievement && !perfectAchievement.unlocked) {
@@ -333,7 +333,7 @@ export const checkAchievements = async (
       perfectAchievement.unlockedAt = new Date();
     }
   }
-  
+
   return updatedAchievements;
 };
 
@@ -343,10 +343,10 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
     // Get current settings
     const settings = await db.settings.toCollection().first();
     if (!settings) return;
-    
+
     // Calculate points for this task
     const taskPoints = calculateTaskPoints(task);
-    
+
     // Update task with points
     if (task.id) {
       await db.tasks.update(task.id, {
@@ -354,27 +354,27 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
         completedAt: task.completedAt || new Date()
       });
     }
-    
+
     // Calculate if task was completed on time
     if (task.startTime && task.completedAt) {
       const startTime = new Date(task.startTime);
       const completedTime = new Date(task.completedAt);
       const completedOnTime = completedTime <= new Date(startTime.getTime() + 5 * 60000); // Within 5 minutes of start time
-      
+
       if (task.id) {
         await db.tasks.update(task.id, { completedOnTime });
       }
     }
-    
+
     // Update total points
-    const newTotalPoints = settings.totalPoints + taskPoints;
-    
+    const newTotalPoints = (settings.totalPoints ?? 0) + taskPoints;
+
     // Calculate new level
     const newLevel = getUserLevel(newTotalPoints);
-    
+
     // Calculate current streak
     const newStreak = await calculateStreak();
-    
+
     // Get tasks completed today
     const today = startOfDay(new Date());
     const todayEnd = endOfDay(today);
@@ -382,7 +382,7 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
       .where('completedAt')
       .between(today, todayEnd)
       .count();
-    
+
     // Check and unlock achievements
     const updatedAchievements = await checkAchievements(
       settings.achievements || DEFAULT_ACHIEVEMENTS,
@@ -390,7 +390,7 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
       newStreak,
       tasksCompletedToday
     );
-    
+
     // Update settings
     await db.settings.update(settings.id!, {
       totalPoints: newTotalPoints,
@@ -399,7 +399,7 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
       achievements: updatedAchievements,
       lastActivityDate: new Date()
     });
-    
+
   } catch (error) {
     console.error('Error updating stats on task completion:', error);
   }
@@ -409,7 +409,7 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
 export const initializeGamification = async (): Promise<void> => {
   try {
     const settings = await db.settings.toCollection().first();
-    
+
     if (settings && !settings.gamificationEnabled) {
       // Initialize gamification settings
       await db.settings.update(settings.id!, {

@@ -15,7 +15,7 @@ export interface ARIAAttributes {
   'aria-disabled'?: boolean;
   'aria-hidden'?: boolean;
   'aria-live'?: 'off' | 'polite' | 'assertive';
-  'aria-atomic'?: boolean;
+  'aria-atomic'?: boolean | string;
   'aria-busy'?: boolean;
   'aria-relevant'?: string;
   'aria-dropeffect'?: string;
@@ -28,6 +28,12 @@ export interface ARIAAttributes {
   'aria-readonly'?: boolean;
   'aria-keyshortcuts'?: string;
   'aria-roledescription'?: string;
+  'aria-pressed'?: boolean;
+  'aria-modal'?: boolean | string;
+  'aria-valuenow'?: number;
+  'aria-valuemin'?: number;
+  'aria-valuemax'?: number;
+  draggable?: string;
 }
 
 // Focus management
@@ -48,7 +54,7 @@ export class FocusManager {
       '[tabindex]:not([tabindex="-1"])',
       '[contenteditable="true"]'
     ].join(', ');
-    
+
     return Array.from(container.querySelectorAll(selector)) as HTMLElement[];
   }
 
@@ -84,21 +90,21 @@ export class FocusManager {
   createFocusTrap(container: HTMLElement): () => void {
     this.focusTrap = container;
     const focusableElements = this.getFocusableElements(container);
-    
-    if (focusableElements.length === 0) return () => {};
-    
+
+    if (focusableElements.length === 0) return () => { };
+
     // Save current focus
     this.saveFocus();
-    
+
     // Set focus to the first element
     focusableElements[0].focus();
-    
+
     // Handle tab key to keep focus within the container
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
-        
+
         if (event.shiftKey) {
           // Shift + Tab
           if (document.activeElement === firstElement) {
@@ -114,9 +120,9 @@ export class FocusManager {
         }
       }
     };
-    
+
     container.addEventListener('keydown', handleKeyDown);
-    
+
     // Return cleanup function
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
@@ -137,6 +143,7 @@ export class ScreenReaderAnnouncer {
   // Create the announcer element
   private createAnnouncer(): void {
     this.announcer = document.createElement('div');
+    if (!this.announcer) return;
     this.announcer.setAttribute('aria-live', 'polite');
     this.announcer.setAttribute('aria-atomic', 'true');
     this.announcer.setAttribute('aria-hidden', 'false');
@@ -145,22 +152,22 @@ export class ScreenReaderAnnouncer {
     this.announcer.style.width = '1px';
     this.announcer.style.height = '1px';
     this.announcer.style.overflow = 'hidden';
-    
+
     document.body.appendChild(this.announcer);
   }
 
   // Announce a message to screen readers
   announce(message: string, priority: 'polite' | 'assertive' = 'polite'): void {
     if (!this.announcer) return;
-    
+
     // Update aria-live if needed
     if (this.announcer.getAttribute('aria-live') !== priority) {
       this.announcer.setAttribute('aria-live', priority);
     }
-    
+
     // Clear the announcer and add the new message
     this.announcer.textContent = '';
-    
+
     // Use setTimeout to ensure the screen reader picks up the change
     setTimeout(() => {
       if (this.announcer) {
@@ -190,49 +197,6 @@ export class ARIAUtils {
       } else {
         element.removeAttribute(key);
       }
-    });
-  }
-
-  // Get ARIA attributes from an element
-  static getAttributes(element: HTMLElement): Partial<ARIAAttributes> {
-    const attributes: Partial<ARIAAttributes> = {};
-    
-    // Get all ARIA attributes
-    Array.from(element.attributes).forEach(attr => {
-      if (attr.name.startsWith('aria-')) {
-        attributes[attr.name as keyof ARIAAttributes] = attr.value;
-      }
-    });
-    
-    // Get role
-    if (element.getAttribute('role')) {
-      attributes.role = element.getAttribute('role');
-    }
-    
-    return attributes;
-  }
-
-  // Add proper ARIA labels to a task element
-  static labelTaskElement(element: HTMLElement, task: any): void {
-    const status = task.isCompleted ? 'completed' : 'pending';
-    const dueDate = task.startTime ? new Date(task.startTime).toLocaleDateString() : '';
-    const dueTime = task.startTime ? new Date(task.startTime).toLocaleTimeString() : '';
-    
-    let label = `Task: ${task.title}, Status: ${status}`;
-    
-    if (dueDate) {
-      label += `, Due date: ${dueDate}`;
-    }
-    
-    if (dueTime) {
-      label += `, Due time: ${dueTime}`;
-    }
-    
-    this.setAttributes(element, {
-      'aria-label': label,
-      'role': 'listitem',
-      'aria-selected': task.isFocused || false,
-      'aria-checked': task.isCompleted || false
     });
   }
 
@@ -346,7 +310,7 @@ export class HighContrastUtils {
     // Check for Windows high contrast mode
     if (window.matchMedia) {
       return window.matchMedia('(prefers-contrast: high)').matches ||
-             window.matchMedia('(-ms-high-contrast: active)').matches;
+        window.matchMedia('(-ms-high-contrast: active)').matches;
     }
     return false;
   }
@@ -354,7 +318,7 @@ export class HighContrastUtils {
   // Apply high contrast styles
   static applyHighContrastStyles(): void {
     if (!this.isHighContrastMode()) return;
-    
+
     const style = document.createElement('style');
     style.id = 'high-contrast-styles';
     style.textContent = `
@@ -394,7 +358,7 @@ export class HighContrastUtils {
         outline-offset: 2px !important;
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -420,7 +384,7 @@ export class ReducedMotionUtils {
   // Apply reduced motion styles
   static applyReducedMotionStyles(): void {
     if (!this.isReducedMotionPreferred()) return;
-    
+
     const style = document.createElement('style');
     style.id = 'reduced-motion-styles';
     style.textContent = `
@@ -431,7 +395,7 @@ export class ReducedMotionUtils {
         scroll-behavior: auto !important;
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 
@@ -449,7 +413,7 @@ export class KeyboardNavigationUtils {
   // Handle keyboard navigation for a list
   static handleListNavigation(event: KeyboardEvent, currentIndex: number, maxIndex: number): number {
     let newIndex = currentIndex;
-    
+
     switch (event.key) {
       case 'ArrowUp':
       case 'ArrowLeft':
@@ -478,21 +442,21 @@ export class KeyboardNavigationUtils {
         newIndex = Math.min(maxIndex, currentIndex + 5);
         break;
     }
-    
+
     return newIndex;
   }
 
   // Handle keyboard navigation for a grid
   static handleGridNavigation(
-    event: KeyboardEvent, 
-    currentIndex: number, 
-    maxIndex: number, 
+    event: KeyboardEvent,
+    currentIndex: number,
+    maxIndex: number,
     columns: number
   ): number {
     let newIndex = currentIndex;
     const row = Math.floor(currentIndex / columns);
     const col = currentIndex % columns;
-    
+
     switch (event.key) {
       case 'ArrowUp':
         event.preventDefault();
@@ -500,7 +464,7 @@ export class KeyboardNavigationUtils {
         break;
       case 'ArrowDown':
         event.preventDefault();
-        newIndex = row < Math.floor(maxIndex / columns) ? 
+        newIndex = row < Math.floor(maxIndex / columns) ?
           Math.min(currentIndex + columns, maxIndex) : currentIndex;
         break;
       case 'ArrowLeft':
@@ -528,7 +492,7 @@ export class KeyboardNavigationUtils {
         newIndex = Math.min(maxIndex, currentIndex + columns * 5);
         break;
     }
-    
+
     return newIndex;
   }
 }
@@ -541,33 +505,33 @@ export const screenReaderAnnouncer = new ScreenReaderAnnouncer();
 export const initializeAccessibility = (): void => {
   // Apply high contrast styles if needed
   HighContrastUtils.applyHighContrastStyles();
-  
+
   // Apply reduced motion styles if needed
   ReducedMotionUtils.applyReducedMotionStyles();
-  
+
   // Listen for changes in preference
   if (window.matchMedia) {
     const highContrastQuery = window.matchMedia('(prefers-contrast: high)');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    
+
     highContrastQuery.addListener(() => {
       HighContrastUtils.removeHighContrastStyles();
       HighContrastUtils.applyHighContrastStyles();
     });
-    
+
     reducedMotionQuery.addListener(() => {
       ReducedMotionUtils.removeReducedMotionStyles();
       ReducedMotionUtils.applyReducedMotionStyles();
     });
   }
-  
+
   // Announce that the app is ready
   screenReaderAnnouncer.polite('EdgeTask application ready');
 };
 
 // Add accessibility attributes to an element
 export const addAccessibilityAttributes = (
-  element: HTMLElement, 
+  element: HTMLElement,
   attributes: ARIAAttributes
 ): void => {
   ARIAUtils.setAttributes(element, attributes);
@@ -592,7 +556,7 @@ export const addSkipLink = (targetId: string, label: string = 'Skip to main cont
   skipLink.textContent = label;
   skipLink.className = 'skip-link';
   skipLink.setAttribute('aria-label', label);
-  
+
   // Add styles
   const style = document.createElement('style');
   style.textContent = `
@@ -613,7 +577,7 @@ export const addSkipLink = (targetId: string, label: string = 'Skip to main cont
       top: 6px;
     }
   `;
-  
+
   document.head.appendChild(style);
   document.body.insertBefore(skipLink, document.body.firstChild);
 };

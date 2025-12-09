@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Calendar, Clock, Tag, Flag } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { db } from '../lib/db';
-import { getTodayTasks, sortTasksByPriority } from '../lib/smartQueue';
+// Smart queue functions available for future use
+// import { getTodayTasks, sortTasksByPriority } from '../lib/smartQueue';
 
 interface TaskInputProps {
   onTaskAdded: () => void;

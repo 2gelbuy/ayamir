@@ -1,0 +1,19 @@
+﻿src/lib/accessibility.ts(140,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(141,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(142,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(143,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(144,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(145,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(146,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(147,5): error TS2531: Object is possibly 'null'.
+src/lib/accessibility.ts(203,9): error TS2322: Type 'string' is not assignable to type 'undefined'.
+src/lib/accessibility.ts(209,7): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+  Type 'null' is not assignable to type 'string | undefined'.
+src/lib/accessibility.ts(243,7): error TS2353: Object literal may only specify known properties, and ''aria-pressed'' does not exist in type 'ARIAAttributes'.
+src/lib/accessibility.ts(263,7): error TS2353: Object literal may only specify known properties, and ''aria-modal'' does not exist in type 'ARIAAttributes'.
+src/lib/accessibility.ts(291,7): error TS2353: Object literal may only specify known properties, and ''aria-valuenow'' does not exist in type 'ARIAAttributes'.
+src/lib/accessibility.ts(310,7): error TS2322: Type 'string' is not assignable to type 'boolean | undefined'.
+src/lib/accessibility.ts(329,7): error TS2353: Object literal may only specify known properties, and ''draggable'' does not exist in type 'ARIAAttributes'.
+src/lib/deepWorkMode.ts(250,56): error TS2554: Expected 1 arguments, but got 0.
+src/lib/smartQueue.ts(111,21): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.

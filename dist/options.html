@@ -1,239 +1,121 @@
-<!DOCTYPE html><!DOCTYPE html>
-
-<html lang="en"><html lang="en">
-
-<head><head>
-
-  <meta charset="UTF-8" />  <meta charset="UTF-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>EdgeTask - Settings</title>  <title>EdgeTask Options</title>
-
-  <style>  <style>
-
-    body {    body {
-
-      margin: 0;      margin: 0;
-
-      padding: 40px;      padding: 20px;
-
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-      background: #f5f5f5;      background-color: #f5f5f5;
-
-    }      color: #333;
-
-        }
-
-    .container {    
-
-      max-width: 800px;    .container {
-
-      margin: 0 auto;      max-width: 800px;
-
-      background: white;      margin: 0 auto;
-
-      padding: 30px;      background-color: white;
-
-      border-radius: 12px;      padding: 20px;
-
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);      border-radius: 8px;
-
-    }      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-        }
-
-    h1 {    
-
-      color: #667eea;    h1 {
-
-      margin-bottom: 10px;      color: #4f46e5;
-
-    }      margin-top: 0;
-
-        }
-
-    p {    
-
-      color: #666;    .section {
-
-      margin-bottom: 30px;      margin-bottom: 30px;
-
-    }    }
-
-        
-
-    .setting-group {    .section h2 {
-
-      margin-bottom: 25px;      border-bottom: 1px solid #e5e7eb;
-
-      padding-bottom: 25px;      padding-bottom: 10px;
-
-      border-bottom: 1px solid #eee;      color: #374151;
-
-    }    }
-
-        
-
-    .setting-group:last-child {    .form-group {
-
-      border-bottom: none;      margin-bottom: 15px;
-
-    }    }
-
-        
-
-    label {    label {
-
-      display: block;      display: block;
-
-      font-weight: 600;      margin-bottom: 5px;
-
-      color: #333;      font-weight: 500;
-
-      margin-bottom: 8px;    }
-
-    }    
-
-        input, select, textarea {
-
-    select, input[type="text"] {      width: 100%;
-
-      width: 100%;      padding: 8px 12px;
-
-      padding: 10px;      border: 1px solid #d1d5db;
-
-      border: 1px solid #ddd;      border-radius: 4px;
-
-      border-radius: 6px;      font-size: 14px;
-
-      font-size: 14px;    }
-
-    }    
-
-        button {
-
-    .description {      background-color: #4f46e5;
-
-      font-size: 13px;      color: white;
-
-      color: #999;      border: none;
-
-      margin-top: 5px;      padding: 10px 15px;
-
-    }      border-radius: 4px;
-
-          cursor: pointer;
-
-    button {      font-size: 14px;
-
-      background: #667eea;    }
-
-      color: white;    
-
-      padding: 12px 24px;    button:hover {
-
-      border: none;      background-color: #4338ca;
-
-      border-radius: 6px;    }
-
-      font-size: 14px;    
-
-      font-weight: 600;    .notification {
-
-      cursor: pointer;      padding: 10px;
-
-      margin-top: 20px;      margin-top: 10px;
-
-    }      border-radius: 4px;
-
-          display: none;
-
-    button:hover {    }
-
-      background: #5568d3;    
-
-    }    .success {
-
-          background-color: #d1fae5;
-
-    .status {      color: #065f46;
-
-      margin-top: 15px;      border: 1px solid #a7f3d0;
-
-      padding: 10px;    }
-
-      border-radius: 6px;    
-
-      text-align: center;    .error {
-
-      display: none;      background-color: #fee2e2;
-
-    }      color: #991b1b;
-
-          border: 1px solid #fecaca;
-
-    .status.success {    }
-
-      background: #d4edda;  </style>
-
-      color: #155724;</head>
-
-      display: block;<body>
-
-    }  <div class="container">
-
-  </style>    <h1>EdgeTask Options</h1>
-
-</head>    
-
-<body>    <div class="section">
-
-  <div class="container">      <h2>General Settings</h2>
-
-    <h1>⚙️ EdgeTask Settings</h1>      <div class="form-group">
-
-    <p>Customize your productivity experience</p>        <label for="notifications">Enable Notifications</label>
-
-            <select id="notifications">
-
-    <div class="setting-group">          <option value="true">Yes</option>
-
-      <label for="humorTone">Notification Humor Tone</label>          <option value="false">No</option>
-
-      <select id="humorTone">        </select>
-
-        <option value="default">Default - Balanced</option>      </div>
-
-        <option value="polite">Polite - Friendly & Encouraging</option>      
-
-        <option value="sarcastic">Sarcastic - Witty & Sharp</option>      <div class="form-group">
-
-      </select>        <label for="humorTone">Humor Tone</label>
-
-      <div class="description">Choose the tone of your task reminder notifications</div>        <select id="humorTone">
-
-    </div>          <option value="default">Default</option>
-
-              <option value="polite">Polite</option>
-
-    <button id="saveSettings">Save Settings</button>          <option value="sarcastic">Sarcastic</option>
-
-            </select>
-
-    <div class="status" id="status"></div>      </div>
-
-  </div>    </div>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdgeTask Options</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      color: #4f46e5;
+      margin-top: 0;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+    }
+    
+    .section h2 {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 10px;
+      color: #374151;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    button {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background-color: #4338ca;
+    }
+    
+    .notification {
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+    
+    .success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EdgeTask Options</h1>
+    
+    <div class="section">
+      <h2>General Settings</h2>
+      <div class="form-group">
+        <label for="notifications">Enable Notifications</label>
+        <select id="notifications">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
       
-
-  <script src="options-script.js"></script>    <div class="section">
-
-</body>      <h2>Deep Work Mode</h2>
-
-</html>      <div class="form-group">
-
+      <div class="form-group">
+        <label for="humorTone">Humor Tone</label>
+        <select id="humorTone">
+          <option value="default">Default</option>
+          <option value="polite">Polite</option>
+          <option value="sarcastic">Sarcastic</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Deep Work Mode</h2>
+      <div class="form-group">
         <label for="deepWorkDuration">Work Duration (minutes)</label>
         <input type="number" id="deepWorkDuration" min="1" max="120" value="25">
       </div>

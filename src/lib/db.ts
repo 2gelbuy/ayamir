@@ -31,10 +31,32 @@ export interface Settings {
   blacklist: string[];
   whitelist: string[];
   isPaused?: boolean;
-  pauseEndTime?: Date;
+  pauseEndTime?: Date | null;
+  gamificationEnabled?: boolean;
+  streakCount?: number;
+  totalPoints?: number;
+  level?: number;
+  achievements?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    points: number;
+    unlocked: boolean;
+    unlockedAt?: Date;
+  }>;
+  lastActivityDate?: Date;
+  deepWorkModeEnabled?: boolean;
+  deepWorkModeDuration?: number;
+  deepWorkModeBreakDuration?: number;
+  deepWorkModeBlockNotifications?: boolean;
+  deepWorkModeBlockSites?: boolean;
+  deepWorkModeShowTimer?: boolean;
+  deepWorkModeAutoStart?: boolean;
+  syncEnabled?: boolean;
 }
 
-class EdgeTaskDB extends Dexie {
+export class EdgeTaskDB extends Dexie {
   tasks!: Table<Task, number>;
   settings!: Table<Settings, number>;
 
@@ -83,7 +105,22 @@ export const getSettings = async (): Promise<Settings> => {
       soundEnabled: true,
       volume: 50,
       blacklist: ['youtube.com', 'reddit.com', 'twitter.com', 'facebook.com', 'instagram.com'],
-      whitelist: []
+      whitelist: [],
+      isPaused: false,
+      pauseEndTime: null,
+      gamificationEnabled: true,
+      streakCount: 0,
+      totalPoints: 0,
+      level: 1,
+      achievements: [],
+      lastActivityDate: undefined,
+      deepWorkModeEnabled: false,
+      deepWorkModeDuration: 25,
+      deepWorkModeBreakDuration: 5,
+      deepWorkModeBlockNotifications: true,
+      deepWorkModeBlockSites: true,
+      deepWorkModeShowTimer: true,
+      deepWorkModeAutoStart: false
     };
     await db.settings.add(defaultSettings);
     return defaultSettings;

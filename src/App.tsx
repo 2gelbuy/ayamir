@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Target, Settings as SettingsIcon, BarChart3, Trophy, Calendar, Brain } from 'lucide-react';
+import { Target, Settings as SettingsIcon } from 'lucide-react';
 import { db } from './lib/db';
 import { useStore } from './store/useStore';
 import TaskList from './components/TaskList';
@@ -8,41 +8,43 @@ import FocusIndicator from './components/FocusIndicator';
 import Settings from './components/Settings';
 import SmartPause from './components/SmartPause';
 import Analytics from './components/Analytics';
-import Gamification from './components/Gamification';
-import CalendarComponent from './components/Calendar';
-import DeepWorkMode from './components/DeepWorkMode';
-import KeyboardNavigation from './components/KeyboardNavigation';
-import { initializeGamification } from './lib/gamification';
-import { initializeDeepWorkMode } from './lib/deepWorkMode';
-import { initializeVisualFeedback, showSuccessFeedback, showErrorFeedback } from './lib/visualFeedback';
-import { initializePerformanceOptimizations, performanceMonitor, scheduleRender } from './lib/performance';
-import {
-  getTodayTasks,
-  getOverdueTasks,
-  getUpcomingTasks,
-  sortTasksByPriority
-} from './lib/smartQueue';
+// Components imported but conditionally used
+// import Gamification from './components/Gamification';
+// import CalendarComponent from './components/Calendar';
+// import DeepWorkMode from './components/DeepWorkMode';
+// import KeyboardNavigation from './components/KeyboardNavigation';
+// Lib functions - some used, some for future features
+// import { initializeGamification } from './lib/gamification';
+// import { initializeDeepWorkMode } from './lib/deepWorkMode';
+import { showSuccessFeedback } from './lib/visualFeedback';
+// Smart queue functions - for future use
+// import {
+//   getTodayTasks,
+//   getOverdueTasks,
+//   getUpcomingTasks,
+//   sortTasksByPriority
+// } from './lib/smartQueue';
 import { KeyboardAction } from './lib/keyboardNavigation';
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showGamification, setShowGamification] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showDeepWorkMode, setShowDeepWorkMode] = useState(false);
+  const [_showGamification, setShowGamification] = useState(false);
+  const [_showCalendar, setShowCalendar] = useState(false);
+  const [_showDeepWorkMode, setShowDeepWorkMode] = useState(false);
   const [filter, setFilter] = useState<'today' | 'week' | 'overdue'>('today');
   const [isPaused, setIsPaused] = useState(false);
   const { tasks, setTasks, focusedTask } = useStore();
 
   // Handle keyboard actions
-  const handleKeyboardAction = (action: KeyboardAction) => {
+  const _handleKeyboardAction = (action: KeyboardAction) => {
     switch (action) {
       case 'new_task':
         // Focus the task input
         const taskInput = document.querySelector('#task-input input') as HTMLElement;
         if (taskInput) taskInput.focus();
         break;
-        
+
       case 'toggle_focus':
         // Toggle focus mode
         if (focusedTask) {
@@ -51,39 +53,53 @@ function App() {
           chrome.storage.local.set({ focusedTask: tasks[0] });
         }
         break;
-        
-      case 'toggle_pause':
-        // Toggle pause
-        setIsPaused(!isPaused);
-        chrome.storage.local.set({ settings: { isPaused: !isPaused } });
+
+      case 'toggle_pause': {
+        // Toggle pause with diagnostics to catch settings clobbering
+        const nextIsPaused = !isPaused;
+        setIsPaused(nextIsPaused);
+        chrome.storage.local.get('settings', (existing: { settings?: any }) => {
+          console.log('EdgeTask Debug [App]: settings before toggle_pause', existing?.settings);
+          const mergedSettings = {
+            ...(existing?.settings || {}),
+            isPaused: nextIsPaused
+          };
+          console.log('EdgeTask Debug [App]: writing settings for toggle_pause', mergedSettings);
+          chrome.storage.local.set({ settings: mergedSettings }, () => {
+            chrome.storage.local.get('settings', (after: { settings?: any }) => {
+              console.log('EdgeTask Debug [App]: settings after toggle_pause', after?.settings);
+            });
+          });
+        });
         break;
-        
+      }
+
       case 'open_settings':
         setShowSettings(true);
         break;
-        
+
       case 'open_analytics':
         setShowAnalytics(true);
         break;
-        
+
       case 'open_gamification':
         setShowGamification(true);
         break;
-        
+
       case 'open_calendar':
         setShowCalendar(true);
         break;
-        
+
       case 'open_deep_work':
         setShowDeepWorkMode(true);
         break;
-        
+
       case 'search':
         // Focus the search input
         const searchInput = document.querySelector('#search-input') as HTMLElement;
         if (searchInput) searchInput.focus();
         break;
-        
+
       case 'escape':
         // Close any open modals/panels
         setShowSettings(false);
@@ -92,7 +108,7 @@ function App() {
         setShowCalendar(false);
         setShowDeepWorkMode(false);
         break;
-        
+
       case 'complete_task':
         // Complete the focused task
         const focusedTaskElement = document.querySelector('.task-item-focused') as HTMLElement;
@@ -105,7 +121,7 @@ function App() {
           }
         }
         break;
-        
+
       case 'delete_task':
         // Delete the focused task
         const focusedTaskElement2 = document.querySelector('.task-item-focused') as HTMLElement;
@@ -118,7 +134,7 @@ function App() {
           }
         }
         break;
-        
+
       case 'edit_task':
         // Edit the focused task
         const focusedTaskElement3 = document.querySelector('.task-item-focused') as HTMLElement;
@@ -146,7 +162,7 @@ function App() {
       .where('isCompleted')
       .equals(0)
       .toArray();
-    
+
     // Sort by order field (if available) or by createdAt for backward compatibility
     const sortedTasks = allTasks.sort((a, b) => {
       if (a.order !== undefined && b.order !== undefined) {
@@ -154,7 +170,7 @@ function App() {
       }
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-    
+
     setTasks(sortedTasks);
   };
 
@@ -250,31 +266,28 @@ function App() {
       <div className="flex-shrink-0 flex gap-2 px-4 py-3 border-b dark:border-gray-700">
         <button
           onClick={() => setFilter('today')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-            filter === 'today'
-              ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-          }`}
+          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${filter === 'today'
+            ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
         >
           Today
         </button>
         <button
           onClick={() => setFilter('week')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-            filter === 'week'
-              ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-          }`}
+          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${filter === 'week'
+            ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
         >
           Week
         </button>
         <button
           onClick={() => setFilter('overdue')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-            filter === 'overdue'
-              ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
-              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-          }`}
+          className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${filter === 'overdue'
+            ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+            }`}
         >
           Overdue
         </button>

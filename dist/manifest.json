@@ -18,7 +18,10 @@
     "tabs"
   ],
   "host_permissions": [
-    "<all_urls>",
+    "https://www.googleapis.com/*",
+    "https://accounts.google.com/*"
+  ],
+  "optional_host_permissions": [
     "https://www.googleapis.com/*",
     "https://accounts.google.com/*"
   ],
@@ -28,9 +31,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js", "edgePanel.js"],
-      "css": ["content.css"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js",
+        "edgePanel.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -73,5 +83,17 @@
     }
   },
   "options_page": "options.html",
-  "offline_enabled": true
+  "offline_enabled": true,
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "index.html",
+        "assets/*",
+        "icon-16.png",
+        "icon-48.png",
+        "icon-128.png"
+      ],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ]
 }

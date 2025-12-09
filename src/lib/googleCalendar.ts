@@ -1,13 +1,12 @@
 import { Task } from './db';
 
-// Type declarations for Chrome APIs
-declare const chrome: any;
+// chrome is available globally via @types/chrome
 
-// Google Calendar API configuration
-const CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // This would be replaced with actual client ID
-const API_KEY = 'YOUR_API_KEY_HERE'; // This would be replaced with actual API key
+// Google Calendar API configuration (would be replaced with actual values)
+const _CLIENT_ID = 'YOUR_CLIENT_ID_HERE';
+const _API_KEY = 'YOUR_API_KEY_HERE';
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+const _DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 
 // Token management
 export const getAuthToken = async (): Promise<string | null> => {
@@ -15,8 +14,8 @@ export const getAuthToken = async (): Promise<string | null> => {
     chrome.identity.getAuthToken({
       interactive: true,
       scopes: SCOPES
-    }, (token: string | null) => {
-      resolve(token);
+    }, (token?: string) => {
+      resolve(token ?? null);
     });
   });
 };
@@ -25,7 +24,7 @@ export const revokeToken = async (): Promise<void> => {
   return new Promise((resolve) => {
     chrome.identity.getAuthToken({
       interactive: false
-    }, (token: string | null) => {
+    }, (token?: string) => {
       if (token) {
         chrome.identity.removeCachedAuthToken({ token }, () => {
           resolve();
@@ -53,7 +52,7 @@ export const createCalendarEvent = async (
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
     },
     end: {
-      dateTime: task.startTime && task.estimatedDuration 
+      dateTime: task.startTime && task.estimatedDuration
         ? new Date(new Date(task.startTime).getTime() + task.estimatedDuration * 60000).toISOString()
         : new Date(new Date().getTime() + 60 * 60000).toISOString(), // Default 1 hour
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -109,7 +108,7 @@ export const updateCalendarEvent = async (
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
     },
     end: {
-      dateTime: task.startTime && task.estimatedDuration 
+      dateTime: task.startTime && task.estimatedDuration
         ? new Date(new Date(task.startTime).getTime() + task.estimatedDuration * 60000).toISOString()
         : new Date(new Date().getTime() + 60 * 60000).toISOString(), // Default 1 hour
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -235,15 +234,15 @@ export const syncTasksWithCalendar = async (
   calendarId: string = 'primary'
 ): Promise<{ synced: number, errors: string[] }> => {
   const results = { synced: 0, errors: [] as string[] };
-  
+
   try {
     // Get existing calendar events
     const now = new Date();
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30); // Get events for next 30 days
-    
+
     const events = await getCalendarEvents(calendarId, now, futureDate);
-    
+
     // Create a map of events by ID for quick lookup
     const eventMap = new Map();
     events.forEach(event => {
@@ -251,7 +250,7 @@ export const syncTasksWithCalendar = async (
         eventMap.set(event.id, event);
       }
     });
-    
+
     // Sync each task
     for (const task of tasks) {
       try {
@@ -261,8 +260,8 @@ export const syncTasksWithCalendar = async (
           results.synced++;
         } else {
           // Create new event
-          const event = await createCalendarEvent(task, calendarId);
-          
+          const _event = await createCalendarEvent(task, calendarId);
+
           // Store the event ID with the task
           if (task.id) {
             // This would update the task in the database
@@ -277,7 +276,7 @@ export const syncTasksWithCalendar = async (
   } catch (error) {
     results.errors.push(`Error during sync: ${error}`);
   }
-  
+
   return results;
 };
 

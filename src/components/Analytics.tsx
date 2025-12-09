@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, TrendingUp, Clock, Target, Calendar, Award } from 'lucide-react';
-import { db, Task } from '../lib/db';
-import { format, startOfDay, endOfDay, subDays, isWithinInterval } from 'date-fns';
+import { db } from '../lib/db';
+import { startOfDay, endOfDay, subDays, isWithinInterval } from 'date-fns';
 
 interface AnalyticsData {
   tasksCompleted: number;
@@ -32,57 +32,57 @@ export default function Analytics() {
     const fetchAnalytics = async () => {
       try {
         setLoading(true);
-        
+
         // Get all tasks
         const allTasks = await db.tasks.toArray();
         const completedTasks = allTasks.filter(task => task.isCompleted && task.completedAt);
-        
+
         // Calculate basic metrics
         const now = new Date();
         const todayStart = startOfDay(now);
         const todayEnd = endOfDay(now);
         const weekStart = subDays(todayStart, 7);
         const monthStart = subDays(todayStart, 30);
-        
-        const tasksCompletedToday = completedTasks.filter(task => 
+
+        const tasksCompletedToday = completedTasks.filter(task =>
           task.completedAt && isWithinInterval(new Date(task.completedAt), { start: todayStart, end: todayEnd })
         ).length;
-        
-        const tasksCompletedThisWeek = completedTasks.filter(task => 
+
+        const tasksCompletedThisWeek = completedTasks.filter(task =>
           task.completedAt && isWithinInterval(new Date(task.completedAt), { start: weekStart, end: todayEnd })
         ).length;
-        
-        const tasksCompletedThisMonth = completedTasks.filter(task => 
+
+        const _tasksCompletedThisMonth = completedTasks.filter(task =>
           task.completedAt && isWithinInterval(new Date(task.completedAt), { start: monthStart, end: todayEnd })
         ).length;
-        
+
         // Calculate average completion time
-        const tasksWithTime = completedTasks.filter(task => 
+        const tasksWithTime = completedTasks.filter(task =>
           task.createdAt && task.completedAt
         );
-        
+
         const totalCompletionTime = tasksWithTime.reduce((total, task) => {
           const created = new Date(task.createdAt);
           const completed = new Date(task.completedAt!);
           return total + (completed.getTime() - created.getTime());
         }, 0);
-        
-        const averageCompletionTime = tasksWithTime.length > 0 
+
+        const averageCompletionTime = tasksWithTime.length > 0
           ? Math.round(totalCompletionTime / tasksWithTime.length / 60000) // convert to minutes
           : 0;
-        
+
         // Calculate focus streak (consecutive days with completed tasks)
         let focusStreak = 0;
         let currentDate = subDays(todayStart, 1);
-        
+
         while (currentDate >= subDays(todayStart, 30)) { // Check up to 30 days back
           const dayStart = startOfDay(currentDate);
           const dayEnd = endOfDay(currentDate);
-          
-          const tasksCompletedOnDay = completedTasks.filter(task => 
+
+          const tasksCompletedOnDay = completedTasks.filter(task =>
             task.completedAt && isWithinInterval(new Date(task.completedAt), { start: dayStart, end: dayEnd })
           ).length;
-          
+
           if (tasksCompletedOnDay > 0) {
             focusStreak++;
             currentDate = subDays(currentDate, 1);
@@ -90,39 +90,39 @@ export default function Analytics() {
             break;
           }
         }
-        
+
         // Find most productive hour
         const hourCounts: { [hour: number]: number } = {};
-        
+
         completedTasks.forEach(task => {
           if (task.completedAt) {
             const hour = new Date(task.completedAt).getHours();
             hourCounts[hour] = (hourCounts[hour] || 0) + 1;
           }
         });
-        
+
         let mostProductiveHour = 0;
         let maxCount = 0;
-        
+
         Object.entries(hourCounts).forEach(([hour, count]) => {
           if (count > maxCount) {
             maxCount = count;
             mostProductiveHour = parseInt(hour);
           }
         });
-        
+
         // Calculate total focus time (sum of all task durations)
         const totalFocusTime = tasksWithTime.reduce((total, task) => {
           const created = new Date(task.createdAt);
           const completed = new Date(task.completedAt!);
           return total + (completed.getTime() - created.getTime());
         }, 0) / 60000; // convert to minutes
-        
+
         // Calculate completion rate
-        const completionRate = allTasks.length > 0 
+        const completionRate = allTasks.length > 0
           ? Math.round((completedTasks.length / allTasks.length) * 100)
           : 0;
-        
+
         setData({
           tasksCompleted: completedTasks.length,
           tasksCompletedToday,
@@ -133,14 +133,14 @@ export default function Analytics() {
           totalFocusTime: Math.round(totalFocusTime),
           completionRate
         });
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching analytics:', error);
         setLoading(false);
       }
     };
-    
+
     fetchAnalytics();
   }, [timeRange]);
 
@@ -178,31 +178,28 @@ export default function Analytics() {
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
           <button
             onClick={() => setTimeRange('day')}
-            className={`px-3 py-1 text-sm rounded ${
-              timeRange === 'day' 
-                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+            className={`px-3 py-1 text-sm rounded ${timeRange === 'day'
+                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400'
-            }`}
+              }`}
           >
             Day
           </button>
           <button
             onClick={() => setTimeRange('week')}
-            className={`px-3 py-1 text-sm rounded ${
-              timeRange === 'week' 
-                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+            className={`px-3 py-1 text-sm rounded ${timeRange === 'week'
+                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400'
-            }`}
+              }`}
           >
             Week
           </button>
           <button
             onClick={() => setTimeRange('month')}
-            className={`px-3 py-1 text-sm rounded ${
-              timeRange === 'month' 
-                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+            className={`px-3 py-1 text-sm rounded ${timeRange === 'month'
+                ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                 : 'text-gray-600 dark:text-gray-400'
-            }`}
+              }`}
           >
             Month
           </button>
@@ -216,14 +213,14 @@ export default function Analytics() {
             <span className="text-xs text-gray-500 dark:text-gray-400">Completed</span>
           </div>
           <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {timeRange === 'day' ? data.tasksCompletedToday : 
-             timeRange === 'week' ? data.tasksCompletedThisWeek : 
-             data.tasksCompleted}
+            {timeRange === 'day' ? data.tasksCompletedToday :
+              timeRange === 'week' ? data.tasksCompletedThisWeek :
+                data.tasksCompleted}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            {timeRange === 'day' ? 'today' : 
-             timeRange === 'week' ? 'this week' : 
-             'all time'}
+            {timeRange === 'day' ? 'today' :
+              timeRange === 'week' ? 'this week' :
+                'all time'}
           </div>
         </div>
 
@@ -301,10 +298,10 @@ export default function Analytics() {
               {data.mostProductiveHour > 0 && data.mostProductiveHour < 12
                 ? `You're most productive in the morning. Try scheduling important tasks before ${formatHour(data.mostProductiveHour + 2)}.`
                 : data.mostProductiveHour >= 12 && data.mostProductiveHour < 17
-                ? `You peak in the afternoon. Block out ${formatHour(data.mostProductiveHour)} for deep work.`
-                : data.mostProductiveHour >= 17
-                ? `You're a night owl! Consider creating a wind-down routine after ${formatHour(data.mostProductiveHour)}.`
-                : "Complete more tasks to see personalized productivity insights."}
+                  ? `You peak in the afternoon. Block out ${formatHour(data.mostProductiveHour)} for deep work.`
+                  : data.mostProductiveHour >= 17
+                    ? `You're a night owl! Consider creating a wind-down routine after ${formatHour(data.mostProductiveHour)}.`
+                    : "Complete more tasks to see personalized productivity insights."}
             </p>
           </div>
         </div>

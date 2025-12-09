@@ -1,0 +1,12 @@
+﻿src/components/Calendar.tsx(2,10): error TS2440: Import declaration conflicts with local declaration of 'Calendar'.
+src/components/Calendar.tsx(39,23): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<boolean>'.
+src/components/Calendar.tsx(235,23): error TS2322: Type '{ className: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'className' does not exist on type 'IntrinsicAttributes'.
+src/components/Calendar.tsx(331,23): error TS2322: Type '{ className: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'className' does not exist on type 'IntrinsicAttributes'.
+src/components/TaskList.tsx(58,33): error TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number | Task'.
+  Type 'undefined' is not assignable to type 'number | Task'.
+src/lib/accessibility.ts(210,9): error TS2322: Type 'string' is not assignable to type 'undefined'.
+src/lib/deepWorkMode.ts(250,56): error TS2554: Expected 1 arguments, but got 0.
+src/lib/smartQueue.ts(111,21): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.

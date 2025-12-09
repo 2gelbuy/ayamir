@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Calendar, RefreshCw, Check, AlertCircle, Settings, ExternalLink, Plus, Trash2 } from 'lucide-react';
-import { 
-  checkCalendarAvailability, 
-  createCalendarEvent, 
-  updateCalendarEvent, 
+import { CalendarIcon, RefreshCw, Check, AlertCircle, Settings, ExternalLink, Plus, Trash2 } from 'lucide-react';
+import {
+  checkCalendarAvailability,
+  createCalendarEvent,
+  updateCalendarEvent,
   deleteCalendarEvent,
   getCalendarList,
   syncTasksWithCalendar,
@@ -30,19 +30,19 @@ export default function Calendar() {
     loadTasks();
     loadCalendars();
     loadCalendarEvents();
-    
+
     // Load auto-sync setting
     const loadAutoSyncSetting = async () => {
       try {
         const settings = await db.settings.toCollection().first();
         if (settings && 'calendarAutoSync' in settings) {
-          setAutoSync(settings.calendarAutoSync);
+          setAutoSync((settings as { calendarAutoSync?: boolean }).calendarAutoSync ?? false);
         }
       } catch (error) {
         console.error('Error loading auto-sync setting:', error);
       }
     };
-    
+
     loadAutoSyncSetting();
   }, []);
 
@@ -51,7 +51,7 @@ export default function Calendar() {
       const interval = setInterval(() => {
         handleSync();
       }, 30 * 60 * 1000); // Sync every 30 minutes
-      
+
       return () => clearInterval(interval);
     }
   }, [autoSync, isAuthenticated]);
@@ -133,7 +133,7 @@ export default function Calendar() {
   const handleSync = async () => {
     setIsSyncing(true);
     setSyncResults(null);
-    
+
     try {
       const results = await syncTasksWithCalendar(tasks, selectedCalendar);
       setSyncResults(results);
@@ -150,12 +150,12 @@ export default function Calendar() {
   const handleCreateEvent = async (task: Task) => {
     try {
       const event = await createCalendarEvent(task, selectedCalendar);
-      
+
       // Update task with calendar event ID
       if (task.id) {
         await db.tasks.update(task.id, { calendarEventId: event.id });
       }
-      
+
       await loadCalendarEvents();
       await loadTasks();
     } catch (error) {
@@ -165,7 +165,7 @@ export default function Calendar() {
 
   const handleUpdateEvent = async (task: Task) => {
     if (!task.calendarEventId) return;
-    
+
     try {
       await updateCalendarEvent(task.calendarEventId, task, selectedCalendar);
       await loadCalendarEvents();
@@ -176,15 +176,15 @@ export default function Calendar() {
 
   const handleDeleteEvent = async (task: Task) => {
     if (!task.calendarEventId) return;
-    
+
     try {
       await deleteCalendarEvent(task.calendarEventId, selectedCalendar);
-      
+
       // Remove calendar event ID from task
       if (task.id) {
         await db.tasks.update(task.id, { calendarEventId: undefined });
       }
-      
+
       await loadCalendarEvents();
       await loadTasks();
     } catch (error) {
@@ -194,7 +194,7 @@ export default function Calendar() {
 
   const handleAutoSyncChange = async (value: boolean) => {
     setAutoSync(value);
-    
+
     try {
       const settings = await db.settings.toCollection().first();
       if (settings) {
@@ -209,7 +209,7 @@ export default function Calendar() {
     if (selectedCalendar === 'primary') {
       return 'Primary Calendar';
     }
-    
+
     const calendar = calendars.find(cal => cal.id === selectedCalendar);
     return calendar ? calendar.summary : 'Unknown Calendar';
   };
@@ -218,12 +218,12 @@ export default function Calendar() {
     if (event.colorId) {
       return event.colorId;
     }
-    
+
     // Default colors based on event status
     if (event.status === 'cancelled') {
       return 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400';
     }
-    
+
     return 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200';
   };
 
@@ -232,7 +232,7 @@ export default function Calendar() {
       <div className="flex-shrink-0 bg-indigo-600 dark:bg-indigo-800 text-white p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5" />
+            <CalendarIcon className="w-5 h-5" />
             <h1 className="text-xl font-bold">Google Calendar</h1>
           </div>
           <button
@@ -253,18 +253,16 @@ export default function Calendar() {
               </span>
               <button
                 onClick={() => handleAutoSyncChange(!autoSync)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  autoSync ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${autoSync ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-700'
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    autoSync ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${autoSync ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 Calendar
@@ -283,7 +281,7 @@ export default function Calendar() {
                 ))}
               </select>
             </div>
-            
+
             <div className="flex gap-2">
               {isAuthenticated ? (
                 <button
@@ -302,7 +300,7 @@ export default function Calendar() {
                   {isLoading ? 'Connecting...' : 'Connect'}
                 </button>
               )}
-              
+
               <button
                 onClick={handleSync}
                 disabled={!isAuthenticated || isSyncing}
@@ -328,7 +326,7 @@ export default function Calendar() {
       <div className="flex-1 overflow-y-auto p-4">
         {!isAuthenticated ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
-            <Calendar className="w-16 h-16 mb-4" />
+            <CalendarIcon className="w-16 h-16 mb-4" />
             <h2 className="text-xl font-semibold mb-2">Connect to Google Calendar</h2>
             <p className="text-center mb-4 max-w-md">
               Connect your Google Calendar to sync tasks and events. You'll be able to create, update, and delete calendar events from EdgeTask.
@@ -354,11 +352,10 @@ export default function Calendar() {
         ) : (
           <div className="space-y-4">
             {syncResults && (
-              <div className={`p-3 rounded-lg ${
-                syncResults.errors.length > 0
+              <div className={`p-3 rounded-lg ${syncResults.errors.length > 0
                   ? 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
                   : 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-              }`}>
+                }`}>
                 <div className="flex items-center gap-2 mb-1">
                   {syncResults.errors.length > 0 ? (
                     <AlertCircle className="w-4 h-4" />
@@ -382,14 +379,14 @@ export default function Calendar() {
                 )}
               </div>
             )}
-            
+
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">
                   {getCalendarName()}
                 </h3>
               </div>
-              
+
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {calendarEvents.length === 0 ? (
                   <div className="p-4 text-center text-gray-500 dark:text-gray-400">
@@ -422,14 +419,14 @@ export default function Calendar() {
                 )}
               </div>
             </div>
-            
+
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">
                   Tasks
                 </h3>
               </div>
-              
+
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 {tasks.length === 0 ? (
                   <div className="p-4 text-center text-gray-500 dark:text-gray-400">
@@ -447,12 +444,11 @@ export default function Calendar() {
                             </p>
                           )}
                           {task.priority && (
-                            <span className={`inline-block px-2 py-0.5 text-xs rounded mt-1 ${
-                              task.priority === 'urgent' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
-                              task.priority === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400' :
-                              task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
-                              'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            }`}>
+                            <span className={`inline-block px-2 py-0.5 text-xs rounded mt-1 ${task.priority === 'urgent' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
+                                task.priority === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400' :
+                                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
+                                    'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                              }`}>
                               {task.priority}
                             </span>
                           )}

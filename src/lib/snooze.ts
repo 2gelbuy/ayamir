@@ -1,8 +1,7 @@
-import { Task } from './db';
+import type { Task as _Task } from './db';
 import { createTaskReminderNotification } from './notifications';
 
-// Type declarations for Chrome APIs
-declare const chrome: any;
+// chrome is available globally via @types/chrome
 
 // Snooze options
 export interface SnoozeOption {
@@ -26,14 +25,14 @@ export const snoozeTask = async (taskId: number, minutes: number, customTime?: D
   try {
     const { db } = await import('./db');
     const task = await db.tasks.get(taskId);
-    
+
     if (!task) {
       throw new Error(`Task with ID ${taskId} not found`);
     }
-    
+
     // Calculate new start time
     let newStartTime: Date;
-    
+
     if (minutes === 0 && customTime) {
       // Use custom time
       newStartTime = customTime;
@@ -42,7 +41,7 @@ export const snoozeTask = async (taskId: number, minutes: number, customTime?: D
       newStartTime = new Date();
       newStartTime.setMinutes(newStartTime.getMinutes() + minutes);
     }
-    
+
     // Update task
     await db.tasks.update(taskId, {
       startTime: newStartTime,
@@ -51,13 +50,13 @@ export const snoozeTask = async (taskId: number, minutes: number, customTime?: D
       notifiedAt5: false,
       notifiedAt0: false
     });
-    
+
     // Create snoozed task notification
     await createTaskReminderNotification({
       ...task,
       startTime: newStartTime
     });
-    
+
     // Log snooze action for analytics
     const { logTaskAction } = await import('./analytics');
     await logTaskAction('snoozed', taskId);
@@ -92,11 +91,11 @@ export const getSnoozeHistory = async (taskId?: number): Promise<any[]> => {
   try {
     const result = await chrome.storage.local.get(['snoozeHistory']);
     let history = result.snoozeHistory || [];
-    
+
     if (taskId) {
       history = history.filter((item: any) => item.taskId === taskId);
     }
-    
+
     return history;
   } catch (error) {
     console.error('Error getting snooze history:', error);
@@ -108,19 +107,19 @@ export const getSnoozeHistory = async (taskId?: number): Promise<any[]> => {
 export const addSnoozeToHistory = async (taskId: number, originalTime: Date, newTime: Date): Promise<void> => {
   try {
     const history = await getSnoozeHistory();
-    
+
     history.push({
       taskId,
       originalTime: originalTime.toISOString(),
       newTime: newTime.toISOString(),
       snoozedAt: new Date().toISOString()
     });
-    
+
     // Keep only the last 100 snooze history items
     if (history.length > 100) {
       history.splice(0, history.length - 100);
     }
-    
+
     await chrome.storage.local.set({ snoozeHistory: history });
   } catch (error) {
     console.error('Error adding snooze to history:', error);
@@ -132,19 +131,19 @@ export const checkSnoozedTasks = async (): Promise<void> => {
   try {
     const { db } = await import('./db');
     const now = new Date();
-    
+
     // Get all snoozed tasks
     const snoozedTasks = await db.tasks
       .where('snoozedUntil')
       .above(now)
       .toArray();
-    
+
     // For each snoozed task, check if it's time to remind
     for (const task of snoozedTasks) {
       if (task.snoozedUntil && new Date(task.snoozedUntil) <= now) {
         // Time to remind
         await createTaskReminderNotification(task);
-        
+
         // Clear snoozed flag
         await db.tasks.update(task.id!, {
           snoozedUntil: undefined
@@ -162,7 +161,7 @@ export const setupSnoozeAlarm = (): void => {
   chrome.alarms.create('checkSnoozedTasks', {
     periodInMinutes: 1
   });
-  
+
   // Set up alarm listener
   chrome.alarms.onAlarm.addListener((alarm: any) => {
     if (alarm.name === 'checkSnoozedTasks') {
@@ -204,7 +203,7 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
       </div>
     </div>
   `;
-  
+
   // Add styles
   const style = document.createElement('style');
   style.textContent = `
@@ -356,33 +355,33 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
       cursor: not-allowed;
     }
   `;
-  
+
   document.head.appendChild(style);
-  
+
   // Populate snooze options
   const populateOptions = async () => {
     const options = await getSnoozeOptions();
     const optionsContainer = dialog.querySelector('.edgetask-snooze-options');
-    
+
     options.forEach((option, index) => {
       const optionElement = document.createElement('div');
       optionElement.className = 'edgetask-snooze-option';
       optionElement.textContent = option.label;
       optionElement.dataset.minutes = option.minutes.toString();
-      
+
       if (index === 0) {
         optionElement.classList.add('selected');
       }
-      
+
       optionElement.addEventListener('click', () => {
         // Remove selected class from all options
         dialog.querySelectorAll('.edgetask-snooze-option').forEach(el => {
           el.classList.remove('selected');
         });
-        
+
         // Add selected class to clicked option
         optionElement.classList.add('selected');
-        
+
         // Show/hide custom time inputs
         const customContainer = dialog.querySelector('.edgetask-snooze-custom') as HTMLElement;
         if (option.minutes === 0) {
@@ -391,55 +390,55 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
           customContainer.style.display = 'none';
         }
       });
-      
-      optionsContainer.appendChild(optionElement);
+
+      optionsContainer?.appendChild(optionElement);
     });
   };
-  
+
   populateOptions();
-  
+
   // Set default values for custom date/time
   const now = new Date();
   now.setHours(now.getHours() + 1);
   const dateStr = now.toISOString().split('T')[0];
   const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
-  
+
   const customDateInput = dialog.querySelector('#snooze-custom-date') as HTMLInputElement;
   const customTimeInput = dialog.querySelector('#snooze-custom-time') as HTMLInputElement;
-  
+
   if (customDateInput) customDateInput.value = dateStr;
   if (customTimeInput) customTimeInput.value = timeStr;
-  
+
   // Add event listeners
   const closeBtn = dialog.querySelector('.edgetask-snooze-dialog-close');
   const cancelBtn = dialog.querySelector('.edgetask-snooze-cancel');
   const confirmBtn = dialog.querySelector('.edgetask-snooze-confirm');
-  
+
   const closeDialog = () => {
     document.body.removeChild(dialog);
     document.head.removeChild(style);
     onClose();
   };
-  
-  closeBtn.addEventListener('click', closeDialog);
-  cancelBtn.addEventListener('click', closeDialog);
-  
-  confirmBtn.addEventListener('click', async () => {
+
+  closeBtn?.addEventListener('click', closeDialog);
+  cancelBtn?.addEventListener('click', closeDialog);
+
+  confirmBtn?.addEventListener('click', async () => {
     const selectedOption = dialog.querySelector('.edgetask-snooze-option.selected') as HTMLElement;
-    
+
     if (!selectedOption) return;
-    
+
     const minutes = parseInt(selectedOption.dataset.minutes || '0');
     let customTime: Date | undefined;
-    
+
     if (minutes === 0) {
       // Use custom date/time
       const dateValue = customDateInput.value;
       const timeValue = customTimeInput.value;
-      
+
       if (dateValue && timeValue) {
         customTime = new Date(`${dateValue}T${timeValue}`);
-        
+
         // Validate custom time is in the future
         if (customTime <= new Date()) {
           alert('Please select a future date and time.');
@@ -450,11 +449,11 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
         return;
       }
     }
-    
+
     try {
       // Snooze the task
       await snoozeTask(taskId, minutes, customTime);
-      
+
       // Close dialog
       closeDialog();
     } catch (error) {
@@ -462,7 +461,7 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
       alert('Failed to snooze task. Please try again.');
     }
   });
-  
+
   // Close on escape
   const handleEscape = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
@@ -470,9 +469,9 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
       document.removeEventListener('keydown', handleEscape);
     }
   };
-  
+
   document.addEventListener('keydown', handleEscape);
-  
+
   // Close on background click
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) {
@@ -480,12 +479,12 @@ export const createSnoozeDialog = (taskId: number, onClose: () => void): HTMLEle
       document.removeEventListener('keydown', handleEscape);
     }
   });
-  
+
   return dialog;
 };
 
 // Show snooze dialog
 export const showSnoozeDialog = (taskId: number, onClose?: () => void): void => {
-  const dialog = createSnoozeDialog(taskId, onClose || (() => {}));
+  const dialog = createSnoozeDialog(taskId, onClose || (() => { }));
   document.body.appendChild(dialog);
 };

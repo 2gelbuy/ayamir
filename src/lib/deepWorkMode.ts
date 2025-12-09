@@ -1,11 +1,9 @@
-import { db, Settings } from './db';
+import { db, Settings as _Settings } from './db';
 import {
-  createBreakTimeNotification,
   createDeepWorkEndNotification
 } from './notifications';
 
-// Type declarations for Chrome APIs
-declare const chrome: any;
+// Chrome API is available globally via @types/chrome
 
 // Deep Work Mode state
 export interface DeepWorkModeState {
@@ -36,7 +34,7 @@ export const getDeepWorkModeSettings = async (): Promise<typeof DEFAULT_DEEP_WOR
     if (!settings) {
       return DEFAULT_DEEP_WORK_SETTINGS;
     }
-    
+
     return {
       deepWorkModeEnabled: settings.deepWorkModeEnabled ?? DEFAULT_DEEP_WORK_SETTINGS.deepWorkModeEnabled,
       deepWorkModeDuration: settings.deepWorkModeDuration ?? DEFAULT_DEEP_WORK_SETTINGS.deepWorkModeDuration,
@@ -57,7 +55,7 @@ export const updateDeepWorkModeSettings = async (settings: Partial<typeof DEFAUL
   try {
     const currentSettings = await db.settings.toCollection().first();
     if (!currentSettings) return;
-    
+
     await db.settings.update(currentSettings.id!, settings);
   } catch (error) {
     console.error('Error updating deep work mode settings:', error);
@@ -102,7 +100,7 @@ export const startDeepWorkMode = async (): Promise<void> => {
     const settings = await getDeepWorkModeSettings();
     const now = new Date();
     const endTime = new Date(now.getTime() + settings.deepWorkModeDuration * 60 * 1000);
-    
+
     await updateDeepWorkModeState({
       isActive: true,
       startTime: now,
@@ -111,19 +109,19 @@ export const startDeepWorkMode = async (): Promise<void> => {
       isBreakTime: false,
       currentCycle: 1
     });
-    
+
     // Apply deep work mode restrictions
     if (settings.deepWorkModeBlockNotifications) {
       await blockNotifications();
     }
-    
+
     if (settings.deepWorkModeBlockSites) {
       await blockDistractingSites();
     }
-    
+
     // Set up timer
     await setupDeepWorkTimer();
-    
+
     // Send notification
     const { createNotification } = await import('./notifications');
     await createNotification({
@@ -140,21 +138,21 @@ export const startDeepWorkMode = async (): Promise<void> => {
 export const stopDeepWorkMode = async (): Promise<void> => {
   try {
     const currentState = await getDeepWorkModeState();
-    
+
     await updateDeepWorkModeState({
       isActive: false,
       startTime: undefined,
       endTime: undefined,
       remainingTime: undefined
     });
-    
+
     // Remove deep work mode restrictions
     await unblockNotifications();
     await unblockDistractingSites();
-    
+
     // Clear timer
     await clearDeepWorkTimer();
-    
+
     // Send notification
     if (currentState.isActive) {
       const currentSettings = await getDeepWorkModeSettings();
@@ -175,21 +173,21 @@ export const startBreakTime = async (): Promise<void> => {
     const currentState = await getDeepWorkModeState();
     const now = new Date();
     const endTime = new Date(now.getTime() + settings.deepWorkModeBreakDuration * 60 * 1000);
-    
+
     await updateDeepWorkModeState({
       isBreakTime: true,
       endTime: endTime,
       remainingTime: settings.deepWorkModeBreakDuration * 60,
       completedCycles: currentState.completedCycles + 1
     });
-    
+
     // Temporarily remove restrictions for break time
     await unblockNotifications();
     await unblockDistractingSites();
-    
+
     // Set up timer for break
     await setupBreakTimer();
-    
+
     // Send notification
     if (chrome.notifications) {
       chrome.notifications.create({
@@ -211,26 +209,26 @@ export const resumeWorkAfterBreak = async (): Promise<void> => {
     const currentState = await getDeepWorkModeState();
     const now = new Date();
     const endTime = new Date(now.getTime() + settings.deepWorkModeDuration * 60 * 1000);
-    
+
     await updateDeepWorkModeState({
       isBreakTime: false,
       endTime: endTime,
       remainingTime: settings.deepWorkModeDuration * 60,
       currentCycle: currentState.currentCycle + 1
     });
-    
+
     // Re-apply deep work mode restrictions
     if (settings.deepWorkModeBlockNotifications) {
       await blockNotifications();
     }
-    
+
     if (settings.deepWorkModeBlockSites) {
       await blockDistractingSites();
     }
-    
+
     // Set up timer
     await setupDeepWorkTimer();
-    
+
     // Send notification
     if (chrome.notifications) {
       chrome.notifications.create({
@@ -248,12 +246,13 @@ export const resumeWorkAfterBreak = async (): Promise<void> => {
 // Block notifications
 export const blockNotifications = async (): Promise<void> => {
   try {
-    // Store current notification settings
-    const currentSettings = await chrome.notifications.getPermissionLevel();
-    await chrome.storage.local.set({ 
-      originalNotificationSettings: currentSettings 
+    // Store current notification settings using callback-based API
+    chrome.notifications.getPermissionLevel((level) => {
+      chrome.storage.local.set({
+        originalNotificationSettings: level
+      });
     });
-    
+
     // This would require additional permissions and is a simplified version
     // In a real implementation, you would use the appropriate APIs to block notifications
   } catch (error) {
@@ -280,24 +279,24 @@ export const blockDistractingSites = async (): Promise<void> => {
   try {
     const settings = await db.settings.toCollection().first();
     if (!settings || !settings.blacklist.length) return;
-    
+
     // Store current blocking state
-    await chrome.storage.local.set({ 
-      originalSiteBlockingState: { enabled: false } 
+    await chrome.storage.local.set({
+      originalSiteBlockingState: { enabled: false }
     });
-    
+
     // Enable site blocking
     // This would be implemented in the content script
-    await chrome.storage.local.set({ 
+    await chrome.storage.local.set({
       siteBlockingEnabled: true,
       blockedSites: settings.blacklist
     });
-    
+
     // Update all tabs to apply blocking
     const tabs = await chrome.tabs.query({});
-    tabs.forEach(tab => {
+    tabs.forEach((tab: chrome.tabs.Tab) => {
       if (tab.url && tab.id) {
-        chrome.tabs.sendMessage(tab.id, { 
+        chrome.tabs.sendMessage(tab.id, {
           action: 'updateSiteBlocking',
           enabled: true,
           blockedSites: settings.blacklist
@@ -313,15 +312,15 @@ export const blockDistractingSites = async (): Promise<void> => {
 export const unblockDistractingSites = async (): Promise<void> => {
   try {
     // Disable site blocking
-    await chrome.storage.local.set({ 
+    await chrome.storage.local.set({
       siteBlockingEnabled: false
     });
-    
+
     // Update all tabs to remove blocking
     const tabs = await chrome.tabs.query({});
-    tabs.forEach(tab => {
+    tabs.forEach((tab: chrome.tabs.Tab) => {
       if (tab.url && tab.id) {
-        chrome.tabs.sendMessage(tab.id, { 
+        chrome.tabs.sendMessage(tab.id, {
           action: 'updateSiteBlocking',
           enabled: false
         });
@@ -337,17 +336,17 @@ export const setupDeepWorkTimer = async (): Promise<void> => {
   try {
     // Clear any existing timers
     await clearDeepWorkTimer();
-    
+
     const state = await getDeepWorkModeState();
     if (!state.endTime) return;
-    
+
     const timeRemaining = new Date(state.endTime).getTime() - Date.now();
-    
+
     // Set alarm for when the session ends
     chrome.alarms.create('deepWorkModeEnd', {
       when: Date.now() + timeRemaining
     });
-    
+
     // Set up timer to update remaining time every second
     const timerInterval = setInterval(async () => {
       const currentState = await getDeepWorkModeState();
@@ -355,15 +354,15 @@ export const setupDeepWorkTimer = async (): Promise<void> => {
         clearInterval(timerInterval);
         return;
       }
-      
+
       const timeRemaining = Math.max(0, Math.floor((new Date(currentState.endTime).getTime() - Date.now()) / 1000));
-      
+
       await updateDeepWorkModeState({ remainingTime: timeRemaining });
-      
+
       // If time is up, transition to break or end session
       if (timeRemaining === 0) {
         clearInterval(timerInterval);
-        
+
         if (currentState.isBreakTime) {
           await resumeWorkAfterBreak();
         } else {
@@ -371,7 +370,7 @@ export const setupDeepWorkTimer = async (): Promise<void> => {
         }
       }
     }, 1000);
-    
+
     // Store interval ID so we can clear it later
     await chrome.storage.local.set({ deepWorkTimerInterval: timerInterval });
   } catch (error) {
@@ -390,7 +389,7 @@ export const clearDeepWorkTimer = async (): Promise<void> => {
   try {
     // Clear alarm
     chrome.alarms.clear('deepWorkModeEnd');
-    
+
     // Clear interval
     const result = await chrome.storage.local.get(['deepWorkTimerInterval']);
     if (result.deepWorkTimerInterval) {
@@ -409,7 +408,7 @@ export const initializeDeepWorkMode = async (): Promise<void> => {
     chrome.alarms.onAlarm.addListener(async (alarm) => {
       if (alarm.name === 'deepWorkModeEnd') {
         const state = await getDeepWorkModeState();
-        
+
         if (state.isBreakTime) {
           await resumeWorkAfterBreak();
         } else {
@@ -417,13 +416,13 @@ export const initializeDeepWorkMode = async (): Promise<void> => {
         }
       }
     });
-    
+
     // Check if there's an active session that should be resumed
     const state = await getDeepWorkModeState();
     if (state.isActive && state.endTime) {
       const now = Date.now();
       const endTime = new Date(state.endTime).getTime();
-      
+
       if (now < endTime) {
         // Session is still active, resume timer
         await setupDeepWorkTimer();

@@ -1,5 +1,6 @@
 let edgePanel: HTMLElement | null = null;
-let edgePanelTimeout: number | null = null;
+let edgePanelInner: HTMLElement | null = null;
+let edgePanelTimeout: ReturnType<typeof setTimeout> | null = null;
 let isPanelOpen = false;
 let isMouseAtEdge = false;
 let lastMousePosition = { x: 0, y: 0 };
@@ -7,75 +8,86 @@ const EDGE_THRESHOLD = 15; // pixels from edge
 const PANEL_WIDTH = 360; // pixels
 const HOVER_DELAY = 300; // milliseconds before showing panel
 
-// Type declarations for Chrome APIs
-declare const chrome: any;
+// chrome is available globally via @types/chrome
 
 const createEdgePanel = () => {
   if (edgePanel) return;
 
   edgePanel = document.createElement('div');
-  edgePanel.id = 'edgetask-edge-panel';
-  edgePanel.className = 'edgetask-edge-panel';
-  
+  edgePanel.id = 'edgetask-edge-panel-host';
+
+  const shadow = edgePanel.attachShadow({ mode: 'open' });
+  const styleLink = document.createElement('link');
+  styleLink.rel = 'stylesheet';
+  styleLink.href = chrome.runtime.getURL('content.css');
+  shadow.appendChild(styleLink);
+
+  const panelContainer = document.createElement('div');
+  panelContainer.className = 'edgetask-edge-panel';
+  edgePanelInner = panelContainer;
+
   // Create iframe for the panel content
   const iframe = document.createElement('iframe');
   iframe.src = chrome.runtime.getURL('index.html');
   iframe.className = 'edgetask-edge-panel-iframe';
-  edgePanel.appendChild(iframe);
+  panelContainer.appendChild(iframe);
 
   // Add close button
   const closeBtn = document.createElement('button');
   closeBtn.className = 'edgetask-edge-panel-close';
   closeBtn.innerHTML = '&times;';
   closeBtn.addEventListener('click', hideEdgePanel);
-  edgePanel.appendChild(closeBtn);
+  panelContainer.appendChild(closeBtn);
+
+  shadow.appendChild(panelContainer);
 
   document.body.appendChild(edgePanel);
 };
 
 const showEdgePanel = () => {
   if (isPanelOpen) return;
-  
+
   createEdgePanel();
   isPanelOpen = true;
-  
-  if (edgePanel) {
-    edgePanel.classList.add('edgetask-edge-panel-visible');
+
+  if (edgePanelInner) {
+    edgePanelInner.classList.add('edgetask-edge-panel-visible');
   }
 };
 
 const hideEdgePanel = () => {
   if (!isPanelOpen) return;
-  
-  if (edgePanel) {
-    edgePanel.classList.remove('edgetask-edge-panel-visible');
+
+  if (edgePanelInner) {
+    edgePanelInner.classList.remove('edgetask-edge-panel-visible');
     setTimeout(() => {
       if (edgePanel && edgePanel.parentNode) {
         edgePanel.parentNode.removeChild(edgePanel);
         edgePanel = null;
+        edgePanelInner = null;
       }
     }, 200);
   }
-  
+
   isPanelOpen = false;
   isMouseAtEdge = false;
 };
 
 const handleMouseMove = (e: MouseEvent) => {
   lastMousePosition = { x: e.clientX, y: e.clientY };
-  
+
   const isAtLeftEdge = e.clientX <= EDGE_THRESHOLD;
   const isAtRightEdge = e.clientX >= window.innerWidth - EDGE_THRESHOLD;
-  
+
   const wasAtEdge = isMouseAtEdge;
   isMouseAtEdge = isAtLeftEdge || isAtRightEdge;
-  
+
   if (isMouseAtEdge && !wasAtEdge) {
     // Mouse just entered the edge zone
     if (edgePanelTimeout) {
       clearTimeout(edgePanelTimeout);
     }
-    
+
     edgePanelTimeout = setTimeout(() => {
       if (isMouseAtEdge) {
         showEdgePanel();
@@ -87,7 +99,7 @@ const handleMouseMove = (e: MouseEvent) => {
       clearTimeout(edgePanelTimeout);
       edgePanelTimeout = null;
     }
-    
+
     // Check if mouse is not over the panel
     if (isPanelOpen && edgePanel) {
       const rect = edgePanel.getBoundingClientRect();
@@ -97,7 +109,7 @@ const handleMouseMove = (e: MouseEvent) => {
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom
       );
-      
+
       if (!isOverPanel) {
         hideEdgePanel();
       }
@@ -110,9 +122,9 @@ const handleMouseLeave = () => {
     clearTimeout(edgePanelTimeout);
     edgePanelTimeout = null;
   }
-  
+
   isMouseAtEdge = false;
-  
+
   // Hide panel if mouse leaves the window
   setTimeout(() => {
     if (isPanelOpen && edgePanel) {
@@ -123,7 +135,7 @@ const handleMouseLeave = () => {
         lastMousePosition.y >= rect.top - 50 &&
         lastMousePosition.y <= rect.bottom + 50
       );
-      
+
       if (!isMouseNearPanel) {
         hideEdgePanel();
       }
@@ -148,7 +160,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Handle messages from background script
-chrome.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
+chrome.runtime.onMessage.addListener((message: { action?: string }, _sender, _sendResponse) => {
   if (message.action === 'togglePanel') {
     if (isPanelOpen) {
       hideEdgePanel();

@@ -4,7 +4,7 @@
 declare const document: any;
 
 // Feedback types
-export type FeedbackType = 
+export type FeedbackType =
   | 'success'
   | 'error'
   | 'warning'
@@ -31,12 +31,12 @@ const activeFeedbackElements = new Map<string, HTMLElement>();
 // Create a feedback element
 export const createFeedback = (options: FeedbackOptions): string => {
   const id = `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  
+
   // Create feedback element
   const feedbackElement = document.createElement('div');
   feedbackElement.id = id;
   feedbackElement.className = `edgetask-feedback edgetask-feedback-${options.type}`;
-  
+
   // Set position
   let positionClass = '';
   switch (options.position) {
@@ -52,12 +52,12 @@ export const createFeedback = (options: FeedbackOptions): string => {
     default:
       positionClass = 'edgetask-feedback-top';
   }
-  
+
   feedbackElement.classList.add(positionClass);
-  
+
   // Create content
   let content = '';
-  
+
   // Add icon
   if (options.showIcon !== false) {
     let icon = '';
@@ -80,22 +80,22 @@ export const createFeedback = (options: FeedbackOptions): string => {
     }
     content += icon;
   }
-  
+
   // Add message
   content += `<div class="edgetask-feedback-message">${options.message}</div>`;
-  
+
   // Add action button
   if (options.action) {
     content += `<button class="edgetask-feedback-action">${options.action.label}</button>`;
   }
-  
+
   // Add progress bar
   if (options.showProgress && options.duration && options.duration > 0) {
     content += '<div class="edgetask-feedback-progress"><div class="edgetask-feedback-progress-bar"></div></div>';
   }
-  
+
   feedbackElement.innerHTML = content;
-  
+
   // Add styles if not already added
   if (!document.querySelector('#edgetask-feedback-styles')) {
     const style = document.createElement('style');
@@ -246,29 +246,29 @@ export const createFeedback = (options: FeedbackOptions): string => {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Add to DOM
   document.body.appendChild(feedbackElement);
-  
+
   // Store in active elements
   activeFeedbackElements.set(id, feedbackElement);
-  
+
   // Add action button event listener
   if (options.action) {
     const actionButton = feedbackElement.querySelector('.edgetask-feedback-action');
     if (actionButton) {
       actionButton.addEventListener('click', () => {
-        options.action.callback();
+        options.action!.callback();
         removeFeedback(id);
       });
     }
   }
-  
+
   // Show animation
   setTimeout(() => {
     feedbackElement.classList.add('edgetask-feedback-show');
   }, 10);
-  
+
   // Set progress bar animation
   if (options.showProgress && options.duration && options.duration > 0) {
     const progressBar = feedbackElement.querySelector('.edgetask-feedback-progress-bar');
@@ -276,24 +276,24 @@ export const createFeedback = (options: FeedbackOptions): string => {
       progressBar.style.animationDuration = `${options.duration}ms`;
     }
   }
-  
+
   // Auto-remove after duration
   if (options.duration && options.duration > 0) {
     setTimeout(() => {
       removeFeedback(id);
     }, options.duration);
   }
-  
+
   return id;
 };
 
 // Remove a feedback element
 export const removeFeedback = (id: string): void => {
   const feedbackElement = activeFeedbackElements.get(id);
-  
+
   if (feedbackElement) {
     feedbackElement.classList.remove('edgetask-feedback-show');
-    
+
     setTimeout(() => {
       if (feedbackElement.parentNode) {
         feedbackElement.parentNode.removeChild(feedbackElement);
@@ -358,20 +358,20 @@ export const showLoadingFeedback = (message: string): string => {
 export const createRipple = (element: HTMLElement, event: MouseEvent): void => {
   const ripple = document.createElement('span');
   ripple.className = 'edgetask-ripple';
-  
+
   // Get the position of the click
   const rect = element.getBoundingClientRect();
   const size = Math.max(rect.width, rect.height);
   const x = event.clientX - rect.left - size / 2;
   const y = event.clientY - rect.top - size / 2;
-  
+
   ripple.style.width = ripple.style.height = size + 'px';
   ripple.style.left = x + 'px';
   ripple.style.top = y + 'px';
-  
+
   // Add to element
   element.appendChild(ripple);
-  
+
   // Remove after animation
   setTimeout(() => {
     if (ripple.parentNode) {
@@ -410,13 +410,13 @@ export const addRippleEffect = (): void => {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Add ripple effect to all buttons
   const buttons = document.querySelectorAll('button');
-  buttons.forEach(button => {
+  buttons.forEach((button: HTMLButtonElement) => {
     if (!button.classList.contains('edgetask-ripple-container')) {
       button.classList.add('edgetask-ripple-container');
-      
+
       button.addEventListener('click', (e: MouseEvent) => {
         createRipple(button, e);
       });
@@ -458,10 +458,10 @@ export const addHoverEffect = (): void => {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Add hover effects to interactive elements
   const interactiveElements = document.querySelectorAll('button, a, .task-item');
-  interactiveElements.forEach((element, index) => {
+  interactiveElements.forEach((element: Element, index: number) => {
     // Add different hover effects based on element type
     if (element.tagName === 'BUTTON') {
       element.classList.add('edgetask-hover-lift');
@@ -492,10 +492,10 @@ export const addFocusEffect = (): void => {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Add focus effects to form elements
   const formElements = document.querySelectorAll('input, textarea, select');
-  formElements.forEach(element => {
+  formElements.forEach((element: Element) => {
     element.classList.add('edgetask-focus-highlight');
   });
 };
@@ -513,15 +513,15 @@ export const addVisualFeedbackToElement = (element: HTMLElement, effects: string
   if (!document.querySelector('#edgetask-hover-styles')) {
     addHoverEffect();
   }
-  
+
   if (!document.querySelector('#edgetask-focus-styles')) {
     addFocusEffect();
   }
-  
+
   if (!document.querySelector('#edgetask-ripple-styles')) {
     addRippleEffect();
   }
-  
+
   // Add requested effects
   effects.forEach(effect => {
     switch (effect) {

@@ -37,7 +37,7 @@ export default function TaskList({ tasks, onTasksChange }: TaskListProps) {
     }
 
     const draggedIndex = tasks.findIndex(t => t.id === draggedTask.id);
-    
+
     // Don't do anything if the task is being dropped in its original position
     if (draggedIndex === dragOverIndex) {
       setDraggedTask(null);
@@ -54,11 +54,11 @@ export default function TaskList({ tasks, onTasksChange }: TaskListProps) {
     try {
       // Update each task with its new order
       for (let i = 0; i < newTasks.length; i++) {
-        if (newTasks[i].id) {
-          await db.tasks.update(newTasks[i].id, { order: i });
+        if (newTasks[i].id !== undefined) {
+          await db.tasks.update(newTasks[i].id as number, { order: i });
         }
       }
-      
+
       onTasksChange();
     } catch (error) {
       console.error('Error reordering tasks:', error);
