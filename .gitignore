@@ -7,6 +7,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+dist
 dist-ssr
 *.local
 
@@ -18,5 +19,15 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
+
+# Archives
+*.tar.gz
+*.zip
+
+# Logs and temporary files
+tsc_errors*.txt
+.agent/
+.release-marker
+VERSION
 *.sw?
 .env
