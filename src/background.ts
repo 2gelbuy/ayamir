@@ -53,8 +53,14 @@ chrome.alarms.onAlarm.addListener(async (alarm: chrome.alarms.Alarm) => {
 
 async function checkTaskReminders() {
   try {
+<<<<<<< HEAD
     const tasks = await db.tasks.toArray();
     const settings = await getSettings();
+=======
+    const response = await chrome.storage.local.get(['tasks', 'settings']);
+    const tasks = response.tasks || [];
+    const settings = response.settings || { humorTone: 'default' };
+>>>>>>> 39f06594764d398eafe2ce6cf12767c213fd89f3
     console.log('EdgeTask Debug [background]: checkTaskReminders fetched', {
       taskCount: tasks.length,
       settingsKeys: settings ? Object.keys(settings) : [],
@@ -70,8 +76,13 @@ async function checkTaskReminders() {
       if (task.isCompleted || !task.startTime) continue;
 
       const startTime = new Date(task.startTime);
+<<<<<<< HEAD
       const minutesDiff = (startTime.getTime() - now.getTime()) / 60000;
       if (Number.isNaN(startTime.getTime()) || Number.isNaN(minutesDiff)) {
+=======
+      const minutesUntil = Math.floor((startTime.getTime() - now.getTime()) / 60000);
+      if (Number.isNaN(startTime.getTime()) || Number.isNaN(minutesUntil)) {
+>>>>>>> 39f06594764d398eafe2ce6cf12767c213fd89f3
         console.warn('EdgeTask Debug [background]: invalid date math for task', {
           taskId: task.id,
           title: task.title,
@@ -83,12 +94,20 @@ async function checkTaskReminders() {
       console.log('EdgeTask Debug [background]: evaluating reminder window', {
         taskId: task.id,
         title: task.title,
+<<<<<<< HEAD
         minutesUntil: minutesDiff,
+=======
+        minutesUntil,
+>>>>>>> 39f06594764d398eafe2ce6cf12767c213fd89f3
         notifiedAt10: task.notifiedAt10,
         notifiedAt5: task.notifiedAt5,
         notifiedAt0: task.notifiedAt0
       });
+<<<<<<< HEAD
       if (minutesDiff <= 10 && minutesDiff > 6 && !task.notifiedAt10) {
+=======
+      if (minutesUntil === 10 && !task.notifiedAt10) {
+>>>>>>> 39f06594764d398eafe2ce6cf12767c213fd89f3
         await showNotification(task, '10min', settings.humorTone);
         task.notifiedAt10 = true;
         await updateTaskInStorage(task);
@@ -136,6 +155,7 @@ async function showNotification(task: any, timing: string, tone: string) {
 }
 
 async function updateTaskInStorage(task: any) {
+<<<<<<< HEAD
   if (task.id) {
     await db.tasks.update(task.id, task);
     console.log('EdgeTask Debug [background]: persisted task update', {
@@ -143,6 +163,25 @@ async function updateTaskInStorage(task: any) {
       notifiedAt10: task.notifiedAt10,
       notifiedAt5: task.notifiedAt5,
       notifiedAt0: task.notifiedAt0
+=======
+  const response = await chrome.storage.local.get(['tasks']);
+  const tasks = response.tasks || [];
+  const index = tasks.findIndex((t: any) => t.id === task.id);
+  console.log('EdgeTask Debug [background]: updateTaskInStorage', {
+    taskId: task.id,
+    foundIndex: index,
+    totalTasks: tasks.length
+  });
+  if (index !== -1) {
+    tasks[index] = task;
+    await chrome.storage.local.set({ tasks }, () => {
+      console.log('EdgeTask Debug [background]: persisted task update', {
+        taskId: task.id,
+        notifiedAt10: task.notifiedAt10,
+        notifiedAt5: task.notifiedAt5,
+        notifiedAt0: task.notifiedAt0
+      });
+>>>>>>> 39f06594764d398eafe2ce6cf12767c213fd89f3
     });
   }
 }
