@@ -17,7 +17,8 @@ export default defineConfig({
             'storage',
             'notifications',
             'alarms',
-            'contextMenus'
+            'contextMenus',
+            'tabs'
         ],
         commands: {
             _execute_action: {

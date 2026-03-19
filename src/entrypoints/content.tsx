@@ -3,11 +3,12 @@
 // This script itself has ZERO imports from React/Dexie/Tailwind.
 
 export default defineContentScript({
-  matches: ['<all_urls>'],
+  matches: ['http://*/*', 'https://*/*'],
   runAt: 'document_idle',
   async main() {
     // Listen for messages from background to inject UI
-    chrome.runtime.onMessage.addListener((message) => {
+    chrome.runtime.onMessage.addListener((message, sender) => {
+      if (sender.id !== chrome.runtime.id) return;
       if (message.action === 'injectBlockPage') {
         injectBlockOverlay(message.settings);
       }

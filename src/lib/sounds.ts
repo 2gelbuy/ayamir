@@ -22,9 +22,11 @@ async function loadBuffer(ctx: AudioContext, name: string): Promise<AudioBuffer>
     return audioBuffer;
 }
 
+const ALLOWED_SOUNDS = new Set(['rain', 'ocean', 'nature', 'fire']);
+
 export async function playAmbientSound(type: string, volume = 0.5): Promise<void> {
     stopAmbientSound();
-    if (type === 'none') return;
+    if (type === 'none' || !ALLOWED_SOUNDS.has(type)) return;
 
     const ctx = getCtx();
     try {

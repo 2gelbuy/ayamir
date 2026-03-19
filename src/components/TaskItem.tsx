@@ -64,7 +64,7 @@ export default function TaskItem({ task }: TaskItemProps) {
 
     const handleSaveEdit = async () => {
         if (task.id && editTitle.trim()) {
-            await db.tasks.update(task.id, { title: editTitle.trim() });
+            await db.tasks.update(task.id, { title: editTitle.trim().substring(0, 500) });
             setIsEditing(false);
         }
     };

@@ -202,7 +202,7 @@ export const checkAchievements = async (
   if (streak >= 3) unlock('streak-3');
   if (streak >= 7) unlock('streak-7');
   if (streak >= 30) unlock('streak-30');
-  if (tasksCompletedToday >= 10) unlock('task-marathon');
+  // task-marathon removed — no matching achievement definition
 
   const today = new Date();
   const todayStart = startOfDay(today);

@@ -13,7 +13,7 @@ export default function TaskInput() {
         if (!title.trim()) return;
 
         const newTask: Task = {
-            title: title.trim(),
+            title: title.trim().substring(0, 500),
             startTime: startTime ? new Date(startTime) : null,
             isCompleted: false,
             createdAt: new Date(),
