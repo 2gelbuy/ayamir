@@ -22,7 +22,7 @@ async function loadBuffer(ctx: AudioContext, name: string): Promise<AudioBuffer>
     return audioBuffer;
 }
 
-export async function playAmbientSound(type: string): Promise<void> {
+export async function playAmbientSound(type: string, volume = 0.5): Promise<void> {
     stopAmbientSound();
     if (type === 'none') return;
 
@@ -34,7 +34,7 @@ export async function playAmbientSound(type: string): Promise<void> {
         source.loop = true;
 
         const gain = ctx.createGain();
-        gain.gain.value = 0.5; // 50% — comfortable ambient level
+        gain.gain.value = volume;
         gain.connect(ctx.destination);
         source.connect(gain);
         source.start();

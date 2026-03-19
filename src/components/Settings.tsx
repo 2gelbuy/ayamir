@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
+import { playAmbientSound, stopAmbientSound } from '@/lib/sounds';
 
 interface SettingsProps {
     onClose: () => void;
@@ -515,6 +516,8 @@ export default function Settings({ onClose }: SettingsProps) {
                                     <button
                                         key={s.id}
                                         onClick={() => setSettings({ ...settings, ambientSound: s.id as SettingsType['ambientSound'] })}
+                                        onMouseEnter={() => { if (s.id !== 'none') playAmbientSound(s.id, 0.25); }}
+                                        onMouseLeave={() => { if (settings.ambientSound === 'none' || settings.ambientSound !== s.id) stopAmbientSound(); }}
                                         className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
                                             settings.ambientSound === s.id
                                                 ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700 text-teal-600 dark:text-teal-400'
