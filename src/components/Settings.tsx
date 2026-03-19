@@ -33,6 +33,7 @@ export default function Settings({ onClose }: SettingsProps) {
         if (settings) {
             await updateSettings(settings);
             await applyTheme();
+            stopAmbientSound();
             onClose();
         }
     };
@@ -163,7 +164,7 @@ export default function Settings({ onClose }: SettingsProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("settingsHeader")}</h2>
-                <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+                <button onClick={() => { stopAmbientSound(); onClose(); }} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
                     <X className="w-5 h-5" />
                 </button>
             </div>
@@ -515,9 +516,12 @@ export default function Settings({ onClose }: SettingsProps) {
                                 ].map(s => (
                                     <button
                                         key={s.id}
-                                        onClick={() => setSettings({ ...settings, ambientSound: s.id as SettingsType['ambientSound'] })}
-                                        onMouseEnter={() => { if (s.id !== 'none') playAmbientSound(s.id, 0.25); }}
-                                        onMouseLeave={() => { if (settings.ambientSound === 'none' || settings.ambientSound !== s.id) stopAmbientSound(); }}
+                                        onClick={() => {
+                                            const newSound = s.id as SettingsType['ambientSound'];
+                                            setSettings({ ...settings, ambientSound: newSound });
+                                            if (newSound === 'none') stopAmbientSound();
+                                            else playAmbientSound(newSound);
+                                        }}
                                         className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
                                             settings.ambientSound === s.id
                                                 ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700 text-teal-600 dark:text-teal-400'
