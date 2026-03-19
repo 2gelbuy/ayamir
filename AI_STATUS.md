@@ -72,5 +72,7 @@ ee6c099 auto: AI_STATUS.md
 <!-- AUTO:GIT_STATUS -->
 ## Uncommitted Changes
 Branch: `main`
-_Clean working tree._
+```
+M AI_STATUS.md
+```
 <!-- /AUTO:GIT_STATUS -->
