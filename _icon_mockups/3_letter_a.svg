@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D9488"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
+  <!-- Stylized A -->
+  <path d="M64 26L34 100H48L54 84H74L80 100H94L64 26Z" fill="white"/>
+  <path d="M58 72L64 46L70 72H58Z" fill="url(#bg)"/>
+  <!-- Small sparkle accent -->
+  <circle cx="92" cy="32" r="4" fill="white" fill-opacity="0.6"/>
+  <circle cx="98" cy="38" r="2" fill="white" fill-opacity="0.4"/>
+</svg>

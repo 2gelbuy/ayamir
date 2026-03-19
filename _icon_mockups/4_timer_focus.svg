@@ -1,0 +1,18 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D9488"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
+  <!-- Timer ring (progress arc ~75%) -->
+  <circle cx="64" cy="66" r="32" stroke="white" stroke-opacity="0.25" stroke-width="5" fill="none"/>
+  <circle cx="64" cy="66" r="32" stroke="white" stroke-width="5" fill="none"
+    stroke-dasharray="150.8 201.06" stroke-dashoffset="0" stroke-linecap="round"
+    transform="rotate(-90 64 66)"/>
+  <!-- Lightning bolt in center -->
+  <path d="M60 54H70L64 66H72L56 82L62 68H54L60 54Z" fill="white"/>
+  <!-- Top knob -->
+  <rect x="60" y="28" width="8" height="8" rx="2" fill="white"/>
+</svg>
