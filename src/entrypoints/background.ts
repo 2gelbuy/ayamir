@@ -10,13 +10,13 @@ export default defineBackground(() => {
 
         chrome.contextMenus.create({
             id: 'ayamir-save-page',
-            title: 'Save page as AyaMir task',
+            title: chrome.i18n.getMessage('ctxSavePage') || 'Save page as AyaMir task',
             contexts: ['page', 'link'],
         });
 
         chrome.contextMenus.create({
             id: 'ayamir-save-selection',
-            title: 'Save "%s" as AyaMir task',
+            title: chrome.i18n.getMessage('ctxSaveSelection') || 'Save "%s" as AyaMir task',
             contexts: ['selection'],
         });
     });
@@ -254,8 +254,8 @@ function showNotification(
             title: 'AyaMir',
             message,
             buttons: [
-                { title: 'Snooze 10min' },
-                { title: 'Done' }
+                { title: chrome.i18n.getMessage('notifSnooze') || 'Snooze 10min' },
+                { title: chrome.i18n.getMessage('notifDone') || 'Done' }
             ],
             priority: 2,
             requireInteraction: true
