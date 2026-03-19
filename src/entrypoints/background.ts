@@ -1,30 +1,26 @@
-import { db, getSettings } from '@/lib/db';
+import { db, getSettings, updateSettings } from '@/lib/db';
 import { getHumorMessage } from '@/lib/humor';
 import { updateStatsOnTaskCompletion } from '@/lib/gamification';
 
 export default defineBackground(() => {
+    // sw-register-listeners-toplevel: all listeners at top level
     chrome.runtime.onInstalled.addListener(() => {
-        // Create alarm for checking reminders every minute
         chrome.alarms.create('checkReminders', { periodInMinutes: 1 });
 
-        // Create context menu for saving page as task
         chrome.contextMenus.create({
             id: 'ayamir-save-page',
             title: 'Save page as AyaMir task',
             contexts: ['page', 'link'],
         });
 
-        // Create context menu for saving selected text
         chrome.contextMenus.create({
             id: 'ayamir-save-selection',
             title: 'Save "%s" as AyaMir task',
             contexts: ['selection'],
         });
-
-        console.log('AyaMir installed, alarms and context menus configured');
     });
 
-    // Context menu click handler
+    // Context menu handler
     chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         let title = '';
         let url = '';
@@ -52,7 +48,6 @@ export default defineBackground(() => {
                 url: url || undefined,
             });
 
-            // Show confirmation notification
             chrome.notifications.create({
                 type: 'basic',
                 iconUrl: chrome.runtime.getURL('/icon/128.png'),
@@ -63,6 +58,7 @@ export default defineBackground(() => {
         }
     });
 
+    // Alarms
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         try {
             if (alarm.name === 'checkReminders') {
@@ -70,11 +66,11 @@ export default defineBackground(() => {
                 await checkScheduledBlocking();
             }
         } catch (error) {
-            console.error('Error in checkReminders alarm:', error);
+            console.error('Alarm error:', error);
         }
     });
 
-    // Handle notification button clicks
+    // Notification buttons
     chrome.notifications.onButtonClicked.addListener(async (notificationId, buttonIndex) => {
         try {
             const taskId = parseInt(notificationId.replace('task-', ''));
@@ -84,7 +80,6 @@ export default defineBackground(() => {
             }
 
             if (buttonIndex === 0) {
-                // Snooze: +10 minutes
                 const newTime = new Date(Date.now() + 10 * 60 * 1000);
                 await db.tasks.update(taskId, {
                     startTime: newTime,
@@ -93,52 +88,87 @@ export default defineBackground(() => {
                     notifiedAt0: false
                 });
             } else if (buttonIndex === 1) {
-                // Done: mark complete
                 const completedAt = new Date();
-                await db.tasks.update(taskId, {
-                    isCompleted: true,
-                    completedAt
-                });
-
+                await db.tasks.update(taskId, { isCompleted: true, completedAt });
                 const task = await db.tasks.get(taskId);
-                if (task) {
-                    await updateStatsOnTaskCompletion(task);
-                }
+                if (task) await updateStatsOnTaskCompletion(task);
             }
         } catch (error) {
-            console.error('Error handling notification click:', error);
+            console.error('Notification button error:', error);
         } finally {
             chrome.notifications.clear(notificationId);
         }
     });
 
-    // Handle notification click
     chrome.notifications.onClicked.addListener((notificationId) => {
         chrome.notifications.clear(notificationId);
     });
 
-    // Handle messages from content scripts
+    // Message handler — sw-return-true-async for all async paths
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.action === 'closeTab' && sender.tab?.id) {
             chrome.tabs.remove(sender.tab.id);
+            return;
         }
+
         if (message.action === 'createTask') {
             db.tasks.add(message.task).then(() => {
                 sendResponse({ success: true });
             }).catch(error => {
                 console.error('Failed to create task:', error);
-                sendResponse({ success: false, error });
+                sendResponse({ success: false, error: String(error) });
             });
-            return true;
+            return true; // async response
+        }
+
+        // Content script asks if current page should be blocked
+        if (message.action === 'checkPage') {
+            getSettings().then(settings => {
+                const hostname = message.hostname || '';
+                const isSiteBlocked = settings.blacklist.some(
+                    (domain: string) => hostname === domain || hostname.endsWith(`.${domain}`)
+                );
+
+                const now = new Date();
+                const isScheduledBlock = settings.scheduledBlocking?.enabled &&
+                    settings.scheduledBlocking.days.includes(now.getDay()) &&
+                    now.getHours() >= settings.scheduledBlocking.startHour &&
+                    now.getHours() < settings.scheduledBlocking.endHour;
+
+                const needsBlock = isSiteBlocked &&
+                    (settings.focusEnabled || settings.isDeepWorkActive || isScheduledBlock);
+                const needsTicker = settings.isDeepWorkActive && !needsBlock;
+
+                sendResponse({
+                    needsBlock,
+                    needsTicker,
+                    settings: needsBlock || needsTicker ? {
+                        isDeepWorkActive: settings.isDeepWorkActive,
+                        deepWorkEndTime: settings.deepWorkEndTime,
+                        deepWorkModeDuration: settings.deepWorkModeDuration,
+                        focusEnabled: settings.focusEnabled,
+                    } : null,
+                });
+            }).catch(() => {
+                sendResponse({ needsBlock: false, needsTicker: false });
+            });
+            return true; // async response
         }
     });
 
-    // Handle Keyboard Commands
+    // Keyboard commands
     chrome.commands.onCommand.addListener((command) => {
         if (command === 'open_command_palette') {
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                if (tabs[0]?.id) {
-                    chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleCommandPalette' });
+                if (chrome.runtime.lastError) return;
+                const tabId = tabs[0]?.id;
+                if (tabId) {
+                    chrome.tabs.sendMessage(tabId, { action: 'toggleCommandPalette' }, () => {
+                        // msg-check-lasterror: ignore if tab has no listener
+                        if (chrome.runtime.lastError) {
+                            // Content script not loaded yet — that's OK
+                        }
+                    });
                 }
             });
         }
@@ -155,9 +185,7 @@ async function checkTaskReminders() {
     for (const task of tasks) {
         if (!task.startTime || !task.id) continue;
 
-        const startTime = new Date(task.startTime);
-        const diffMs = startTime.getTime() - now.getTime();
-        const diffMinutes = diffMs / (1000 * 60);
+        const diffMinutes = (new Date(task.startTime).getTime() - now.getTime()) / 60000;
 
         if (diffMinutes <= 10 && diffMinutes > 5 && !task.notifiedAt10) {
             showNotification(task.id, task.title, 'reminder10');
@@ -176,20 +204,15 @@ async function checkTaskReminders() {
 
 async function checkScheduledBlocking() {
     const settings = await getSettings();
-    if (!settings.scheduledBlocking.enabled) return;
+    if (!settings.scheduledBlocking?.enabled) return;
 
     const now = new Date();
-    const currentHour = now.getHours();
-    const currentDay = now.getDay();
-
     const isWorkHours =
-        settings.scheduledBlocking.days.includes(currentDay) &&
-        currentHour >= settings.scheduledBlocking.startHour &&
-        currentHour < settings.scheduledBlocking.endHour;
+        settings.scheduledBlocking.days.includes(now.getDay()) &&
+        now.getHours() >= settings.scheduledBlocking.startHour &&
+        now.getHours() < settings.scheduledBlocking.endHour;
 
-    // Auto-enable focus mode during scheduled hours
     if (isWorkHours && !settings.focusEnabled) {
-        const { updateSettings } = await import('@/lib/db');
         await updateSettings({ focusEnabled: true });
     }
 }
@@ -201,20 +224,19 @@ function showNotification(
 ) {
     try {
         const message = getHumorMessage(type, taskTitle);
-
         chrome.notifications.create(`task-${taskId}`, {
             type: 'basic',
             iconUrl: chrome.runtime.getURL('/icon/128.png'),
             title: 'AyaMir',
-            message: message,
+            message,
             buttons: [
-                { title: '⏰ Snooze 10min' },
-                { title: '✓ Done' }
+                { title: 'Snooze 10min' },
+                { title: 'Done' }
             ],
             priority: 2,
             requireInteraction: true
         });
     } catch (error) {
-        console.error('Error showing notification:', error);
+        console.error('Notification error:', error);
     }
 }
