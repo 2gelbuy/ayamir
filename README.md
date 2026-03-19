@@ -21,6 +21,16 @@ No accounts. No cloud. No tracking. Everything stays on your device.
 
 ---
 
+<!-- Screenshots: replace these placeholders with actual screenshots -->
+<!-- To add: run the extension, take screenshots, save to .github/screenshots/ -->
+<p align="center">
+  <img src=".github/screenshots/popup-light.png" alt="AyaMir Light Mode" width="360" />
+  &nbsp;&nbsp;
+  <img src=".github/screenshots/popup-dark.png" alt="AyaMir Dark Mode" width="360" />
+</p>
+
+---
+
 ## Install
 
 ### Chrome Web Store
@@ -154,6 +164,10 @@ AyaMir is **100% local**. Your data never leaves your device.
 - All data stored in IndexedDB and Chrome Storage API
 - Full data export/import for portability
 - [Read the full Privacy Policy](PRIVACY.md)
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Contributing
 
