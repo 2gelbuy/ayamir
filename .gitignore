@@ -49,4 +49,14 @@ _backup_future_features/
 AGENTS.md
 GEMINI.md
 CLAUDE.md
+AI_STATUS.md
 .gemini/
+
+# Dev-only docs (not for public repo)
+.env.example
+SPEC.md
+HANDOVER.md
+CHANGELOG.md
+INSTALLATION.md
+e2e/
+playwright.config.ts

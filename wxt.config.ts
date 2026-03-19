@@ -6,7 +6,7 @@ export default defineConfig({
     manifest: {
         name: '__MSG_extName__', default_locale: 'en',
         description: '__MSG_extDesc__',
-        version: '1.2.0',
+        version: '1.0.0',
         homepage_url: 'https://konabayev.com/ayamir',
         icons: {
             16: 'icon/16.png',

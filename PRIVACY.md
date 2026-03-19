@@ -64,5 +64,5 @@ If you have questions about this privacy policy, please open an issue on our Git
 
 ---
 
-**AyaMir v1.2.0**
+**AyaMir v1.0.0**
 *Protect your time, build your legacy.*
