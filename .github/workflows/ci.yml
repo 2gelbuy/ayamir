@@ -21,8 +21,11 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Prepare WXT types
+        run: npx wxt prepare
+
+      - name: Type check
+        run: npx tsc --noEmit
 
       - name: Build
         run: npm run build

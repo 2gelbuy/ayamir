@@ -150,7 +150,7 @@ export default function TaskItem({ task }: TaskItemProps) {
 
                     {/* Meta info row */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                        {task.priority && task.priority !== 'undefined' && !task.isCompleted && (
+                        {task.priority && task.priority !== ('undefined' as string) && !task.isCompleted && (
                             <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md ${priorityConfig[task.priority]?.bg} ${priorityConfig[task.priority]?.text}`}>
                                 <div className={`w-1.5 h-1.5 rounded-full ${priorityConfig[task.priority]?.dot}`} />
                                 {task.priority}
