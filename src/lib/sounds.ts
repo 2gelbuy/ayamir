@@ -1,16 +1,22 @@
 // Ambient sound generator using Web Audio API (no external files needed)
 let audioCtx: AudioContext | null = null;
-let currentNodes: AudioNode[] = [];
+let currentSource: AudioBufferSourceNode | null = null;
+let currentGain: GainNode | null = null;
 let isPlaying = false;
 
 function getContext(): AudioContext {
-    if (!audioCtx) {
+    if (!audioCtx || audioCtx.state === 'closed') {
         audioCtx = new AudioContext();
     }
     return audioCtx;
 }
 
-function createBrownNoise(ctx: AudioContext): AudioNode {
+interface SoundResult {
+    source: AudioBufferSourceNode;
+    output: AudioNode; // final node to connect to gain
+}
+
+function createBrownNoise(ctx: AudioContext): SoundResult {
     const bufferSize = 2 * ctx.sampleRate;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -24,18 +30,16 @@ function createBrownNoise(ctx: AudioContext): AudioNode {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.loop = true;
-    return source;
+    return { source, output: source };
 }
 
-function createRain(ctx: AudioContext): AudioNode {
+function createRain(ctx: AudioContext): SoundResult {
     const bufferSize = 2 * ctx.sampleRate;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        // Pink-ish noise for rain
         data[i] = (Math.random() * 2 - 1) * 0.3;
         if (Math.random() < 0.001) {
-            // Occasional "drop" clicks
             data[i] += (Math.random() - 0.5) * 0.8;
         }
     }
@@ -48,14 +52,13 @@ function createRain(ctx: AudioContext): AudioNode {
     filter.frequency.value = 800;
     filter.Q.value = 0.7;
     source.connect(filter);
-    return filter;
+    return { source, output: filter };
 }
 
-function createLofi(ctx: AudioContext): AudioNode {
+function createLofi(ctx: AudioContext): SoundResult {
     const bufferSize = 2 * ctx.sampleRate;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
-    // Create a warm, filtered noise with slight rhythm
     for (let i = 0; i < bufferSize; i++) {
         const t = i / ctx.sampleRate;
         const beat = Math.sin(2 * Math.PI * 1.5 * t) * 0.1;
@@ -70,17 +73,15 @@ function createLofi(ctx: AudioContext): AudioNode {
     filter.type = 'lowpass';
     filter.frequency.value = 600;
     source.connect(filter);
-    return filter;
+    return { source, output: filter };
 }
 
-function createCafe(ctx: AudioContext): AudioNode {
+function createCafe(ctx: AudioContext): SoundResult {
     const bufferSize = 3 * ctx.sampleRate;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        // Background murmur
         data[i] = (Math.random() * 2 - 1) * 0.2;
-        // Occasional clinking
         if (Math.random() < 0.0003) {
             const clink = Math.sin(i * 0.5) * 0.4 * Math.exp(-((i % 1000) / 200));
             data[i] += clink;
@@ -95,7 +96,7 @@ function createCafe(ctx: AudioContext): AudioNode {
     filter.frequency.value = 500;
     filter.Q.value = 0.5;
     source.connect(filter);
-    return filter;
+    return { source, output: filter };
 }
 
 export function playAmbientSound(type: string): void {
@@ -103,50 +104,46 @@ export function playAmbientSound(type: string): void {
     if (type === 'none') return;
 
     const ctx = getContext();
+    if (ctx.state === 'suspended') {
+        ctx.resume();
+    }
+
     const gain = ctx.createGain();
-    gain.gain.value = 0.15; // Low volume
+    gain.gain.value = 0.2;
     gain.connect(ctx.destination);
 
-    let sourceNode: AudioNode;
+    let result: SoundResult;
 
     switch (type) {
-        case 'rain':
-            sourceNode = createRain(ctx);
-            break;
-        case 'lofi':
-            sourceNode = createLofi(ctx);
-            break;
-        case 'cafe':
-            sourceNode = createCafe(ctx);
-            break;
-        case 'whitenoise':
-            sourceNode = createBrownNoise(ctx);
-            break;
-        default:
-            return;
+        case 'rain': result = createRain(ctx); break;
+        case 'lofi': result = createLofi(ctx); break;
+        case 'cafe': result = createCafe(ctx); break;
+        case 'whitenoise': result = createBrownNoise(ctx); break;
+        default: return;
     }
 
-    sourceNode.connect(gain);
-    if ('start' in sourceNode) {
-        (sourceNode as AudioBufferSourceNode).start();
-    }
+    result.output.connect(gain);
+    result.source.start();
 
-    currentNodes = [sourceNode, gain];
+    currentSource = result.source;
+    currentGain = gain;
     isPlaying = true;
 }
 
 export function stopAmbientSound(): void {
-    currentNodes.forEach(node => {
-        try {
-            node.disconnect();
-            if ('stop' in node) {
-                (node as AudioBufferSourceNode).stop();
-            }
-        } catch {
-            // already stopped
+    try {
+        if (currentSource) {
+            currentSource.stop();
+            currentSource.disconnect();
         }
-    });
-    currentNodes = [];
+        if (currentGain) {
+            currentGain.disconnect();
+        }
+    } catch {
+        // already stopped
+    }
+    currentSource = null;
+    currentGain = null;
     isPlaying = false;
 }
 

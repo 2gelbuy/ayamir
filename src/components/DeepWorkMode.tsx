@@ -173,12 +173,13 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
     ? ((totalSeconds - remainingTime) / totalSeconds) * 100
     : 0;
 
+  const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
   const sounds = [
-    { id: 'none', label: 'Off', icon: '🔇' },
-    { id: 'rain', label: 'Rain', icon: '🌧️' },
-    { id: 'lofi', label: 'Lo-fi', icon: '🎵' },
-    { id: 'cafe', label: 'Cafe', icon: '☕' },
-    { id: 'whitenoise', label: 'White', icon: '🌊' },
+    { id: 'none', label: t('soundOff', 'Off'), icon: '🔇' },
+    { id: 'rain', label: t('soundRain', 'Rain'), icon: '🌧️' },
+    { id: 'lofi', label: t('soundLofi', 'Lo-fi'), icon: '🎵' },
+    { id: 'cafe', label: t('soundCafe', 'Cafe'), icon: '☕' },
+    { id: 'whitenoise', label: t('soundNoise', 'Noise'), icon: '🌊' },
   ];
 
   const presetDurations = [15, 25, 45, 60, 90];
@@ -188,7 +189,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
       {/* Header */}
       <div className={`flex-shrink-0 p-4 flex items-center justify-between transition-colors duration-500 ${
         settings.isDeepWorkActive
-          ? 'bg-gradient-to-r from-teal-600 to-purple-600 text-white'
+          ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white'
           : 'bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-700'
       }`}>
         <div className="flex items-center gap-2">
@@ -209,9 +210,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 space-y-4 overflow-y-auto slim-scrollbar">
         {/* Timer Circle */}
-        <div className="relative w-48 h-48 flex items-center justify-center">
+        <div className="relative w-36 h-36 flex items-center justify-center flex-shrink-0">
           {/* Background circle */}
           <svg className="absolute inset-0 w-full h-full circular-progress" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor"
@@ -231,17 +232,17 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           <div className="text-center z-10">
             {settings.isDeepWorkActive ? (
               <>
-                <div className="text-4xl font-bold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
                   {formatTime(remainingTime)}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{chrome.i18n.getMessage('remainingLabel') || 'remaining'}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">{chrome.i18n.getMessage('remainingLabel') || 'remaining'}</p>
               </>
             ) : (
               <>
-                <div className="text-4xl font-bold text-slate-900 dark:text-white tabular-nums tracking-tight">
+                <div className="text-3xl font-extrabold text-slate-900 dark:text-white tabular-nums tracking-tight">
                   {selectedDuration}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{chrome.i18n.getMessage('minutesLabel') || 'minutes'}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-semibold">{chrome.i18n.getMessage('minutesLabel') || 'minutes'}</p>
               </>
             )}
           </div>
@@ -249,9 +250,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
 
         {/* Controls */}
         {!settings.isDeepWorkActive ? (
-          <div className="w-full space-y-4">
+          <div className="w-full space-y-3">
             {/* Duration presets */}
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-1.5">
               {presetDurations.map(d => (
                 <button
                   key={d}
@@ -270,7 +271,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
             {/* Break duration */}
             <div className="flex items-center justify-center gap-3">
               <Coffee className="w-4 h-4 text-slate-400" />
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Break:</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('breakLabel', 'Break')}:</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSelectedBreak(Math.max(1, selectedBreak - 1))}
@@ -354,7 +355,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
             {!showHardLockConfirm && (
               <button
                 onClick={handleStart}
-                className="w-full py-3.5 bg-gradient-to-r from-teal-600 to-purple-600 text-white rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 font-semibold shadow-lg shadow-teal-500/25"
+                className="w-full py-3.5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 font-semibold shadow-lg shadow-teal-500/25"
               >
                 <Play className="w-5 h-5 fill-current" />
                 {chrome.i18n.getMessage('startDeepWork') || 'Start Deep Work'}
