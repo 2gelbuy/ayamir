@@ -110,12 +110,22 @@ function injectBlockOverlay(settings: any) {
     </div>
   `;
 
+  const savedOverflow = document.body.style.overflow;
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
+
+  let blockInterval: ReturnType<typeof setInterval> | null = null;
+
+  const removeOverlay = () => {
+    if (blockInterval) clearInterval(blockInterval);
+    overlay.remove();
+    document.body.style.overflow = savedOverflow;
+  };
 
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
   overlay.querySelector('#ayamir-close-tab')!.addEventListener('click', () => {
+    removeOverlay();
     try { chrome.runtime.sendMessage({ action: 'closeTab' }); } catch {}
   });
 
@@ -149,8 +159,7 @@ function injectBlockOverlay(settings: any) {
 
   submitBtn.addEventListener('click', () => {
     if (input.value === quote) {
-      overlay.remove();
-      document.body.style.overflow = '';
+      removeOverlay();
     }
   });
 
@@ -158,7 +167,7 @@ function injectBlockOverlay(settings: any) {
   if (isDeepWork && settings.deepWorkEndTime) {
     const timerEl = overlay.querySelector('div[style*="font-size:48px"]');
     if (timerEl) {
-      const interval = setInterval(() => {
+      blockInterval = setInterval(() => {
         const rem = Math.max(0, Math.floor((settings.deepWorkEndTime - Date.now()) / 1000));
         if (rem <= 0) { clearInterval(interval); return; }
         const m = String(Math.floor(rem / 60)).padStart(2, '0');
@@ -237,11 +246,11 @@ function injectPalette() {
   backdrop.innerHTML = `
     <div style="background:#fff;width:100%;max-width:540px;border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,0.25);overflow:hidden">
       <form id="ayamir-palette-form" style="display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #f1f5f9">
-        <div style="width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,#0d9488,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
         <input id="ayamir-palette-input" type="text" placeholder="Add a quick task..." style="flex:1;border:0;outline:0;font-size:17px;font-weight:500;color:#1e293b;background:transparent" autofocus />
-        <button id="ayamir-palette-submit" type="submit" style="display:none;padding:8px 16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">Save</button>
+        <button id="ayamir-palette-submit" type="submit" style="display:none;padding:8px 16px;background:linear-gradient(135deg,#0d9488,#059669);color:#fff;border:0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">Save</button>
       </form>
       <div style="background:#f8fafc;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
         <div id="ayamir-priorities" style="display:flex;gap:6px"></div>
@@ -290,21 +299,22 @@ function injectPalette() {
     submitBtn.style.display = input.value.trim() ? 'block' : 'none';
   });
 
+  const paletteSavedOverflow = document.body.style.overflow;
+  const escHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') closePalette();
+  };
+
   const closePalette = () => {
     backdrop.remove();
-    document.body.style.overflow = '';
+    document.body.style.overflow = paletteSavedOverflow;
+    document.removeEventListener('keydown', escHandler);
   };
 
   backdrop.addEventListener('click', (e) => {
     if (e.target === backdrop) closePalette();
   });
 
-  document.addEventListener('keydown', function escHandler(e) {
-    if (e.key === 'Escape') {
-      closePalette();
-      document.removeEventListener('keydown', escHandler);
-    }
-  });
+  document.addEventListener('keydown', escHandler);
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();

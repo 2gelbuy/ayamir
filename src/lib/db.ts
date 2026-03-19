@@ -88,7 +88,7 @@ class AyaMirDB extends Dexie {
             tasks: '++id, title, startTime, isCompleted, createdAt'
         });
         this.version(3).stores({
-            tasks: '++id, title, startTime, isCompleted, createdAt',
+            tasks: '++id, title, startTime, isCompleted, createdAt, completedAt',
             focusSessions: '++id, startedAt, completed, type'
         });
     }
@@ -145,8 +145,13 @@ export async function getSettings(): Promise<Settings> {
         await storage.setItem('local:settings', DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
     }
-    // Merge with defaults to ensure new fields exist
-    return { ...DEFAULT_SETTINGS, ...settings };
+    // Deep merge with defaults to ensure nested objects have new fields
+    return {
+        ...DEFAULT_SETTINGS,
+        ...settings,
+        scheduledBlocking: { ...DEFAULT_SETTINGS.scheduledBlocking, ...settings.scheduledBlocking },
+        siteCategories: { ...DEFAULT_SETTINGS.siteCategories, ...settings.siteCategories },
+    };
 }
 
 export async function updateSettings(settings: Partial<Settings>): Promise<void> {

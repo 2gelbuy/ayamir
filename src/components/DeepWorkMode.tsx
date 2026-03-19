@@ -47,14 +47,16 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
     let interval: ReturnType<typeof setInterval>;
 
     if (settings?.isDeepWorkActive && settings.deepWorkEndTime) {
+      let completed = false;
       const updateTimer = () => {
         const now = Date.now();
         const end = settings.deepWorkEndTime!;
         if (now < end) {
           setRemainingTime(Math.floor((end - now) / 1000));
-        } else {
+        } else if (!completed) {
+          completed = true;
+          clearInterval(interval);
           setRemainingTime(0);
-          // Session complete — play sound + notification
           playCompletionSound();
           chrome.notifications.create({
             type: 'basic',
@@ -91,9 +93,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
     return () => clearInterval(interval);
   }, [settings?.isDeepWorkActive, settings?.deepWorkEndTime]);
 
-  if (!settings) return null;
-
   const [showHardLockConfirm, setShowHardLockConfirm] = useState(false);
+
+  if (!settings) return null;
 
   const doStart = async () => {
     const durationMs = selectedDuration * 60 * 1000;

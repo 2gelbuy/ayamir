@@ -100,18 +100,31 @@ export default function Settings({ onClose }: SettingsProps) {
             const text = await file.text();
             try {
                 const data = JSON.parse(text);
-                if (data.settings) await updateSettings(data.settings);
-                if (data.tasks) {
-                    await db.tasks.clear();
-                    await db.tasks.bulkAdd(data.tasks);
+                if (!data || typeof data !== 'object') throw new Error('Invalid format');
+                // Validate settings — only merge known keys
+                if (data.settings && typeof data.settings === 'object') {
+                    const safe: Record<string, unknown> = {};
+                    const allowed = Object.keys(DEFAULT_SETTINGS);
+                    for (const key of allowed) {
+                        if (key in data.settings) safe[key] = data.settings[key];
+                    }
+                    await updateSettings(safe);
                 }
-                if (data.sessions) {
+                // Validate tasks — must be arrays with required fields
+                if (Array.isArray(data.tasks)) {
+                    const validTasks = data.tasks.filter((t: any) =>
+                        t && typeof t.title === 'string' && t.title.length > 0 && t.title.length < 1000
+                    );
+                    await db.tasks.clear();
+                    await db.tasks.bulkAdd(validTasks);
+                }
+                if (Array.isArray(data.sessions)) {
                     await db.focusSessions.clear();
                     await db.focusSessions.bulkAdd(data.sessions);
                 }
                 getSettings().then(setSettings);
             } catch {
-                // invalid file
+                alert('Invalid backup file');
             }
         };
         input.click();

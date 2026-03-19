@@ -15,9 +15,9 @@ export default function Stats({ onClose }: StatsProps) {
 
     useEffect(() => {
         getSettings().then(setSettings);
-        // Calculate weekly completion data
+        // Calculate weekly completion data with Promise.all
         const now = new Date();
-        const data: number[] = [];
+        const promises = [];
         for (let i = 6; i >= 0; i--) {
             const day = new Date(now);
             day.setDate(day.getDate() - i);
@@ -25,15 +25,15 @@ export default function Stats({ onClose }: StatsProps) {
             const nextDay = new Date(day);
             nextDay.setDate(nextDay.getDate() + 1);
 
-            db.tasks.filter(t =>
-                !!t.isCompleted && !!t.completedAt &&
-                new Date(t.completedAt) >= day &&
-                new Date(t.completedAt) < nextDay
-            ).count().then(count => {
-                data[6 - i] = count;
-                if (i === 0) setWeeklyData([...data]);
-            });
+            promises.push(
+                db.tasks.filter(t =>
+                    !!t.isCompleted && !!t.completedAt &&
+                    new Date(t.completedAt) >= day &&
+                    new Date(t.completedAt) < nextDay
+                ).count()
+            );
         }
+        Promise.all(promises).then(counts => setWeeklyData(counts));
     }, []);
 
     const completed = allTasks.filter(t => t.isCompleted);
