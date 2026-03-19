@@ -1,73 +1,58 @@
-# Privacy Policy for EdgeTask
+# Privacy Policy for AyaMir
 
-**Last Updated:** December 14, 2024
+**Last Updated:** March 19, 2026
 
 ## Overview
 
-EdgeTask is a browser extension that helps you manage tasks and stay focused. We are committed to protecting your privacy.
+AyaMir is a local-first Chrome extension for productivity and focus management. We are committed to protecting your privacy.
 
 ## Data Collection
 
 ### What We Collect
-- **Task data:** Your tasks, reminders, and settings are stored locally on your device
-- **Settings preferences:** Your chosen humor tone, blacklist/whitelist domains, and notification preferences
+- **Task data:** Your tasks, focus sessions, and settings are stored locally on your device
+- **Settings preferences:** Your theme, blocked sites, focus preferences, and notification settings
 
 ### What We DO NOT Collect
-- ❌ Personal identifying information (name, email, address)
-- ❌ Browsing history or visited URLs
-- ❌ Passwords or sensitive credentials
-- ❌ Analytics or usage tracking data
-- ❌ Any data sent to external servers (except optional sync features)
+- No personal identifying information (name, email, address)
+- No browsing history or visited URLs
+- No passwords or sensitive credentials
+- No analytics or usage tracking data
+- No data sent to external servers
 
 ## Data Storage
 
 All data is stored locally using:
-- **IndexedDB (Dexie):** For tasks and settings
-- **Chrome Storage API:** For sync between devices (if enabled by user)
+- **IndexedDB (Dexie):** For tasks and focus sessions
+- **Chrome Storage API:** For extension settings
 
-**No data is sent to external servers unless you explicitly enable sync features.**
-
-## Optional Features
-
-### Chrome Sync
-If you enable Chrome Sync, your data is synced through Google's Chrome Sync API. This data is encrypted and managed by Google according to their privacy policy.
-
-### Google Calendar Integration
-If you connect Google Calendar, we request permission to:
-- Read your calendar events
-- Create calendar entries for your tasks
-
-We only access calendar data when you explicitly use this feature.
+**No data leaves your device. AyaMir has no server, no accounts, no cloud sync.**
 
 ## Permissions Explained
 
 | Permission | Why We Need It |
 |------------|----------------|
-| `storage` | Save your tasks and settings locally |
-| `notifications` | Send task reminders |
-| `alarms` | Schedule reminder checks |
-| `activeTab` | Detect when you're on a blocked site |
-| `scripting` | Show focus mode overlays |
-| `tabs` | Communicate with content scripts |
+| `storage` | Save your tasks, settings, and focus sessions locally |
+| `notifications` | Send task reminders and focus session alerts |
+| `alarms` | Schedule reminder checks and focus timers |
+| `activeTab` | Detect when you're on a blocked site during focus |
+| `scripting` | Show focus mode overlays and typing penalty |
+| `tabs` | Communicate between popup and content scripts |
+| `contextMenus` | Right-click to save pages/text as tasks |
 
 ## Third-Party Services
 
-EdgeTask does not share your data with third parties. Optional integrations:
-- **Google Calendar:** Only when you explicitly connect
-- **Chrome Sync:** Only when you enable it in settings
+AyaMir does not use any third-party services and does not share your data with anyone.
 
-## Data Deletion
+## Data Export & Deletion
 
-To delete all your data:
-1. Open EdgeTask Options page
-2. Click "Clear Data"
-3. Uninstall the extension
-
-This will remove all locally stored data.
+You have full control over your data:
+- **Export:** Use Settings > Data > Export to download a JSON backup of all your data
+- **Import:** Use Settings > Data > Import to restore from a backup
+- **Delete:** Uninstall the extension to remove all locally stored data
 
 ## Children's Privacy
 
-EdgeTask is not intended for children under 13 years of age.
+AyaMir is not intended for children under 13 years of age.
 
 ## Changes to This Policy
 
@@ -79,5 +64,5 @@ If you have questions about this privacy policy, please open an issue on our Git
 
 ---
 
-**EdgeTask v1.1.0**  
-*A task manager that doesn't take itself too seriously.*
+**AyaMir v1.2.0**
+*Protect your time, build your legacy.*
