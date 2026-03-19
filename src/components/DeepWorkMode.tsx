@@ -178,8 +178,8 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
     { id: 'none', label: t('soundOff', 'Off'), icon: '🔇' },
     { id: 'rain', label: t('soundRain', 'Rain'), icon: '🌧' },
     { id: 'ocean', label: t('soundOcean', 'Ocean'), icon: '🌊' },
+    { id: 'nature', label: t('soundNature', 'Nature'), icon: '🌿' },
     { id: 'fire', label: t('soundFire', 'Fire'), icon: '🔥' },
-    { id: 'cafe', label: t('soundCafe', 'Cafe'), icon: '☕' },
   ];
 
   // Preview: play sound immediately on selection

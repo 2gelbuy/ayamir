@@ -400,6 +400,7 @@
   "soundLofi": { "message": "Lo-fi" },
   "soundCafe": { "message": "Cafe" },
   "soundOcean": { "message": "Ocean" },
+  "soundNature": { "message": "Nature" },
   "soundFire": { "message": "Fire" },
   "soundWind": { "message": "Wind" },
   "exportData": { "message": "Export Data" },
