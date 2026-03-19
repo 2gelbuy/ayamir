@@ -507,12 +507,10 @@ export default function Settings({ onClose }: SettingsProps) {
                             <div className="flex gap-2">
                                 {[
                                     { id: 'none', label: 'Off', emoji: '🔇' },
-                                    { id: 'rain', label: 'Rain', emoji: '🌧️' },
-                                    { id: 'lofi', label: 'Lo-fi', emoji: '🎵' },
-                                    { id: 'cafe', label: 'Cafe', emoji: '☕' },
+                                    { id: 'rain', label: t('soundRain', 'Rain'), emoji: '🌧️' },
                                     { id: 'ocean', label: t('soundOcean', 'Ocean'), emoji: '🌊' },
+                                    { id: 'nature', label: t('soundNature', 'Nature'), emoji: '🌿' },
                                     { id: 'fire', label: t('soundFire', 'Fire'), emoji: '🔥' },
-                                    { id: 'wind', label: t('soundWind', 'Wind'), emoji: '🍃' },
                                 ].map(s => (
                                     <button
                                         key={s.id}

@@ -59,7 +59,7 @@ export interface Settings {
     theme: 'light' | 'dark' | 'system';
     onboardingCompleted: boolean;
     hardLockMode: boolean;
-    ambientSound: 'none' | 'rain' | 'ocean' | 'lofi' | 'cafe' | 'fire' | 'wind';
+    ambientSound: 'none' | 'rain' | 'ocean' | 'nature' | 'fire';
     scheduledBlocking: {
         enabled: boolean;
         startHour: number;
