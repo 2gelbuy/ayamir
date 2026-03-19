@@ -89,7 +89,7 @@ export default function Stats({ onClose }: StatsProps) {
 
                 {/* Level Card */}
                 {settings?.gamificationEnabled && (
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg shadow-indigo-500/20">
+                    <div className="bg-gradient-to-br from-teal-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg shadow-teal-500/20">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                                 <Star className="w-5 h-5 text-yellow-300 fill-yellow-300" />
@@ -119,20 +119,20 @@ export default function Stats({ onClose }: StatsProps) {
 
                 {/* Weekly Activity Chart */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
-                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">This Week</h3>
+                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">{chrome.i18n.getMessage('statsCurrentStreak') ? 'This Week' : 'This Week'}</h3>
                     <div className="flex items-end justify-between gap-1 h-20">
                         {weeklyData.map((count, i) => (
                             <div key={i} className="flex-1 flex flex-col items-center gap-1">
                                 <div className="w-full flex justify-center">
                                     <div
                                         className={`w-full max-w-[24px] rounded-t-lg transition-all duration-500 ${
-                                            i === 6 ? 'bg-indigo-500' : count > 0 ? 'bg-indigo-200 dark:bg-indigo-700' : 'bg-slate-100 dark:bg-slate-700'
+                                            i === 6 ? 'bg-teal-500' : count > 0 ? 'bg-teal-200 dark:bg-teal-700' : 'bg-slate-100 dark:bg-slate-700'
                                         }`}
                                         style={{ height: `${Math.max(4, (count / maxWeekly) * 64)}px` }}
                                     />
                                 </div>
                                 <span className={`text-[9px] font-bold ${
-                                    i === 6 ? 'text-indigo-500' : 'text-slate-400 dark:text-slate-500'
+                                    i === 6 ? 'text-teal-500' : 'text-slate-400 dark:text-slate-500'
                                 }`}>{orderedLabels[i]}</span>
                             </div>
                         ))}
@@ -156,13 +156,13 @@ export default function Stats({ onClose }: StatsProps) {
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
                         <TrendingUp className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                         <p className="text-xl font-bold text-slate-900 dark:text-white">{completionRate}%</p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Completion</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{chrome.i18n.getMessage('completionLabel') || 'Completion'}</p>
                     </div>
 
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
                         <Clock className="w-5 h-5 text-purple-500 mx-auto mb-1" />
                         <p className="text-xl font-bold text-slate-900 dark:text-white">{Math.round((settings?.totalFocusMinutes || 0) / 60 * 10) / 10}h</p>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Focus Time</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{chrome.i18n.getMessage('focusTimeLabel') || 'Focus Time'}</p>
                     </div>
                 </div>
 
@@ -171,7 +171,7 @@ export default function Stats({ onClose }: StatsProps) {
                     <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                                <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                <Award className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("statsAchievements")}</h3>
                             </div>
                             <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-md">

@@ -36,7 +36,7 @@ export default function TaskInput() {
 
     return (
         <form onSubmit={handleSubmit} className="relative group">
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-2xl p-2 shadow-sm border border-slate-200/60 dark:border-slate-700/60 focus-within:border-indigo-400 dark:focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all">
+            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-2xl p-2 shadow-sm border border-slate-200/60 dark:border-slate-700/60 focus-within:border-teal-400 dark:focus-within:border-teal-500 focus-within:ring-4 focus-within:ring-teal-500/10 transition-all">
                 {/* Priority dot */}
                 <button
                     type="button"
@@ -64,7 +64,7 @@ export default function TaskInput() {
                     onClick={() => setShowOptions(!showOptions)}
                     className={`p-1.5 rounded-xl transition-all ${
                         showOptions || startTime
-                            ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                            ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400'
                             : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600'
                     }`}
                     title="Options"
@@ -75,7 +75,7 @@ export default function TaskInput() {
                 <button
                     type="submit"
                     disabled={!title.trim()}
-                    className="p-1.5 bg-slate-900 dark:bg-indigo-600 text-white rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 disabled:opacity-30 disabled:hover:bg-slate-900 transition-all"
+                    className="p-1.5 bg-slate-900 dark:bg-teal-600 text-white rounded-xl hover:bg-slate-800 dark:hover:bg-teal-700 disabled:opacity-30 disabled:hover:bg-slate-900 transition-all"
                 >
                     <Plus className="w-4 h-4" />
                 </button>

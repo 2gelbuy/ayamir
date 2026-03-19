@@ -85,12 +85,12 @@ export default function TaskItem({ task }: TaskItemProps) {
 
     if (isEditing) {
         return (
-            <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl border border-indigo-200 dark:border-indigo-700 shadow-sm shadow-indigo-500/10 mx-4 animate-scale-in">
+            <div className="p-3 bg-white dark:bg-slate-800 rounded-2xl border border-teal-200 dark:border-teal-700 shadow-sm shadow-teal-500/10 mx-4 animate-scale-in">
                 <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm mb-3 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 text-slate-800 dark:text-slate-200"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-sm mb-3 outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-500/20 text-slate-800 dark:text-slate-200"
                     autoFocus
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') handleSaveEdit();
@@ -100,7 +100,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                 <div className="flex gap-2">
                     <button
                         onClick={handleSaveEdit}
-                        className="flex-1 py-2 bg-slate-900 dark:bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-indigo-700 transition-colors"
+                        className="flex-1 py-2 bg-slate-900 dark:bg-teal-600 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-teal-700 transition-colors"
                     >
                         Save
                     </button>
@@ -133,8 +133,8 @@ export default function TaskItem({ task }: TaskItemProps) {
                         justCompleted
                             ? 'bg-green-500 border-green-500 scale-110'
                             : task.isCompleted
-                                ? 'bg-indigo-500 border-indigo-500 scale-95'
-                                : 'border-slate-300 dark:border-slate-600 hover:border-indigo-400 dark:hover:border-indigo-500 bg-transparent hover:scale-110'
+                                ? 'bg-teal-500 border-teal-500 scale-95'
+                                : 'border-slate-300 dark:border-slate-600 hover:border-teal-400 dark:hover:border-teal-500 bg-transparent hover:scale-110'
                     }`}
                 >
                     {(task.isCompleted || justCompleted) && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
@@ -172,7 +172,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                                 href={task.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-0.5 text-[11px] text-indigo-500 hover:text-indigo-600 font-medium"
+                                className="flex items-center gap-0.5 text-[11px] text-teal-500 hover:text-teal-600 font-medium"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <Link className="w-3 h-3" />
@@ -201,7 +201,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                     )}
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
                         title="Edit"
                     >
                         <Edit2 className="w-3.5 h-3.5" />

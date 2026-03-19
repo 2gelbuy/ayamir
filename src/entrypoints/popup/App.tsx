@@ -157,8 +157,8 @@ export default function App() {
                             onClick={() => setShowDeepWork(true)}
                             className={`p-1.5 hover:bg-white dark:hover:bg-slate-600 hover:shadow-sm rounded-lg transition-all ${
                                 settings?.isDeepWorkActive
-                                    ? 'text-indigo-500 animate-pulse'
-                                    : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600'
+                                    ? 'text-teal-500 animate-pulse'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-teal-600'
                             }`}
                             title={chrome.i18n.getMessage("deepWorkTitle")}
                         >
@@ -210,7 +210,7 @@ export default function App() {
                         onClick={() => setFilter(f)}
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all flex items-center gap-1.5 whitespace-nowrap ${
                             filter === f
-                                ? 'bg-slate-800 dark:bg-indigo-600 text-white shadow-md shadow-slate-800/20 dark:shadow-indigo-500/20'
+                                ? 'bg-slate-800 dark:bg-teal-600 text-white shadow-md shadow-slate-800/20 dark:shadow-teal-500/20'
                                 : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                         }`}
                     >

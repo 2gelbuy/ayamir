@@ -55,7 +55,7 @@ body {
   flex-shrink: 0;
 }
 .toggle-switch.active {
-  background: #6366f1;
+  background: #0d9488;
 }
 .toggle-switch::after {
   content: '';
@@ -92,7 +92,7 @@ body {
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+  background: linear-gradient(135deg, #0d9488, #8b5cf6, #a855f7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

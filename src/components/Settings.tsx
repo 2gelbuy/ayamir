@@ -404,12 +404,12 @@ export default function Settings({ onClose }: SettingsProps) {
                                     value={newDomain}
                                     onChange={(e) => setNewDomain(e.target.value)}
                                     placeholder="e.g. facebook.com"
-                                    className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 text-slate-700 dark:text-slate-300"
+                                    className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 text-slate-700 dark:text-slate-300"
                                     onKeyDown={(e) => e.key === 'Enter' && addDomain()}
                                 />
                                 <button
                                     onClick={addDomain}
-                                    className="px-3 py-2 bg-teal-500 text-white rounded-xl hover:bg-indigo-600 transition-colors"
+                                    className="px-3 py-2 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
