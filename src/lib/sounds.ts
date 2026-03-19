@@ -1,226 +1,254 @@
-// Ambient sound generator using Web Audio API — no external files
+// Ambient sounds — each uses a DIFFERENT synthesis method, no shared noise base
 let audioCtx: AudioContext | null = null;
 let currentNodes: AudioNode[] = [];
 let isPlaying = false;
-let currentType: string = 'none';
+let currentType = 'none';
 
-function getCtx(): AudioContext {
-    if (!audioCtx || audioCtx.state === 'closed') {
-        audioCtx = new AudioContext();
-    }
+function ctx(): AudioContext {
+    if (!audioCtx || audioCtx.state === 'closed') audioCtx = new AudioContext();
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
 }
+function t(...n: AudioNode[]) { currentNodes.push(...n); }
 
-function noise(ctx: AudioContext, sec: number, stereo = true): AudioBuffer {
-    const ch = stereo ? 2 : 1;
-    const len = sec * ctx.sampleRate;
-    const buf = ctx.createBuffer(ch, len, ctx.sampleRate);
-    for (let c = 0; c < ch; c++) {
-        const d = buf.getChannelData(c);
-        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    }
-    return buf;
-}
-
-function track(...nodes: AudioNode[]) { currentNodes.push(...nodes); }
-
-function src(ctx: AudioContext, buf: AudioBuffer): AudioBufferSourceNode {
-    const s = ctx.createBufferSource();
-    s.buffer = buf;
-    s.loop = true;
-    return s;
-}
-
-// ── RAIN: pink noise base + droplet transients ──
-function startRain(ctx: AudioContext, out: GainNode) {
-    // Pink noise (smoothed white)
-    const buf = noise(ctx, 2);
-    for (let c = 0; c < 2; c++) {
-        const d = buf.getChannelData(c);
-        let prev = 0;
-        for (let i = 0; i < d.length; i++) { d[i] = prev = prev * 0.82 + d[i] * 0.18; }
-    }
-    const s = src(ctx, buf);
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
-    const g = ctx.createGain(); g.gain.value = 0.5;
-    s.connect(lp).connect(g).connect(out); s.start(); track(s, lp, g);
-
-    // Droplets
-    const db = ctx.createBuffer(1, 3 * ctx.sampleRate, ctx.sampleRate);
-    const dd = db.getChannelData(0);
-    for (let i = 0; i < dd.length; i++) {
-        if (Math.random() < 0.0004) {
-            const f = 3000 + Math.random() * 4000;
-            for (let j = 0; j < 80 && i + j < dd.length; j++)
-                dd[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 15) * 0.2;
+// ═══════════════════════════════════════════════
+// RAIN — individual water drops at random intervals, NO continuous noise
+// ═══════════════════════════════════════════════
+function rain(c: AudioContext, out: GainNode) {
+    // Gentle background patter (very soft pink noise, barely audible)
+    const len = c.sampleRate * 2;
+    const buf = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+        const d = buf.getChannelData(ch);
+        let p = 0;
+        for (let i = 0; i < len; i++) {
+            p = p * 0.9 + (Math.random() * 2 - 1) * 0.1;
+            d[i] = p * 0.3;
         }
     }
-    const ds = src(ctx, db);
-    const dg = ctx.createGain(); dg.gain.value = 0.3;
-    ds.connect(dg).connect(out); ds.start(); track(ds, dg);
-}
+    const bg = c.createBufferSource(); bg.buffer = buf; bg.loop = true;
+    const bgG = c.createGain(); bgG.gain.value = 0.25;
+    const bgF = c.createBiquadFilter(); bgF.type = 'lowpass'; bgF.frequency.value = 1500;
+    bg.connect(bgF).connect(bgG).connect(out); bg.start(); t(bg, bgF, bgG);
 
-// ── OCEAN: brown noise with slow wave LFO ──
-function startOcean(ctx: AudioContext, out: GainNode) {
-    const buf = noise(ctx, 3);
-    for (let c = 0; c < 2; c++) {
-        const d = buf.getChannelData(c);
-        let prev = 0;
-        for (let i = 0; i < d.length; i++) { d[i] = prev = prev * 0.95 + d[i] * 0.05; d[i] *= 3; }
+    // Individual drops — short sine bursts at high frequency
+    function makeDrop() {
+        if (!isPlaying) return;
+        const freq = 2500 + Math.random() * 4000;
+        const osc = c.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.3, c.currentTime + 0.05);
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.08 + Math.random() * 0.06, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.04 + Math.random() * 0.03);
+        const pan = c.createStereoPanner();
+        pan.pan.value = Math.random() * 2 - 1;
+        osc.connect(g).connect(pan).connect(out);
+        osc.start();
+        osc.stop(c.currentTime + 0.08);
+        setTimeout(makeDrop, 30 + Math.random() * 120);
     }
-    const s = src(ctx, buf);
-    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800;
-
-    // Wave rhythm: slow amplitude modulation
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.12;
-    const lfoG = ctx.createGain(); lfoG.gain.value = 0.3;
-    lfo.connect(lfoG);
-
-    const g = ctx.createGain(); g.gain.value = 0.4;
-    lfoG.connect(g.gain); // modulate volume
-
-    s.connect(lp).connect(g).connect(out);
-    s.start(); lfo.start(); track(s, lp, g, lfo, lfoG);
+    // Start multiple drop streams
+    for (let i = 0; i < 5; i++) setTimeout(makeDrop, i * 50);
 }
 
-// ── LO-FI: warm chord + vinyl crackle ──
-function startLofi(ctx: AudioContext, out: GainNode) {
-    [130.81, 164.81, 196.00, 233.08].forEach((freq, i) => {
-        const osc = ctx.createOscillator(); osc.type = 'triangle'; osc.frequency.value = freq;
-        const lfo = ctx.createOscillator(); lfo.frequency.value = 0.2 + i * 0.12;
-        const lfg = ctx.createGain(); lfg.gain.value = 1.5;
-        lfo.connect(lfg).connect(osc.frequency); lfo.start();
-        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400;
-        const g = ctx.createGain(); g.gain.value = 0.12;
-        osc.connect(lp).connect(g).connect(out); osc.start();
-        track(osc, lfo, lfg, lp, g);
+// ═══════════════════════════════════════════════
+// OCEAN — sine oscillators simulating wave rhythm, NO noise
+// ═══════════════════════════════════════════════
+function ocean(c: AudioContext, out: GainNode) {
+    // Two detuned low oscillators = deep rumble
+    [55, 58].forEach(freq => {
+        const osc = c.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const g = c.createGain();
+        g.gain.value = 0.15;
+        // Slow swell: volume fades in and out like waves
+        const lfo = c.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.08 + Math.random() * 0.04;
+        const lg = c.createGain(); lg.gain.value = 0.12;
+        lfo.connect(lg).connect(g.gain);
+        osc.connect(g).connect(out);
+        osc.start(); lfo.start(); t(osc, g, lfo, lg);
     });
-    // Crackle
-    const cb = ctx.createBuffer(1, 2 * ctx.sampleRate, ctx.sampleRate);
-    const cd = cb.getChannelData(0);
-    for (let i = 0; i < cd.length; i++) { if (Math.random() < 0.002) cd[i] = (Math.random() - 0.5) * 0.5; }
-    const cs = src(ctx, cb);
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 4000;
-    const cg = ctx.createGain(); cg.gain.value = 0.12;
-    cs.connect(hp).connect(cg).connect(out); cs.start(); track(cs, hp, cg);
-}
 
-// ── CAFE: speech-band murmur + clinks + machine hum ──
-function startCafe(ctx: AudioContext, out: GainNode) {
-    const mb = noise(ctx, 3);
-    for (let c = 0; c < 2; c++) {
-        const d = mb.getChannelData(c);
-        for (let i = 0; i < d.length; i++)
-            d[i] *= 0.4 + 0.6 * Math.sin(2 * Math.PI * (0.3 + c * 0.2) * i / ctx.sampleRate);
-    }
-    const ms = src(ctx, mb);
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1000; bp.Q.value = 0.4;
-    const mg = ctx.createGain(); mg.gain.value = 0.3;
-    ms.connect(bp).connect(mg).connect(out); ms.start(); track(ms, bp, mg);
-
-    // Clinks
-    const clb = ctx.createBuffer(1, 4 * ctx.sampleRate, ctx.sampleRate);
-    const cld = clb.getChannelData(0);
-    for (let i = 0; i < cld.length; i++) {
-        if (Math.random() < 0.00015) {
-            const f = 4000 + Math.random() * 4000;
-            for (let j = 0; j < 150 && i + j < cld.length; j++)
-                cld[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 30) * 0.1;
+    // Surf hiss: filtered noise with strong wave rhythm
+    const len = c.sampleRate * 3;
+    const buf = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) {
+        const d = buf.getChannelData(ch);
+        for (let i = 0; i < len; i++) {
+            // Wave-shaped amplitude envelope
+            const wave = Math.pow(Math.sin(Math.PI * i / len), 2);
+            d[i] = (Math.random() * 2 - 1) * wave * 0.4;
         }
     }
-    const cls = src(ctx, clb); cls.connect(out); cls.start(); track(cls);
-
-    // Machine hum
-    const hum = ctx.createOscillator(); hum.type = 'sawtooth'; hum.frequency.value = 110;
-    const hlp = ctx.createBiquadFilter(); hlp.type = 'lowpass'; hlp.frequency.value = 180;
-    const hg = ctx.createGain(); hg.gain.value = 0.02;
-    hum.connect(hlp).connect(hg).connect(out); hum.start(); track(hum, hlp, hg);
+    const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 600;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3000;
+    const sg = c.createGain(); sg.gain.value = 0.35;
+    src.connect(hp).connect(lp).connect(sg).connect(out); src.start(); t(src, hp, lp, sg);
 }
 
-// ── FIRE: crackle + low rumble + amplitude wobble ──
-function startFire(ctx: AudioContext, out: GainNode) {
-    // Base crackle
-    const fb = noise(ctx, 2, false);
-    const fd = fb.getChannelData(0);
-    for (let i = 0; i < fd.length; i++) {
-        if (Math.random() < 0.005) fd[i] *= 3; else fd[i] *= 0.15;
+// ═══════════════════════════════════════════════
+// FIRE — crackle pops + deep rumble oscillator, distinct from noise
+// ═══════════════════════════════════════════════
+function fire(c: AudioContext, out: GainNode) {
+    // Deep warm rumble from oscillator
+    const osc = c.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = 80;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 120;
+    const og = c.createGain(); og.gain.value = 0.06;
+    // Slow flicker
+    const lfo = c.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.5;
+    const lg = c.createGain(); lg.gain.value = 0.03;
+    lfo.connect(lg).connect(og.gain);
+    osc.connect(lp).connect(og).connect(out); osc.start(); lfo.start(); t(osc, lp, og, lfo, lg);
+
+    // Crackle: individual pop sounds at random intervals
+    function makePop() {
+        if (!isPlaying) return;
+        const freq = 800 + Math.random() * 2000;
+        const o = c.createOscillator(); o.type = 'square';
+        o.frequency.value = freq;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.04 + Math.random() * 0.06, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.01 + Math.random() * 0.02);
+        const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 5;
+        o.connect(f).connect(g).connect(out);
+        o.start(); o.stop(c.currentTime + 0.04);
+        setTimeout(makePop, 50 + Math.random() * 200);
     }
-    const fs = src(ctx, fb);
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2000; bp.Q.value = 0.3;
-
-    // Slow wobble
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.4;
-    const lfg = ctx.createGain(); lfg.gain.value = 0.15;
-    lfo.connect(lfg);
-
-    const g = ctx.createGain(); g.gain.value = 0.35;
-    lfg.connect(g.gain);
-
-    fs.connect(bp).connect(g).connect(out); fs.start(); lfo.start(); track(fs, bp, g, lfo, lfg);
-
-    // Deep rumble
-    const rb = noise(ctx, 2, false);
-    const rd = rb.getChannelData(0);
-    let prev = 0;
-    for (let i = 0; i < rd.length; i++) { rd[i] = prev = prev * 0.97 + rd[i] * 0.03; rd[i] *= 4; }
-    const rs = src(ctx, rb);
-    const rlp = ctx.createBiquadFilter(); rlp.type = 'lowpass'; rlp.frequency.value = 200;
-    const rg = ctx.createGain(); rg.gain.value = 0.2;
-    rs.connect(rlp).connect(rg).connect(out); rs.start(); track(rs, rlp, rg);
+    for (let i = 0; i < 3; i++) setTimeout(makePop, i * 80);
 }
 
-// ── WIND: highpass noise with LFO on filter ──
-function startWind(ctx: AudioContext, out: GainNode) {
-    const buf = noise(ctx, 2);
-    const s2 = src(ctx, buf);
-    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 400;
+// ═══════════════════════════════════════════════
+// CAFE — speech-like modulated tones + distinct clinks
+// ═══════════════════════════════════════════════
+function cafe(c: AudioContext, out: GainNode) {
+    // "Voices": multiple oscillators in speech range with random modulation
+    [180, 220, 300, 400].forEach((freq, i) => {
+        const osc = c.createOscillator(); osc.type = 'sawtooth'; osc.frequency.value = freq;
+        const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 3;
+        // Random volume modulation = "conversation" feel
+        const lfo = c.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.3 + i * 0.15 + Math.random() * 0.2;
+        const lg = c.createGain(); lg.gain.value = 0.03;
+        const g = c.createGain(); g.gain.value = 0.04;
+        lfo.connect(lg).connect(g.gain);
+        osc.connect(bp).connect(g).connect(out);
+        osc.start(); lfo.start(); t(osc, bp, lfo, lg, g);
+    });
 
-    // Wind gusts: LFO on filter frequency
-    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.15;
-    const lfg = ctx.createGain(); lfg.gain.value = 300;
-    lfo.connect(lfg).connect(hp.frequency);
-
-    const g = ctx.createGain(); g.gain.value = 0.25;
-    s2.connect(hp).connect(g).connect(out); s2.start(); lfo.start(); track(s2, hp, g, lfo, lfg);
+    // Clinks: short high-pitched sine taps
+    function makeClink() {
+        if (!isPlaying) return;
+        const freq = 4000 + Math.random() * 4000;
+        const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.05, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.06);
+        o.connect(g).connect(out); o.start(); o.stop(c.currentTime + 0.08);
+        setTimeout(makeClink, 800 + Math.random() * 3000);
+    }
+    setTimeout(makeClink, 500);
 }
 
-// ── PUBLIC API ──
+// ═══════════════════════════════════════════════
+// LO-FI — warm chord + vinyl crackle (oscillator-based, NO noise)
+// ═══════════════════════════════════════════════
+function lofi(c: AudioContext, out: GainNode) {
+    // Jazz chord: Cmaj7 low octave
+    [130.81, 164.81, 196.00, 246.94].forEach((freq, i) => {
+        const osc = c.createOscillator(); osc.type = 'triangle'; osc.frequency.value = freq;
+        // Vibrato
+        const lfo = c.createOscillator(); lfo.frequency.value = 0.15 + i * 0.1;
+        const lg = c.createGain(); lg.gain.value = 1.2;
+        lfo.connect(lg).connect(osc.frequency); lfo.start();
+        const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500;
+        const g = c.createGain(); g.gain.value = 0.1;
+        osc.connect(lp).connect(g).connect(out); osc.start(); t(osc, lfo, lg, lp, g);
+    });
 
+    // Crackle pops
+    function makeCrackle() {
+        if (!isPlaying) return;
+        const o = c.createOscillator(); o.type = 'square'; o.frequency.value = 6000 + Math.random() * 4000;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.015, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.003);
+        o.connect(g).connect(out); o.start(); o.stop(c.currentTime + 0.005);
+        setTimeout(makeCrackle, 20 + Math.random() * 100);
+    }
+    makeCrackle();
+}
+
+// ═══════════════════════════════════════════════
+// WIND — pitch-modulated oscillator "howl", NO noise buffer
+// ═══════════════════════════════════════════════
+function wind(c: AudioContext, out: GainNode) {
+    // Main howl: sine oscillator with slow random pitch sweeps
+    const osc = c.createOscillator(); osc.type = 'sine'; osc.frequency.value = 300;
+    // Pitch LFO — slow sweep creates howling effect
+    const lfo1 = c.createOscillator(); lfo1.type = 'sine'; lfo1.frequency.value = 0.07;
+    const lg1 = c.createGain(); lg1.gain.value = 200; // ±200Hz sweep
+    lfo1.connect(lg1).connect(osc.frequency); lfo1.start();
+    // Volume LFO — gusts
+    const lfo2 = c.createOscillator(); lfo2.type = 'sine'; lfo2.frequency.value = 0.12;
+    const lg2 = c.createGain(); lg2.gain.value = 0.08;
+    const g = c.createGain(); g.gain.value = 0.1;
+    lfo2.connect(lg2).connect(g.gain);
+    osc.connect(g).connect(out); osc.start(); lfo2.start(); t(osc, lfo1, lg1, lfo2, lg2, g);
+
+    // Second howl layer, different speed
+    const osc2 = c.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = 500;
+    const lfo3 = c.createOscillator(); lfo3.type = 'sine'; lfo3.frequency.value = 0.05;
+    const lg3 = c.createGain(); lg3.gain.value = 250;
+    lfo3.connect(lg3).connect(osc2.frequency); lfo3.start();
+    const g2 = c.createGain(); g2.gain.value = 0.06;
+    osc2.connect(g2).connect(out); osc2.start(); t(osc2, lfo3, lg3, g2);
+
+    // Soft rustle: very gentle filtered noise
+    const len = c.sampleRate;
+    const buf = c.createBuffer(1, len, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.15;
+    const rs = c.createBufferSource(); rs.buffer = buf; rs.loop = true;
+    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2000;
+    const rg = c.createGain(); rg.gain.value = 0.15;
+    rs.connect(hp).connect(rg).connect(out); rs.start(); t(rs, hp, rg);
+}
+
+// ═══════════════════════════════════════════════
 export function playAmbientSound(type: string): void {
     stopAmbientSound();
     if (type === 'none') return;
-
-    const ctx = getCtx();
-    const master = ctx.createGain();
-    master.gain.value = 0.25; // 25% master — comfortable background level
-    master.connect(ctx.destination);
-    track(master);
-
-    switch (type) {
-        case 'rain': startRain(ctx, master); break;
-        case 'ocean': startOcean(ctx, master); break;
-        case 'lofi': startLofi(ctx, master); break;
-        case 'cafe': startCafe(ctx, master); break;
-        case 'fire': startFire(ctx, master); break;
-        case 'wind': startWind(ctx, master); break;
-        default: return;
-    }
-
+    const c2 = ctx();
+    const master = c2.createGain();
+    master.gain.value = 0.3;
+    master.connect(c2.destination);
+    t(master);
     currentType = type;
     isPlaying = true;
+
+    switch (type) {
+        case 'rain': rain(c2, master); break;
+        case 'ocean': ocean(c2, master); break;
+        case 'fire': fire(c2, master); break;
+        case 'cafe': cafe(c2, master); break;
+        case 'lofi': lofi(c2, master); break;
+        case 'wind': wind(c2, master); break;
+    }
 }
 
 export function stopAmbientSound(): void {
-    for (const node of currentNodes) {
-        try {
-            if ('stop' in node && typeof (node as any).stop === 'function') (node as any).stop();
-            node.disconnect();
-        } catch { /* ok */ }
-    }
-    currentNodes = [];
     isPlaying = false;
     currentType = 'none';
+    for (const n of currentNodes) {
+        try {
+            if ('stop' in n && typeof (n as any).stop === 'function') (n as any).stop();
+            n.disconnect();
+        } catch {}
+    }
+    currentNodes = [];
 }
 
 export function isAmbientPlaying(): boolean { return isPlaying; }
