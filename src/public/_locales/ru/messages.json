@@ -465,5 +465,8 @@
   "breakLabel": { "message": "Перерыв" },
   "completionLabel": { "message": "Выполнение" },
   "sessionCompleteTitle": { "message": "Сессия завершена!" },
-  "sessionCompleteMsg": { "message": "Отличная работа! Время для перерыва." }
+  "sessionCompleteMsg": { "message": "Отличная работа! Время для перерыва." },
+  "feedbackSectionLabel": { "message": "Помогите нам стать лучше" },
+  "feedbackBtn": { "message": "Обратная связь" },
+  "rateBtn": { "message": "Оценить" }
 }

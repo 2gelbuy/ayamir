@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck } from 'lucide-react';
+import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck, MessageSquare, Star, ExternalLink } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
 import { playAmbientSound, stopAmbientSound } from '@/lib/sounds';
@@ -256,6 +256,29 @@ export default function Settings({ onClose }: SettingsProps) {
                             <p className="text-[11px] text-green-600/70 dark:text-green-500/70 leading-relaxed">
                                 {t('privacyDesc')}
                             </p>
+                        </div>
+
+                        {/* Feedback & Rate */}
+                        <div>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">{t('feedbackSectionLabel', 'Help Us Improve')}</label>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => chrome.tabs.create({ url: 'https://github.com/2gelbuy/ayamir/issues/new/choose' })}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:border-teal-200 dark:hover:border-teal-700 hover:text-teal-600 dark:hover:text-teal-400 transition-all"
+                                >
+                                    <MessageSquare className="w-3.5 h-3.5" />
+                                    {t('feedbackBtn', 'Send Feedback')}
+                                    <ExternalLink className="w-3 h-3 opacity-50" />
+                                </button>
+                                <button
+                                    onClick={() => chrome.tabs.create({ url: 'https://chromewebstore.google.com/detail/ayamir/EXTENSION_ID/reviews' })}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-700 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
+                                >
+                                    <Star className="w-3.5 h-3.5" />
+                                    {t('rateBtn', 'Rate Us')}
+                                    <ExternalLink className="w-3 h-3 opacity-50" />
+                                </button>
+                            </div>
                         </div>
                     </>
                 )}

@@ -465,5 +465,8 @@
   "breakLabel": { "message": "Descanso" },
   "completionLabel": { "message": "Finalización" },
   "sessionCompleteTitle": { "message": "¡Sesión Completada!" },
-  "sessionCompleteMsg": { "message": "¡Buen trabajo! Hora de descansar." }
+  "sessionCompleteMsg": { "message": "¡Buen trabajo! Hora de descansar." },
+  "feedbackSectionLabel": { "message": "Ayúdanos a mejorar" },
+  "feedbackBtn": { "message": "Enviar opinión" },
+  "rateBtn": { "message": "Calificar" }
 }

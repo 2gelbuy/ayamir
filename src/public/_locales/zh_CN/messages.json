@@ -465,5 +465,8 @@
   "breakLabel": { "message": "休息" },
   "completionLabel": { "message": "完成度" },
   "sessionCompleteTitle": { "message": "会话完成！" },
-  "sessionCompleteMsg": { "message": "干得好！休息一下吧。" }
+  "sessionCompleteMsg": { "message": "干得好！休息一下吧。" },
+  "feedbackSectionLabel": { "message": "帮助我们改进" },
+  "feedbackBtn": { "message": "发送反馈" },
+  "rateBtn": { "message": "评分" }
 }

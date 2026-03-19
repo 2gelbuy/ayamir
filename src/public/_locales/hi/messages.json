@@ -465,5 +465,8 @@
   "breakLabel": { "message": "ब्रेक" },
   "completionLabel": { "message": "पूर्णता" },
   "sessionCompleteTitle": { "message": "सत्र पूरा हुआ!" },
-  "sessionCompleteMsg": { "message": "बहुत अच्छा काम! अब ब्रेक लेने का समय है।" }
+  "sessionCompleteMsg": { "message": "बहुत अच्छा काम! अब ब्रेक लेने का समय है।" },
+  "feedbackSectionLabel": { "message": "हमें बेहतर बनने में मदद करें" },
+  "feedbackBtn": { "message": "प्रतिक्रिया भेजें" },
+  "rateBtn": { "message": "रेटिंग दें" }
 }

@@ -465,5 +465,8 @@
   "breakLabel": { "message": "Break" },
   "completionLabel": { "message": "Completion" },
   "sessionCompleteTitle": { "message": "Session Complete!" },
-  "sessionCompleteMsg": { "message": "Great work! Time for a break." }
+  "sessionCompleteMsg": { "message": "Great work! Time for a break." },
+  "feedbackSectionLabel": { "message": "Help Us Improve" },
+  "feedbackBtn": { "message": "Send Feedback" },
+  "rateBtn": { "message": "Rate Us" }
 }
