@@ -55,6 +55,7 @@ AyaMir is a premium, local-first Chrome extension for productivity based on the 
 <!-- AUTO:GIT_LOG -->
 ## Recent Commits
 ```
+f4fa59c auto: AI_STATUS.md
 8ccd91c auto: AI_STATUS.md, package.json, src/entrypoints/background.ts, src/public...
 c31fb64 auto: AI_STATUS.md
 9b8e62c auto: AI_STATUS.md, _icon_mockups/1_shield_clock.svg, _icon_mockups/2_shiel...
@@ -64,7 +65,6 @@ bc18d11 auto: AI_STATUS.md, src/components/Settings.tsx
 de8ca43 auto: AI_STATUS.md, src/components/Settings.tsx, src/lib/db.ts
 f7d13c9 auto: AI_STATUS.md
 0e9db53 auto: AI_STATUS.md
-1689954 auto: AI_STATUS.md
 ```
 <!-- /AUTO:GIT_LOG -->
 
@@ -72,5 +72,8 @@ f7d13c9 auto: AI_STATUS.md
 <!-- AUTO:GIT_STATUS -->
 ## Uncommitted Changes
 Branch: `main`
-_Clean working tree._
+```
+M AI_STATUS.md
+ M wxt.config.ts
+```
 <!-- /AUTO:GIT_STATUS -->
