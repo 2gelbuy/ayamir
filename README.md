@@ -1,42 +1,138 @@
+<div align="center">
+
+<img src="src/public/icon/icon.svg" alt="AyaMir" width="96" height="96" />
+
 # AyaMir
 
 **Protect your time, build your legacy.**
 
-AyaMir is a local-first Chrome extension for productivity and deep focus. No accounts, no cloud, no tracking — everything stays on your device.
+[![CI](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml/badge.svg)](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-1.0.0-teal)](https://github.com/2gelbuy/ayamir/releases/tag/v1.0.0)
+[![Manifest](https://img.shields.io/badge/manifest-v3-blue)](https://developer.chrome.com/docs/extensions/mv3/)
+[![License](https://img.shields.io/badge/license-MIT-green)](#license)
+[![Chrome Web Store](https://img.shields.io/badge/chrome-web%20store-4285F4?logo=googlechrome&logoColor=white)](#install)
+
+A local-first Chrome extension for productivity and deep focus.<br/>
+No accounts. No cloud. No tracking. Everything stays on your device.
+
+[Install](#install) &bull; [Features](#features) &bull; [Development](#development) &bull; [Privacy](#privacy)
+
+</div>
+
+---
+
+## Install
+
+### Chrome Web Store
+> Coming soon
+
+### Manual Install
+1. Download [`ayamir-1.0.0-chrome.zip`](https://github.com/2gelbuy/ayamir/releases/latest) from Releases
+2. Unzip to a folder
+3. Go to `chrome://extensions/` &rarr; enable **Developer Mode**
+4. Click **Load unpacked** &rarr; select the unzipped folder
 
 ## Features
 
-- **Smart Task Queue** — Priority-based task management with inline editing, snooze, and animations
-- **Command Palette** — `Ctrl+Shift+K` to add tasks from any page with auto-captured URL
-- **Deep Work Mode** — Pomodoro timer (15/25/45/60/90 min) with circular progress ring
-- **Site Blocking** — Category presets (Social, News, Entertainment, Shopping) + custom domains
-- **Typing Penalty** — Must type a motivational quote to bypass blocked sites during focus
-- **Scheduled Blocking** — Auto-block during configurable work hours and days
-- **Ambient Sounds** — Rain, Lo-fi, Cafe, White Noise (Web Audio API, zero network)
-- **Hard Lock Mode** — Cannot cancel Deep Work timer once started
-- **Dark Mode** — Light / Dark / System with full component coverage
-- **Gamification** — XP, 10 levels, 8 achievements, streak tracking
-- **Focus Analytics** — Session history, weekly activity chart
-- **Data Export/Import** — Full JSON backup and restore
-- **i18n** — English, Russian, Spanish, Chinese, Hindi
-- **Context Menu** — Right-click to save pages, selections, or links as tasks
+### Core
+| Feature | Description |
+|---------|-------------|
+| **Smart Task Queue** | Priority-based tasks with inline editing, snooze, and completion animations |
+| **Command Palette** | `Ctrl+Shift+K` from any page &mdash; auto-captures page URL |
+| **Deep Work Mode** | Pomodoro timer (15 / 25 / 45 / 60 / 90 min) with circular SVG progress ring |
+| **Site Blocking** | One-click category presets: Social (9), News (7), Entertainment (7), Shopping (6) + custom domains |
+| **Typing Penalty** | Must type a motivational quote to bypass a blocked site during focus |
 
-## Stack
+### Focus & Productivity
+| Feature | Description |
+|---------|-------------|
+| **Scheduled Blocking** | Auto-block distracting sites during configurable work hours & days |
+| **Hard Lock Mode** | Cannot cancel the Deep Work timer once started |
+| **Ambient Sounds** | Rain, Ocean, Nature, Fire &mdash; Web Audio API, zero network requests |
+| **Focus Analytics** | Total sessions, focus hours, 7-day activity chart |
 
-- [WXT](https://wxt.dev) (Manifest V3)
-- React 18
-- Tailwind CSS 3
-- Dexie.js (IndexedDB)
-- TypeScript
+### Personalization
+| Feature | Description |
+|---------|-------------|
+| **Dark Mode** | Light / Dark / System with full component coverage |
+| **Gamification** | XP system, 10 levels, 8 achievements, streak tracking |
+| **i18n** | English, Russian, Spanish, Chinese, Hindi |
+| **Context Menu** | Right-click any page, selection, or link to save as a task |
+| **Data Export/Import** | Full JSON backup & restore of all data |
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | [WXT](https://wxt.dev) (Manifest V3) |
+| UI | React 18 + Tailwind CSS 3 |
+| Storage | Dexie.js (IndexedDB) + Chrome Storage API |
+| Language | TypeScript (strict) |
+| Audio | Web Audio API (oscillators & buffers) |
+| CI | GitHub Actions (type check + build) |
+
+## Project Structure
+
+```
+src/
+  components/       # React UI components
+    DeepWorkMode    # Pomodoro timer with sounds
+    Settings        # 4-tab settings panel
+    Stats           # Analytics & gamification
+    TaskInput       # Task creation with priority dots
+    TaskItem        # Individual task card
+    TaskList        # Filtered task list
+    Onboarding      # 3-step welcome flow
+    DailyFocus      # Daily priority prompt
+    KeyboardHelp    # Shortcuts overlay
+  entrypoints/
+    background.ts   # Service worker (alarms, messages, context menu)
+    content.tsx     # Content script (block page, command palette, ticker)
+    popup/          # Main popup UI
+  lib/
+    db.ts           # Dexie schema, settings cache
+    gamification.ts # XP, levels, achievements
+    sounds.ts       # Ambient sound player
+    smartQueue.ts   # Priority sorting algorithm
+    messages.ts     # Typed message constants
+    theme.ts        # Dark mode management
+    humor.ts        # Notification messages
+  public/
+    _locales/       # i18n (en, ru, es, zh_CN, hi)
+    icon/           # Extension icons (16, 48, 128, SVG)
+    sounds/         # Ambient sound files (WAV)
+```
 
 ## Development
 
+### Prerequisites
+- Node.js 18+
+- npm
+
+### Quick Start
+
 ```bash
+git clone https://github.com/2gelbuy/ayamir.git
+cd ayamir
 npm install
-npm run dev        # Dev mode with hot reload
-npm run build      # Production build
-npm run zip        # Create CWS-ready ZIP
+npm run dev          # Dev mode with hot reload
 ```
+
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server with hot reload |
+| `npm run build` | Production build to `.output/chrome-mv3/` |
+| `npm run zip` | Create CWS-ready ZIP package |
+| `npx tsc --noEmit` | Type check without emitting |
+
+### Loading in Chrome
+
+1. Run `npm run build`
+2. Open `chrome://extensions/`
+3. Enable **Developer Mode**
+4. Click **Load unpacked** &rarr; select `.output/chrome-mv3/`
 
 ## Keyboard Shortcuts
 
@@ -44,12 +140,25 @@ npm run zip        # Create CWS-ready ZIP
 |----------|--------|
 | `Ctrl+Shift+E` | Open AyaMir popup |
 | `Ctrl+Shift+K` | Command Palette (from any page) |
+| `N` or `/` | New task (when popup is open) |
+| `D` | Deep Work Mode |
+| `S` | Settings |
+| `V` | Stats & XP |
 | `?` | Keyboard shortcuts help |
 
 ## Privacy
 
-AyaMir is 100% local. No servers, no accounts, no analytics. See [PRIVACY.md](PRIVACY.md).
+AyaMir is **100% local**. Your data never leaves your device.
+
+- No servers, no accounts, no analytics
+- All data stored in IndexedDB and Chrome Storage API
+- Full data export/import for portability
+- [Read the full Privacy Policy](PRIVACY.md)
+
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a PR.
 
 ## License
 
-All rights reserved.
+[MIT](LICENSE) &copy; 2026 [Tugelbay Konabayev](https://konabayev.com)
