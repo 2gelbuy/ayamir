@@ -40,3 +40,16 @@ jobs:
         with:
           files: ayamir-${{ github.ref_name }}-chrome.zip
           generate_release_notes: true
+
+      - name: Upload to Chrome Web Store
+        if: env.CWS_CLIENT_ID != ''
+        uses: mobilefirstllc/cws-publish@v2
+        with:
+          action: publish
+          client_id: ${{ secrets.CWS_CLIENT_ID }}
+          client_secret: ${{ secrets.CWS_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.CWS_REFRESH_TOKEN }}
+          extension_id: ${{ secrets.CWS_EXTENSION_ID }}
+          zip_file: ayamir-${{ github.ref_name }}-chrome.zip
+        env:
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
