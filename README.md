@@ -78,7 +78,6 @@ No accounts. No cloud. No tracking. Everything stays on your device.
 | UI | React 18 + Tailwind CSS 3 |
 | Storage | Dexie.js (IndexedDB) + Chrome Storage API |
 | Language | TypeScript (strict) |
-| Audio | Web Audio API (oscillators & buffers) |
 | CI | GitHub Actions (type check + build) |
 
 ## Project Structure
@@ -86,7 +85,7 @@ No accounts. No cloud. No tracking. Everything stays on your device.
 ```
 src/
   components/       # React UI components
-    DeepWorkMode    # Pomodoro timer with sounds
+    DeepWorkMode    # Pomodoro timer with hard lock
     Settings        # 4-tab settings panel
     Stats           # Analytics & gamification
     TaskInput       # Task creation with priority dots
@@ -102,7 +101,6 @@ src/
   lib/
     db.ts           # Dexie schema, settings cache
     gamification.ts # XP, levels, achievements
-    sounds.ts       # Ambient sound player
     smartQueue.ts   # Priority sorting algorithm
     messages.ts     # Typed message constants
     theme.ts        # Dark mode management
@@ -110,7 +108,6 @@ src/
   public/
     _locales/       # i18n (en, ru, es, zh_CN, hi)
     icon/           # Extension icons (16, 48, 128, SVG)
-    sounds/         # Ambient sound files (WAV)
 ```
 
 ## Development

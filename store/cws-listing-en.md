@@ -16,7 +16,7 @@ SMART TASK MANAGEMENT
 
 DEEP WORK MODE
 • Pomodoro timer (15 / 25 / 45 / 60 / 90 min)
-• Circular progress ring with ambient sounds (rain, ocean, nature, fire)
+• Circular progress ring with real-time countdown
 • Hard Lock Mode — can't cancel once started
 • Automatic site blocking during focus sessions
 

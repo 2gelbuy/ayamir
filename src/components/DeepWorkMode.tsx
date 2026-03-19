@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Play, Square, Brain, X, Lock, Unlock, Volume2, VolumeX, Coffee, Minus, Plus, AlertTriangle } from 'lucide-react';
+import { Play, Square, Brain, X, Lock, Unlock, Coffee, Minus, Plus, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings, db } from '@/lib/db';
-import { playAmbientSound, stopAmbientSound } from '@/lib/sounds';
 
 function playCompletionSound() {
   try {
@@ -26,10 +25,8 @@ function playCompletionSound() {
 export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [remainingTime, setRemainingTime] = useState<number>(0);
-  const [soundPlaying, setSoundPlaying] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState(25);
   const [selectedBreak, setSelectedBreak] = useState(5);
-  const [selectedSound, setSelectedSound] = useState<string>('none');
   const [hardLock, setHardLock] = useState(false);
 
   useEffect(() => {
@@ -37,10 +34,8 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
       setSettings(s);
       setSelectedDuration(s.deepWorkModeDuration);
       setSelectedBreak(s.deepWorkModeBreakDuration);
-      setSelectedSound(s.ambientSound || 'none');
       setHardLock(s.hardLockMode || false);
     });
-    return () => stopAmbientSound();
   }, []);
 
   useEffect(() => {
@@ -79,8 +74,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
             totalFocusMinutes: (settings.totalFocusMinutes || 0) + settings.deepWorkModeDuration,
             completedSessions: (settings.completedSessions || 0) + 1,
           }).then(() => getSettings().then(setSettings));
-          stopAmbientSound();
-          setSoundPlaying(false);
         }
       };
 
@@ -106,15 +99,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
       deepWorkModeDuration: selectedDuration,
       deepWorkModeBreakDuration: selectedBreak,
       hardLockMode: hardLock,
-      ambientSound: selectedSound as Settings['ambientSound'],
     });
     setSettings(await getSettings());
     setShowHardLockConfirm(false);
-
-    if (selectedSound !== 'none') {
-      playAmbientSound(selectedSound);
-      setSoundPlaying(true);
-    }
   };
 
   const handleStart = async () => {
@@ -148,18 +135,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
       totalFocusMinutes: (settings.totalFocusMinutes || 0) + actualMinutes,
     });
     setSettings(await getSettings());
-    stopAmbientSound();
-    setSoundPlaying(false);
-  };
-
-  const toggleSound = () => {
-    if (soundPlaying) {
-      stopAmbientSound();
-      setSoundPlaying(false);
-    } else if (selectedSound !== 'none') {
-      playAmbientSound(selectedSound);
-      setSoundPlaying(true);
-    }
   };
 
   const formatTime = (seconds: number) => {
@@ -174,25 +149,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
     : 0;
 
   const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
-  const sounds = [
-    { id: 'none', label: t('soundOff', 'Off'), icon: '🔇' },
-    { id: 'rain', label: t('soundRain', 'Rain'), icon: '🌧' },
-    { id: 'ocean', label: t('soundOcean', 'Ocean'), icon: '🌊' },
-    { id: 'nature', label: t('soundNature', 'Nature'), icon: '🌿' },
-    { id: 'fire', label: t('soundFire', 'Fire'), icon: '🔥' },
-  ];
-
-  // Preview: play sound immediately on selection
-  const handleSoundSelect = (id: string) => {
-    setSelectedSound(id);
-    if (id === 'none') {
-      stopAmbientSound();
-      setSoundPlaying(false);
-    } else {
-      playAmbientSound(id);
-      setSoundPlaying(true);
-    }
-  };
 
   const presetDurations = [15, 25, 45, 60, 90];
 
@@ -209,11 +165,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           <h1 className="text-lg font-bold">{chrome.i18n.getMessage("deepWorkHeader") || 'Deep Work'}</h1>
         </div>
         <div className="flex items-center gap-1">
-          {settings.isDeepWorkActive && selectedSound !== 'none' && (
-            <button onClick={toggleSound} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
-              {soundPlaying ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-            </button>
-          )}
           <button onClick={onClose} className={`p-1.5 rounded-lg transition-colors ${
             settings.isDeepWorkActive ? 'hover:bg-white/10' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
           }`}>
@@ -299,26 +250,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
-            </div>
-
-            {/* Ambient sounds */}
-            <div className="flex justify-center gap-1.5">
-              {sounds.map(s => (
-                <button
-                  key={s.id}
-                  onClick={() => handleSoundSelect(s.id)}
-                  className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all ${
-                    selectedSound === s.id
-                      ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700'
-                      : 'bg-slate-50 dark:bg-slate-800 border border-transparent hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  <span className="text-base">{s.icon}</span>
-                  <span className={`text-[9px] font-bold uppercase tracking-wider ${
-                    selectedSound === s.id ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'
-                  }`}>{s.label}</span>
-                </button>
-              ))}
             </div>
 
             {/* Hard lock toggle */}

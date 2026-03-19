@@ -59,7 +59,6 @@ export interface Settings {
     theme: 'light' | 'dark' | 'system';
     onboardingCompleted: boolean;
     hardLockMode: boolean;
-    ambientSound: 'none' | 'rain' | 'ocean' | 'nature' | 'fire';
     scheduledBlocking: {
         enabled: boolean;
         startHour: number;
@@ -119,7 +118,6 @@ export const DEFAULT_SETTINGS: Settings = {
     theme: 'system',
     onboardingCompleted: false,
     hardLockMode: false,
-    ambientSound: 'none',
     scheduledBlocking: {
         enabled: false,
         startHour: 9,

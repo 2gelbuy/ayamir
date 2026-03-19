@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck, MessageSquare, Star, ExternalLink } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
-import { playAmbientSound, stopAmbientSound } from '@/lib/sounds';
 
 interface SettingsProps {
     onClose: () => void;
@@ -33,7 +32,6 @@ export default function Settings({ onClose }: SettingsProps) {
         if (settings) {
             await updateSettings(settings);
             await applyTheme();
-            stopAmbientSound();
             onClose();
         }
     };
@@ -171,7 +169,7 @@ export default function Settings({ onClose }: SettingsProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("settingsHeader")}</h2>
-                <button onClick={() => { stopAmbientSound(); onClose(); }} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+                <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
                     <X className="w-5 h-5" />
                 </button>
             </div>
@@ -531,39 +529,6 @@ export default function Settings({ onClose }: SettingsProps) {
                             <Toggle checked={settings.hardLockMode} onChange={v => setSettings({ ...settings, hardLockMode: v })} />
                         </div>
 
-                        {/* {t('ambientSoundLabel')} */}
-                        <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
-                                {t('ambientSoundLabel')}
-                            </label>
-                            <div className="flex gap-2">
-                                {[
-                                    { id: 'none', label: 'Off', emoji: '🔇' },
-                                    { id: 'rain', label: t('soundRain', 'Rain'), emoji: '🌧️' },
-                                    { id: 'ocean', label: t('soundOcean', 'Ocean'), emoji: '🌊' },
-                                    { id: 'nature', label: t('soundNature', 'Nature'), emoji: '🌿' },
-                                    { id: 'fire', label: t('soundFire', 'Fire'), emoji: '🔥' },
-                                ].map(s => (
-                                    <button
-                                        key={s.id}
-                                        onClick={() => {
-                                            const newSound = s.id as SettingsType['ambientSound'];
-                                            setSettings({ ...settings, ambientSound: newSound });
-                                            if (newSound === 'none') stopAmbientSound();
-                                            else playAmbientSound(newSound);
-                                        }}
-                                        className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
-                                            settings.ambientSound === s.id
-                                                ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700 text-teal-600 dark:text-teal-400'
-                                                : 'bg-slate-50 dark:bg-slate-800 border border-transparent text-slate-500 dark:text-slate-400'
-                                        }`}
-                                    >
-                                        <span>{s.emoji}</span>
-                                        <span className="text-[9px]">{s.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
                     </>
                 )}
 
