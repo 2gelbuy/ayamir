@@ -28,8 +28,8 @@ export default defineConfig({
             },
             open_command_palette: {
                 suggested_key: {
-                    default: 'Alt+Shift+N',
-                    mac: 'MacCtrl+Shift+N'
+                    default: 'Ctrl+Shift+K',
+                    mac: 'Command+Shift+K'
                 },
                 description: '__MSG_openPalette__'
             }
