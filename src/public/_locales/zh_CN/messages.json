@@ -374,7 +374,7 @@
   "gamificationLabel": { "message": "游戏化" },
   "gamificationDesc": { "message": "经验值、等级和成就" },
   "incognitoTitle": { "message": "在无痕模式中启用" },
-  "incognitoDesc": { "message": "默认情况下，网站屏蔽在无痕模式中不起作用。请前往 chrome://extensions，找到 AyaMir，并启用"允许在无痕模式中运行"。" },
+  "incognitoDesc": { "message": "默认情况下，网站屏蔽在无痕模式中不起作用。请前往 chrome://extensions，找到 AyaMir，并启用「允许在无痕模式中运行」。" },
   "privacyTitle": { "message": "100% 本地隐私" },
   "privacyDesc": { "message": "您的数据永不离开浏览器。无需账号，无服务器，无追踪。" },
   "scheduledBlocking": { "message": "定时屏蔽" },
