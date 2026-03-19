@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — AyaMir Chrome Extension</title>
+    <meta name="description" content="AyaMir privacy policy. 100% local-first. No data collection, no network requests, no tracking.">
+    <link rel="canonical" href="https://2gelbuy.github.io/ayamir/privacy">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; line-height: 1.7; }
+        .container { max-width: 680px; margin: 0 auto; padding: 60px 24px; }
+        a { color: #5eead4; }
+        h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+        .date { color: #64748b; font-size: 14px; margin-bottom: 40px; }
+        h2 { font-size: 20px; font-weight: 700; color: #5eead4; margin: 32px 0 12px; }
+        p, li { font-size: 15px; color: #94a3b8; margin-bottom: 12px; }
+        ul { padding-left: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        th, td { text-align: left; padding: 10px 12px; border: 1px solid #334155; font-size: 14px; }
+        th { background: #1e293b; color: #e2e8f0; font-weight: 600; }
+        td { color: #94a3b8; }
+        .back { display: inline-block; margin-bottom: 32px; color: #64748b; text-decoration: none; font-size: 14px; }
+        .back:hover { color: #94a3b8; }
+        hr { border: none; border-top: 1px solid #1e293b; margin: 24px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="./" class="back">&larr; Back to AyaMir</a>
+        <h1>Privacy Policy</h1>
+        <p class="date">Effective date: 2026-03-20 &middot; Last updated: 2026-03-20</p>
+
+        <h2>Overview</h2>
+        <p>AyaMir is a 100% local-first productivity extension for Google Chrome. It includes a task manager, Pomodoro timer, website blocker, and gamification features. This policy explains how AyaMir handles your data — in short: <strong>it does not collect, transmit, or share any data whatsoever.</strong></p>
+
+        <h2>Data Collection</h2>
+        <p><strong>AyaMir collects no data.</strong></p>
+        <ul>
+            <li>No personal information is collected.</li>
+            <li>No usage analytics are recorded.</li>
+            <li>No crash reports are sent.</li>
+            <li>No telemetry of any kind is transmitted.</li>
+            <li>No third-party analytics, tracking, or advertising SDKs are included.</li>
+        </ul>
+
+        <h2>Data Storage</h2>
+        <p>All data created by AyaMir (tasks, timer settings, blocked sites, points, preferences) is stored exclusively on your local device using:</p>
+        <ul>
+            <li><strong>IndexedDB</strong> (via the Dexie library) — for structured application data such as tasks and history.</li>
+            <li><strong>chrome.storage.local</strong> — for extension settings and preferences.</li>
+        </ul>
+        <p>This data never leaves your device. It is not synced to any server, cloud service, or external system.</p>
+
+        <h2>Network Requests</h2>
+        <p>AyaMir makes <strong>zero network requests</strong>. The extension operates fully offline and does not connect to any external server, API, or service at any time.</p>
+
+        <h2>Permissions</h2>
+        <table>
+            <tr><th>Permission</th><th>Why it is needed</th></tr>
+            <tr><td>storage</td><td>Saves your tasks, settings, and preferences to your local device via chrome.storage.local.</td></tr>
+            <tr><td>notifications</td><td>Displays local desktop notifications when a Pomodoro session ends or a timer fires. No notification data is sent anywhere.</td></tr>
+            <tr><td>alarms</td><td>Schedules Pomodoro timers and reminders in the background. All alarms are processed locally.</td></tr>
+            <tr><td>contextMenus</td><td>Adds an optional right-click menu entry for quickly creating tasks. No menu interaction data is recorded.</td></tr>
+            <tr><td>tabs</td><td>Allows closing the current tab when you click "Close Tab" on a blocked site. No browsing history is accessed.</td></tr>
+        </table>
+        <p>No permission is used to access browsing history, read page content, capture keystrokes, or observe user behavior.</p>
+
+        <h2>Data Sharing</h2>
+        <p>AyaMir does not share data with anyone because it does not collect data in the first place. There are no third-party services, affiliates, advertisers, or data brokers involved.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>AyaMir does not collect any information from any user, including children under the age of 13. There is nothing to collect.</p>
+
+        <h2>Changes to This Policy</h2>
+        <p>If the extension is updated in a way that changes data handling practices, this policy will be updated and the effective date revised.</p>
+
+        <h2>Open Source</h2>
+        <p>AyaMir is open source under the MIT License. You can review all source code at <a href="https://github.com/2gelbuy/ayamir">github.com/2gelbuy/ayamir</a>.</p>
+
+        <hr>
+        <p>Questions? <a href="https://github.com/2gelbuy/ayamir/issues">Open an issue on GitHub</a>.</p>
+    </div>
+</body>
+</html>

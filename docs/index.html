@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyaMir — Protect your time, build your legacy</title>
+    <meta name="description" content="Local-first Chrome extension for productivity: smart tasks, Pomodoro timer, site blocker, gamification. 100% private, zero network requests.">
+    <meta property="og:title" content="AyaMir — Chrome Extension for Deep Focus">
+    <meta property="og:description" content="Smart tasks, Pomodoro timer, site blocker, gamification. 100% local, no account needed.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://2gelbuy.github.io/ayamir/">
+    <link rel="canonical" href="https://2gelbuy.github.io/ayamir/">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        .hero { max-width: 720px; margin: 0 auto; padding: 80px 24px; text-align: center; }
+        .logo { width: 80px; height: 80px; margin: 0 auto 32px; background: linear-gradient(135deg, #0d9488, #059669); border-radius: 24px; display: flex; align-items: center; justify-content: center; }
+        .logo svg { width: 40px; height: 40px; }
+        h1 { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, #5eead4, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
+        .tagline { font-size: 20px; color: #94a3b8; margin-bottom: 40px; }
+        .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; text-align: left; margin-bottom: 48px; }
+        .feature { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px; }
+        .feature h3 { font-size: 14px; font-weight: 700; color: #5eead4; margin-bottom: 6px; }
+        .feature p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+        .cta { display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #0d9488, #059669); color: #fff; text-decoration: none; border-radius: 16px; font-weight: 700; font-size: 16px; transition: opacity 0.2s; }
+        .cta:hover { opacity: 0.9; }
+        .privacy-link { display: block; margin-top: 24px; color: #64748b; font-size: 13px; }
+        .privacy-link a { color: #94a3b8; text-decoration: underline; }
+        .badges { display: flex; gap: 12px; justify-content: center; margin-top: 16px; font-size: 12px; color: #64748b; }
+        .badge { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px; }
+        @media (max-width: 600px) { .features { grid-template-columns: 1fr; } h1 { font-size: 36px; } }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 10v2l1.5 1.5"/>
+            </svg>
+        </div>
+        <h1>AyaMir</h1>
+        <p class="tagline">Protect your time, build your legacy.</p>
+
+        <div class="features">
+            <div class="feature">
+                <h3>Smart Tasks</h3>
+                <p>Priority queue, reminders, quick add from any page with Ctrl+Shift+K.</p>
+            </div>
+            <div class="feature">
+                <h3>Deep Work Mode</h3>
+                <p>Pomodoro timer with hard lock mode. Sites auto-blocked during sessions.</p>
+            </div>
+            <div class="feature">
+                <h3>Site Blocker</h3>
+                <p>One-click category presets. Scheduled blocking. Typing challenge to bypass.</p>
+            </div>
+            <div class="feature">
+                <h3>100% Private</h3>
+                <p>All data local. Zero network requests. No accounts. Open source (MIT).</p>
+            </div>
+        </div>
+
+        <a href="https://chromewebstore.google.com/detail/ayamir/" class="cta">Install from Chrome Web Store</a>
+
+        <div class="badges">
+            <span class="badge">Free forever</span>
+            <span class="badge">No ads</span>
+            <span class="badge">No tracking</span>
+            <span class="badge">Open source</span>
+        </div>
+
+        <p class="privacy-link">
+            <a href="privacy">Privacy Policy</a> &middot;
+            <a href="https://github.com/2gelbuy/ayamir">GitHub</a>
+        </p>
+    </div>
+</body>
+</html>
