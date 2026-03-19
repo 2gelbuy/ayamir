@@ -1,232 +1,227 @@
-// Ambient sound generator using Web Audio API
+// Ambient sound generator using Web Audio API — no external files
 let audioCtx: AudioContext | null = null;
 let currentNodes: AudioNode[] = [];
 let isPlaying = false;
+let currentType: string = 'none';
 
 function getCtx(): AudioContext {
     if (!audioCtx || audioCtx.state === 'closed') {
         audioCtx = new AudioContext();
     }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
 }
 
-function makeNoise(ctx: AudioContext, seconds: number): AudioBuffer {
-    const len = seconds * ctx.sampleRate;
-    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-        const d = buf.getChannelData(ch);
-        for (let i = 0; i < len; i++) {
-            d[i] = Math.random() * 2 - 1;
-        }
+function noise(ctx: AudioContext, sec: number, stereo = true): AudioBuffer {
+    const ch = stereo ? 2 : 1;
+    const len = sec * ctx.sampleRate;
+    const buf = ctx.createBuffer(ch, len, ctx.sampleRate);
+    for (let c = 0; c < ch; c++) {
+        const d = buf.getChannelData(c);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     }
     return buf;
 }
 
-function track(...nodes: AudioNode[]) {
-    currentNodes.push(...nodes);
+function track(...nodes: AudioNode[]) { currentNodes.push(...nodes); }
+
+function src(ctx: AudioContext, buf: AudioBuffer): AudioBufferSourceNode {
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    s.loop = true;
+    return s;
 }
 
-// ── RAIN: pink noise + high-freq droplets ──
-function startRain(ctx: AudioContext, master: GainNode) {
-    const buf = makeNoise(ctx, 2);
-    // Make it pink-ish
-    for (let ch = 0; ch < 2; ch++) {
-        const d = buf.getChannelData(ch);
+// ── RAIN: pink noise base + droplet transients ──
+function startRain(ctx: AudioContext, out: GainNode) {
+    // Pink noise (smoothed white)
+    const buf = noise(ctx, 2);
+    for (let c = 0; c < 2; c++) {
+        const d = buf.getChannelData(c);
         let prev = 0;
-        for (let i = 0; i < d.length; i++) {
-            d[i] = prev = prev * 0.85 + d[i] * 0.15;
-        }
+        for (let i = 0; i < d.length; i++) { d[i] = prev = prev * 0.82 + d[i] * 0.18; }
     }
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-
-    const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 2500;
-
-    const g = ctx.createGain();
-    g.gain.value = 0.6;
-
-    src.connect(lp).connect(g).connect(master);
-    src.start();
-    track(src, lp, g);
+    const s = src(ctx, buf);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    s.connect(lp).connect(g).connect(out); s.start(); track(s, lp, g);
 
     // Droplets
-    const dropBuf = ctx.createBuffer(1, 3 * ctx.sampleRate, ctx.sampleRate);
-    const dd = dropBuf.getChannelData(0);
+    const db = ctx.createBuffer(1, 3 * ctx.sampleRate, ctx.sampleRate);
+    const dd = db.getChannelData(0);
     for (let i = 0; i < dd.length; i++) {
-        if (Math.random() < 0.0005) {
-            const f = 3000 + Math.random() * 5000;
-            for (let j = 0; j < 100 && i + j < dd.length; j++) {
-                dd[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 20) * 0.3;
-            }
+        if (Math.random() < 0.0004) {
+            const f = 3000 + Math.random() * 4000;
+            for (let j = 0; j < 80 && i + j < dd.length; j++)
+                dd[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 15) * 0.2;
         }
     }
-    const ds = ctx.createBufferSource();
-    ds.buffer = dropBuf;
-    ds.loop = true;
-    const dg = ctx.createGain();
-    dg.gain.value = 0.4;
-    ds.connect(dg).connect(master);
-    ds.start();
-    track(ds, dg);
+    const ds = src(ctx, db);
+    const dg = ctx.createGain(); dg.gain.value = 0.3;
+    ds.connect(dg).connect(out); ds.start(); track(ds, dg);
 }
 
-// ── LO-FI: warm detuned chords + crackle ──
-function startLofi(ctx: AudioContext, master: GainNode) {
-    // Chord: C3, E3, G3, Bb3 (jazzy)
+// ── OCEAN: brown noise with slow wave LFO ──
+function startOcean(ctx: AudioContext, out: GainNode) {
+    const buf = noise(ctx, 3);
+    for (let c = 0; c < 2; c++) {
+        const d = buf.getChannelData(c);
+        let prev = 0;
+        for (let i = 0; i < d.length; i++) { d[i] = prev = prev * 0.95 + d[i] * 0.05; d[i] *= 3; }
+    }
+    const s = src(ctx, buf);
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 800;
+
+    // Wave rhythm: slow amplitude modulation
+    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.12;
+    const lfoG = ctx.createGain(); lfoG.gain.value = 0.3;
+    lfo.connect(lfoG);
+
+    const g = ctx.createGain(); g.gain.value = 0.4;
+    lfoG.connect(g.gain); // modulate volume
+
+    s.connect(lp).connect(g).connect(out);
+    s.start(); lfo.start(); track(s, lp, g, lfo, lfoG);
+}
+
+// ── LO-FI: warm chord + vinyl crackle ──
+function startLofi(ctx: AudioContext, out: GainNode) {
     [130.81, 164.81, 196.00, 233.08].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        osc.type = 'triangle';
-        osc.frequency.value = freq;
-        // Slow detune wobble
-        const lfo = ctx.createOscillator();
-        lfo.frequency.value = 0.2 + i * 0.15;
-        const lfoG = ctx.createGain();
-        lfoG.gain.value = 2;
-        lfo.connect(lfoG).connect(osc.frequency);
-        lfo.start();
-
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass';
-        lp.frequency.value = 350;
-
-        const g = ctx.createGain();
-        g.gain.value = 0.15;
-
-        osc.connect(lp).connect(g).connect(master);
-        osc.start();
-        track(osc, lfo, lfoG, lp, g);
+        const osc = ctx.createOscillator(); osc.type = 'triangle'; osc.frequency.value = freq;
+        const lfo = ctx.createOscillator(); lfo.frequency.value = 0.2 + i * 0.12;
+        const lfg = ctx.createGain(); lfg.gain.value = 1.5;
+        lfo.connect(lfg).connect(osc.frequency); lfo.start();
+        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400;
+        const g = ctx.createGain(); g.gain.value = 0.12;
+        osc.connect(lp).connect(g).connect(out); osc.start();
+        track(osc, lfo, lfg, lp, g);
     });
-
-    // Vinyl crackle
+    // Crackle
     const cb = ctx.createBuffer(1, 2 * ctx.sampleRate, ctx.sampleRate);
     const cd = cb.getChannelData(0);
-    for (let i = 0; i < cd.length; i++) {
-        if (Math.random() < 0.003) cd[i] = (Math.random() - 0.5) * 0.8;
-    }
-    const cs = ctx.createBufferSource();
-    cs.buffer = cb;
-    cs.loop = true;
-    const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 4000;
-    const cg = ctx.createGain();
-    cg.gain.value = 0.15;
-    cs.connect(hp).connect(cg).connect(master);
-    cs.start();
-    track(cs, hp, cg);
+    for (let i = 0; i < cd.length; i++) { if (Math.random() < 0.002) cd[i] = (Math.random() - 0.5) * 0.5; }
+    const cs = src(ctx, cb);
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 4000;
+    const cg = ctx.createGain(); cg.gain.value = 0.12;
+    cs.connect(hp).connect(cg).connect(out); cs.start(); track(cs, hp, cg);
 }
 
-// ── CAFE: murmur at speech freq + dish clinks + machine hum ──
-function startCafe(ctx: AudioContext, master: GainNode) {
-    // Murmur: bandpass noise modulated slowly
-    const mb = makeNoise(ctx, 3);
-    for (let ch = 0; ch < 2; ch++) {
-        const d = mb.getChannelData(ch);
-        for (let i = 0; i < d.length; i++) {
-            d[i] *= 0.4 + 0.6 * Math.sin(2 * Math.PI * (0.3 + ch * 0.2) * i / ctx.sampleRate);
-        }
+// ── CAFE: speech-band murmur + clinks + machine hum ──
+function startCafe(ctx: AudioContext, out: GainNode) {
+    const mb = noise(ctx, 3);
+    for (let c = 0; c < 2; c++) {
+        const d = mb.getChannelData(c);
+        for (let i = 0; i < d.length; i++)
+            d[i] *= 0.4 + 0.6 * Math.sin(2 * Math.PI * (0.3 + c * 0.2) * i / ctx.sampleRate);
     }
-    const ms = ctx.createBufferSource();
-    ms.buffer = mb;
-    ms.loop = true;
-
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 1000;
-    bp.Q.value = 0.4;
-
-    const mg = ctx.createGain();
-    mg.gain.value = 0.35;
-
-    ms.connect(bp).connect(mg).connect(master);
-    ms.start();
-    track(ms, bp, mg);
+    const ms = src(ctx, mb);
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1000; bp.Q.value = 0.4;
+    const mg = ctx.createGain(); mg.gain.value = 0.3;
+    ms.connect(bp).connect(mg).connect(out); ms.start(); track(ms, bp, mg);
 
     // Clinks
     const clb = ctx.createBuffer(1, 4 * ctx.sampleRate, ctx.sampleRate);
     const cld = clb.getChannelData(0);
     for (let i = 0; i < cld.length; i++) {
-        if (Math.random() < 0.0002) {
+        if (Math.random() < 0.00015) {
             const f = 4000 + Math.random() * 4000;
-            for (let j = 0; j < 200 && i + j < cld.length; j++) {
-                cld[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 40) * 0.15;
-            }
+            for (let j = 0; j < 150 && i + j < cld.length; j++)
+                cld[i + j] += Math.sin(2 * Math.PI * f * j / ctx.sampleRate) * Math.exp(-j / 30) * 0.1;
         }
     }
-    const cls = ctx.createBufferSource();
-    cls.buffer = clb;
-    cls.loop = true;
-    cls.connect(master);
-    cls.start();
-    track(cls);
+    const cls = src(ctx, clb); cls.connect(out); cls.start(); track(cls);
 
-    // Espresso hum
-    const hum = ctx.createOscillator();
-    hum.type = 'sawtooth';
-    hum.frequency.value = 110;
-    const hlp = ctx.createBiquadFilter();
-    hlp.type = 'lowpass';
-    hlp.frequency.value = 180;
-    const hg = ctx.createGain();
-    hg.gain.value = 0.03;
-    hum.connect(hlp).connect(hg).connect(master);
-    hum.start();
-    track(hum, hlp, hg);
+    // Machine hum
+    const hum = ctx.createOscillator(); hum.type = 'sawtooth'; hum.frequency.value = 110;
+    const hlp = ctx.createBiquadFilter(); hlp.type = 'lowpass'; hlp.frequency.value = 180;
+    const hg = ctx.createGain(); hg.gain.value = 0.02;
+    hum.connect(hlp).connect(hg).connect(out); hum.start(); track(hum, hlp, hg);
 }
 
-// ── WHITE NOISE: pure stereo ──
-function startWhite(ctx: AudioContext, master: GainNode) {
-    const buf = makeNoise(ctx, 2);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    src.loop = true;
-    const g = ctx.createGain();
-    g.gain.value = 0.5;
-    src.connect(g).connect(master);
-    src.start();
-    track(src, g);
+// ── FIRE: crackle + low rumble + amplitude wobble ──
+function startFire(ctx: AudioContext, out: GainNode) {
+    // Base crackle
+    const fb = noise(ctx, 2, false);
+    const fd = fb.getChannelData(0);
+    for (let i = 0; i < fd.length; i++) {
+        if (Math.random() < 0.005) fd[i] *= 3; else fd[i] *= 0.15;
+    }
+    const fs = src(ctx, fb);
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2000; bp.Q.value = 0.3;
+
+    // Slow wobble
+    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.4;
+    const lfg = ctx.createGain(); lfg.gain.value = 0.15;
+    lfo.connect(lfg);
+
+    const g = ctx.createGain(); g.gain.value = 0.35;
+    lfg.connect(g.gain);
+
+    fs.connect(bp).connect(g).connect(out); fs.start(); lfo.start(); track(fs, bp, g, lfo, lfg);
+
+    // Deep rumble
+    const rb = noise(ctx, 2, false);
+    const rd = rb.getChannelData(0);
+    let prev = 0;
+    for (let i = 0; i < rd.length; i++) { rd[i] = prev = prev * 0.97 + rd[i] * 0.03; rd[i] *= 4; }
+    const rs = src(ctx, rb);
+    const rlp = ctx.createBiquadFilter(); rlp.type = 'lowpass'; rlp.frequency.value = 200;
+    const rg = ctx.createGain(); rg.gain.value = 0.2;
+    rs.connect(rlp).connect(rg).connect(out); rs.start(); track(rs, rlp, rg);
 }
+
+// ── WIND: highpass noise with LFO on filter ──
+function startWind(ctx: AudioContext, out: GainNode) {
+    const buf = noise(ctx, 2);
+    const s2 = src(ctx, buf);
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 400;
+
+    // Wind gusts: LFO on filter frequency
+    const lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.15;
+    const lfg = ctx.createGain(); lfg.gain.value = 300;
+    lfo.connect(lfg).connect(hp.frequency);
+
+    const g = ctx.createGain(); g.gain.value = 0.25;
+    s2.connect(hp).connect(g).connect(out); s2.start(); lfo.start(); track(s2, hp, g, lfo, lfg);
+}
+
+// ── PUBLIC API ──
 
 export function playAmbientSound(type: string): void {
     stopAmbientSound();
     if (type === 'none') return;
 
     const ctx = getCtx();
-    // Resume if suspended (Chrome requires user gesture)
-    if (ctx.state === 'suspended') ctx.resume();
-
     const master = ctx.createGain();
-    master.gain.value = 0.35; // Master volume
+    master.gain.value = 0.25; // 25% master — comfortable background level
     master.connect(ctx.destination);
     track(master);
 
     switch (type) {
         case 'rain': startRain(ctx, master); break;
+        case 'ocean': startOcean(ctx, master); break;
         case 'lofi': startLofi(ctx, master); break;
         case 'cafe': startCafe(ctx, master); break;
-        case 'whitenoise': startWhite(ctx, master); break;
+        case 'fire': startFire(ctx, master); break;
+        case 'wind': startWind(ctx, master); break;
         default: return;
     }
 
+    currentType = type;
     isPlaying = true;
 }
 
 export function stopAmbientSound(): void {
     for (const node of currentNodes) {
         try {
-            if ('stop' in node && typeof (node as any).stop === 'function') {
-                (node as any).stop();
-            }
+            if ('stop' in node && typeof (node as any).stop === 'function') (node as any).stop();
             node.disconnect();
-        } catch { /* already stopped */ }
+        } catch { /* ok */ }
     }
     currentNodes = [];
     isPlaying = false;
+    currentType = 'none';
 }
 
-export function isAmbientPlaying(): boolean {
-    return isPlaying;
-}
+export function isAmbientPlaying(): boolean { return isPlaying; }
+export function getCurrentSound(): string { return currentType; }

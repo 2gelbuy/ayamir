@@ -176,11 +176,25 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
   const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
   const sounds = [
     { id: 'none', label: t('soundOff', 'Off'), icon: '🔇' },
-    { id: 'rain', label: t('soundRain', 'Rain'), icon: '🌧️' },
-    { id: 'lofi', label: t('soundLofi', 'Lo-fi'), icon: '🎵' },
+    { id: 'rain', label: t('soundRain', 'Rain'), icon: '🌧' },
+    { id: 'ocean', label: t('soundOcean', 'Ocean'), icon: '🌊' },
+    { id: 'fire', label: t('soundFire', 'Fire'), icon: '🔥' },
     { id: 'cafe', label: t('soundCafe', 'Cafe'), icon: '☕' },
-    { id: 'whitenoise', label: t('soundNoise', 'Noise'), icon: '🌊' },
+    { id: 'lofi', label: t('soundLofi', 'Lo-fi'), icon: '🎵' },
+    { id: 'wind', label: t('soundWind', 'Wind'), icon: '🍃' },
   ];
+
+  // Preview: play sound immediately on selection
+  const handleSoundSelect = (id: string) => {
+    setSelectedSound(id);
+    if (id === 'none') {
+      stopAmbientSound();
+      setSoundPlaying(false);
+    } else {
+      playAmbientSound(id);
+      setSoundPlaying(true);
+    }
+  };
 
   const presetDurations = [15, 25, 45, 60, 90];
 
@@ -294,7 +308,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
               {sounds.map(s => (
                 <button
                   key={s.id}
-                  onClick={() => setSelectedSound(s.id)}
+                  onClick={() => handleSoundSelect(s.id)}
                   className={`flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all ${
                     selectedSound === s.id
                       ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700'

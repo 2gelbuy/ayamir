@@ -510,7 +510,9 @@ export default function Settings({ onClose }: SettingsProps) {
                                     { id: 'rain', label: 'Rain', emoji: '🌧️' },
                                     { id: 'lofi', label: 'Lo-fi', emoji: '🎵' },
                                     { id: 'cafe', label: 'Cafe', emoji: '☕' },
-                                    { id: 'whitenoise', label: 'Noise', emoji: '🌊' },
+                                    { id: 'ocean', label: t('soundOcean', 'Ocean'), emoji: '🌊' },
+                                    { id: 'fire', label: t('soundFire', 'Fire'), emoji: '🔥' },
+                                    { id: 'wind', label: t('soundWind', 'Wind'), emoji: '🍃' },
                                 ].map(s => (
                                     <button
                                         key={s.id}
