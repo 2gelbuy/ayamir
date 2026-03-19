@@ -4,15 +4,70 @@ import { updateStatsOnTaskCompletion } from '@/lib/gamification';
 
 export default defineBackground(() => {
     chrome.runtime.onInstalled.addListener(() => {
-        // Create alarm for checking reminders every minute on install/update
+        // Create alarm for checking reminders every minute
         chrome.alarms.create('checkReminders', { periodInMinutes: 1 });
-        console.log('AyaMir installed, alarms configured');
+
+        // Create context menu for saving page as task
+        chrome.contextMenus.create({
+            id: 'ayamir-save-page',
+            title: 'Save page as AyaMir task',
+            contexts: ['page', 'link'],
+        });
+
+        // Create context menu for saving selected text
+        chrome.contextMenus.create({
+            id: 'ayamir-save-selection',
+            title: 'Save "%s" as AyaMir task',
+            contexts: ['selection'],
+        });
+
+        console.log('AyaMir installed, alarms and context menus configured');
+    });
+
+    // Context menu click handler
+    chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+        let title = '';
+        let url = '';
+
+        if (info.menuItemId === 'ayamir-save-selection' && info.selectionText) {
+            title = info.selectionText.trim();
+            url = tab?.url || '';
+        } else if (info.menuItemId === 'ayamir-save-page') {
+            if (info.linkUrl) {
+                title = `Check: ${info.linkUrl}`;
+                url = info.linkUrl;
+            } else {
+                title = tab?.title || 'Saved page';
+                url = tab?.url || '';
+            }
+        }
+
+        if (title) {
+            await db.tasks.add({
+                title,
+                startTime: null,
+                isCompleted: false,
+                createdAt: new Date(),
+                priority: 'medium',
+                url: url || undefined,
+            });
+
+            // Show confirmation notification
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: chrome.runtime.getURL('/icon/128.png'),
+                title: 'AyaMir',
+                message: `Task saved: "${title.substring(0, 60)}${title.length > 60 ? '...' : ''}"`,
+                priority: 1,
+            });
+        }
     });
 
     chrome.alarms.onAlarm.addListener(async (alarm) => {
         try {
             if (alarm.name === 'checkReminders') {
                 await checkTaskReminders();
+                await checkScheduledBlocking();
             }
         } catch (error) {
             console.error('Error in checkReminders alarm:', error);
@@ -57,7 +112,7 @@ export default defineBackground(() => {
         }
     });
 
-    // Also handle notification click (opens popup)
+    // Handle notification click
     chrome.notifications.onClicked.addListener((notificationId) => {
         chrome.notifications.clear(notificationId);
     });
@@ -74,7 +129,7 @@ export default defineBackground(() => {
                 console.error('Failed to create task:', error);
                 sendResponse({ success: false, error });
             });
-            return true; // Indicates asynchronous response
+            return true;
         }
     });
 
@@ -94,7 +149,6 @@ async function checkTaskReminders() {
     const settings = await getSettings();
     if (!settings.notificationsEnabled) return;
 
-    // Use query to avoid loading all completed tasks
     const tasks = await db.tasks.filter(t => !t.isCompleted && !!t.startTime).toArray();
     const now = new Date();
 
@@ -105,21 +159,38 @@ async function checkTaskReminders() {
         const diffMs = startTime.getTime() - now.getTime();
         const diffMinutes = diffMs / (1000 * 60);
 
-        // 10 minute reminder
         if (diffMinutes <= 10 && diffMinutes > 5 && !task.notifiedAt10) {
             showNotification(task.id, task.title, 'reminder10');
             await db.tasks.update(task.id, { notifiedAt10: true });
         }
-        // 5 minute reminder
         else if (diffMinutes <= 5 && diffMinutes > 0 && !task.notifiedAt5) {
             showNotification(task.id, task.title, 'reminder5');
             await db.tasks.update(task.id, { notifiedAt5: true });
         }
-        // Time's up reminder
         else if (diffMinutes <= 0 && diffMinutes > -1 && !task.notifiedAt0) {
             showNotification(task.id, task.title, 'reminder0');
             await db.tasks.update(task.id, { notifiedAt0: true });
         }
+    }
+}
+
+async function checkScheduledBlocking() {
+    const settings = await getSettings();
+    if (!settings.scheduledBlocking.enabled) return;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentDay = now.getDay();
+
+    const isWorkHours =
+        settings.scheduledBlocking.days.includes(currentDay) &&
+        currentHour >= settings.scheduledBlocking.startHour &&
+        currentHour < settings.scheduledBlocking.endHour;
+
+    // Auto-enable focus mode during scheduled hours
+    if (isWorkHours && !settings.focusEnabled) {
+        const { updateSettings } = await import('@/lib/db');
+        await updateSettings({ focusEnabled: true });
     }
 }
 

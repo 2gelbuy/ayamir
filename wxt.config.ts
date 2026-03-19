@@ -6,7 +6,7 @@ export default defineConfig({
     manifest: {
         name: '__MSG_extName__', default_locale: 'en',
         description: '__MSG_extDesc__',
-        version: '1.0.0',
+        version: '1.2.0',
         icons: {
             16: 'icon/16.png',
             48: 'icon/48.png',
@@ -15,7 +15,8 @@ export default defineConfig({
         permissions: [
             'storage',
             'notifications',
-            'alarms'
+            'alarms',
+            'contextMenus'
         ],
         commands: {
             _execute_action: {

@@ -2,10 +2,13 @@
 export {}
 declare global {
   const ContentScriptContext: typeof import('wxt/client')['ContentScriptContext']
+  const DailyFocus: typeof import('C:/Projects/edgetask-extension-main/src/components/DailyFocus')['default']
   const DeepWorkMode: typeof import('C:/Projects/edgetask-extension-main/src/components/DeepWorkMode')['default']
   const InvalidMatchPattern: typeof import('wxt/sandbox')['InvalidMatchPattern']
+  const KeyboardHelp: typeof import('C:/Projects/edgetask-extension-main/src/components/KeyboardHelp')['default']
   const MatchPattern: typeof import('wxt/sandbox')['MatchPattern']
   const MigrationError: typeof import('wxt/storage')['MigrationError']
+  const Onboarding: typeof import('C:/Projects/edgetask-extension-main/src/components/Onboarding')['default']
   const Settings: typeof import('C:/Projects/edgetask-extension-main/src/components/Settings')['default']
   const Stats: typeof import('C:/Projects/edgetask-extension-main/src/components/Stats')['default']
   const TaskInput: typeof import('C:/Projects/edgetask-extension-main/src/components/TaskInput')['default']

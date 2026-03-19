@@ -1,6 +1,6 @@
 import { getSettings, Settings, db, Task } from '@/lib/db';
 import { createRoot } from 'react-dom/client';
-import { Target, Brain, CheckCircle, Clock, Plus, Zap } from 'lucide-react';
+import { Target, Brain, Zap, Shield } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import '@/styles/global.css';
 
@@ -10,11 +10,21 @@ export default defineContentScript({
   async main(ctx) {
     const settings = await getSettings();
     const currentHostname = window.location.hostname;
-    const isSiteBlocked = settings.blacklist.some(domain => 
+    const isSiteBlocked = settings.blacklist.some(domain =>
         currentHostname === domain || currentHostname.endsWith(`.${domain}`)
     );
 
-    const needsNudge = !!(isSiteBlocked && (settings.focusEnabled || settings.isDeepWorkActive));
+    // Check scheduled blocking
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentDay = now.getDay();
+    const isScheduledBlock = settings.scheduledBlocking?.enabled &&
+        settings.scheduledBlocking.days.includes(currentDay) &&
+        currentHour >= settings.scheduledBlocking.startHour &&
+        currentHour < settings.scheduledBlocking.endHour;
+
+    const shouldBlock = isSiteBlocked && (settings.focusEnabled || settings.isDeepWorkActive || isScheduledBlock);
+    const needsNudge = !!shouldBlock;
     const needsTicker = settings.isDeepWorkActive;
 
     let ui: any = null;
@@ -65,7 +75,7 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
     const [challengeText, setChallengeText] = useState('');
     const [inputChallenge, setInputChallenge] = useState('');
     const [showChallenge, setShowChallenge] = useState(false);
-    
+
     // Command Palette State
     const [showPalette, setShowPalette] = useState(initialPalette || false);
     const [taskTitle, setTaskTitle] = useState('');
@@ -78,7 +88,6 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
         chrome.i18n.getMessage("quote3")
     ];
 
-    // Listen for Command Palette toggle
     useEffect(() => {
         const listener = () => {
             setShowPalette(prev => {
@@ -91,7 +100,6 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
         return () => window.removeEventListener('ayamir-toggle-palette', listener);
     }, []);
 
-    // Global Escape to close palette
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && showPalette) {
@@ -157,69 +165,81 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
             startTime: null,
             isCompleted: false,
             createdAt: new Date(),
-            priority
+            priority,
+            url: window.location.href,
         };
 
-        // Send task to background script for saving in the correct DB context
         chrome.runtime.sendMessage({ action: 'createTask', task: newTask }, (response) => {
             if (response && response.success) {
                 setTaskTitle('');
                 setPriority('medium');
                 setShowPalette(false);
-            } else {
-                console.error('Failed to save task via background script', response?.error);
             }
         });
     };
 
+    const priorityConfig: Record<string, { color: string; label: string }> = {
+        low: { color: 'bg-slate-400', label: 'Low' },
+        medium: { color: 'bg-blue-500', label: 'Medium' },
+        high: { color: 'bg-orange-500', label: 'High' },
+        urgent: { color: 'bg-red-500', label: 'Urgent' },
+    };
+
     return (
         <div style={{ fontFamily: 'system-ui, sans-serif' }}>
-            
+
             {/* Command Palette Overlay */}
             {showPalette && (
-                <div className="fixed inset-0 z-[2147483647] flex items-start justify-center pt-[20vh] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div 
-                        className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-4 zoom-in-95 duration-200"
+                <div
+                    className="fixed inset-0 z-[2147483647] flex items-start justify-center pt-[20vh] bg-slate-900/50 backdrop-blur-sm"
+                    onClick={() => { setShowPalette(false); setTaskTitle(''); }}
+                >
+                    <div
+                        className="bg-white w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
+                        style={{ animation: 'slideDown 0.2s ease-out' }}
                     >
                         <form onSubmit={handleCreateTask} className="flex items-center gap-3 p-4 border-b border-slate-100">
-                            <Zap className="w-6 h-6 text-indigo-500 flex-shrink-0" />
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                <Zap className="w-4 h-4 text-white" />
+                            </div>
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={taskTitle}
                                 onChange={e => setTaskTitle(e.target.value)}
                                 placeholder={chrome.i18n.getMessage("quickTaskPlaceholder")}
-                                className="flex-1 bg-transparent text-xl font-medium outline-none text-slate-800 placeholder:text-slate-300"
+                                className="flex-1 bg-transparent text-lg font-medium outline-none text-slate-800 placeholder:text-slate-300"
                                 autoFocus
                             />
                             {taskTitle.trim() && (
-                                <button 
+                                <button
                                     type="submit"
-                                    className="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+                                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity shadow-sm"
                                 >
-                                    {chrome.i18n.getMessage("enterSubmit")} ↵
+                                    Save ↵
                                 </button>
                             )}
                         </form>
-                        <div className="bg-slate-50 px-4 py-3 flex items-center justify-between">
-                            <div className="flex gap-2">
+                        <div className="bg-slate-50 px-4 py-2.5 flex items-center justify-between">
+                            <div className="flex gap-1.5">
                                 {(['low', 'medium', 'high', 'urgent'] as const).map(p => (
                                     <button
                                         key={p}
                                         type="button"
                                         onClick={() => setPriority(p)}
-                                        className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
                                             priority === p
                                                 ? 'bg-slate-800 text-white shadow-sm'
-                                                : 'text-slate-500 hover:bg-slate-200'
+                                                : 'text-slate-400 hover:bg-slate-200'
                                         }`}
                                     >
+                                        <div className={`w-2 h-2 rounded-full ${priorityConfig[p].color}`} />
                                         {p}
                                     </button>
                                 ))}
                             </div>
-                            <span className="text-xs font-semibold text-slate-400">{chrome.i18n.getMessage("escToClose")}</span>
+                            <span className="text-[10px] font-semibold text-slate-400">{chrome.i18n.getMessage("escToClose")}</span>
                         </div>
                     </div>
                 </div>
@@ -227,69 +247,93 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
 
             {/* Block Site Overlay */}
             {needsNudge && !showAnyway && !showPalette && (
-                <div className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-gray-900/95 backdrop-blur-md">
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center space-y-6 animate-in fade-in zoom-in duration-300">
+                <div className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900">
+                    <div className="max-w-md w-full text-center space-y-8 p-8" style={{ animation: 'scaleIn 0.3s ease-out' }}>
+                        {/* Icon */}
                         <div className="flex justify-center">
-                            <div className={`p-4 rounded-full ${settings.isDeepWorkActive ? 'bg-indigo-100 text-indigo-600' : 'bg-primary-100 text-primary-600'}`}>
-                                {settings.isDeepWorkActive ? <Brain className="w-12 h-12 animate-pulse" /> : <Target className="w-12 h-12" />}
+                            <div className={`p-5 rounded-3xl ${
+                                settings.isDeepWorkActive
+                                    ? 'bg-indigo-500/20 ring-2 ring-indigo-500/30'
+                                    : 'bg-white/10 ring-2 ring-white/10'
+                            }`}>
+                                {settings.isDeepWorkActive
+                                    ? <Brain className="w-14 h-14 text-indigo-400" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
+                                    : <Shield className="w-14 h-14 text-white/80" />
+                                }
                             </div>
                         </div>
-                        
-                        <div className="space-y-2">
-                            <h1 className="text-2xl font-bold text-gray-900 m-0">
+
+                        {/* Text */}
+                        <div className="space-y-3">
+                            <h1 className="text-3xl font-bold text-white m-0 tracking-tight">
                                 {settings.isDeepWorkActive ? chrome.i18n.getMessage('deepWorkActive') : chrome.i18n.getMessage('focusModeActive')}
                             </h1>
-                            <p className="text-gray-500 m-0 text-base">
-                                {settings.isDeepWorkActive 
+                            <p className="text-white/50 m-0 text-base leading-relaxed max-w-sm mx-auto">
+                                {settings.isDeepWorkActive
                                     ? chrome.i18n.getMessage('deepWorkMessage')
                                     : chrome.i18n.getMessage('focusModeMessage')}
                             </p>
+
+                            {/* Timer if deep work active */}
+                            {settings.isDeepWorkActive && remainingTime !== null && remainingTime > 0 && (
+                                <div className="text-4xl font-bold text-indigo-400 tabular-nums tracking-tight pt-2" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                                    {formatTime(remainingTime)}
+                                </div>
+                            )}
                         </div>
 
                         {!showChallenge ? (
-                            <div className="flex flex-col gap-3 pt-4">
-                                <button 
+                            <div className="flex flex-col gap-3 pt-2">
+                                <button
                                     onClick={() => chrome.runtime.sendMessage({ action: 'closeTab' })}
-                                    className={`w-full py-3 px-4 text-white rounded-lg font-medium text-base transition-all border-0 cursor-pointer shadow-sm hover:shadow-md ${settings.isDeepWorkActive ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-primary-600 hover:bg-primary-700'}`}
+                                    className={`w-full py-4 px-4 text-white rounded-2xl font-semibold text-base transition-all border-0 cursor-pointer shadow-lg ${
+                                        settings.isDeepWorkActive
+                                            ? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/25'
+                                            : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm'
+                                    }`}
                                 >
                                     {chrome.i18n.getMessage('closeTabGetToWork')}
                                 </button>
-                                
-                                <button 
+
+                                <button
                                     onClick={handleShowChallenge}
-                                    className="w-full py-3 px-4 bg-transparent text-gray-500 hover:text-gray-800 font-medium text-sm transition-colors border-0 cursor-pointer underline-offset-4 hover:underline"
+                                    className="w-full py-3 px-4 bg-transparent text-white/30 hover:text-white/60 font-medium text-sm transition-colors border-0 cursor-pointer"
                                 >
                                     {chrome.i18n.getMessage('continueAnyway')}
                                 </button>
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4 pt-2 text-left">
-                                <div className="p-3 bg-red-50 text-red-800 rounded-lg text-sm font-medium leading-relaxed border border-red-100">
+                                <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-300 rounded-2xl text-sm font-medium leading-relaxed">
                                     {chrome.i18n.getMessage("typeToProceed")}
                                     <br/><br/>
-                                    <span className="font-bold select-none">{challengeText}</span>
+                                    <span className="font-bold select-none text-white/90">{challengeText}</span>
                                 </div>
                                 <textarea
                                     value={inputChallenge}
                                     onChange={(e) => setInputChallenge(e.target.value)}
                                     placeholder={chrome.i18n.getMessage("typeTextAbove")}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-sm resize-none"
+                                    className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-red-500/30 focus:border-red-500/30 outline-none text-sm text-white placeholder:text-white/20 resize-none backdrop-blur-sm"
                                     rows={3}
                                     onPaste={(e) => e.preventDefault()}
                                 />
-                                <div className="flex gap-2">
-                                    <button 
+                                <div className="flex gap-3">
+                                    <button
                                         onClick={() => setShowChallenge(false)}
-                                        className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors border-0 cursor-pointer"
+                                        className="flex-1 py-3 bg-white/5 text-white/60 rounded-2xl font-medium hover:bg-white/10 transition-colors border-0 cursor-pointer"
                                     >
-                                        Cancel
+                                        {chrome.i18n.getMessage('cancel')}
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={handleChallengeSubmit}
                                         disabled={inputChallenge !== challengeText}
-                                        className={`flex-1 py-2 rounded-lg font-medium transition-colors border-0 cursor-pointer ${inputChallenge === challengeText ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                                        className={`flex-1 py-3 rounded-2xl font-medium transition-colors border-0 cursor-pointer ${
+                                            inputChallenge === challengeText
+                                                ? 'bg-red-600 text-white hover:bg-red-500'
+                                                : 'bg-white/5 text-white/20 cursor-not-allowed'
+                                        }`}
                                     >
-                                        Unlock Site
+                                        {chrome.i18n.getMessage('unlockSite')}
                                     </button>
                                 </div>
                             </div>
@@ -299,18 +343,21 @@ function ContentUI({ settings, needsNudge, needsTicker, initialPalette }: { sett
             )}
 
             {/* Deep Work Ticker */}
-            {needsTicker && remainingTime !== null && remainingTime > 0 && !showPalette && (
-                <div className="fixed bottom-4 right-4 z-[2147483645] bg-gray-900 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-bottom-4 border border-gray-700/50 backdrop-blur-xl group hover:scale-105 transition-transform cursor-default">
-                    <div className="flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-indigo-400 animate-pulse" />
+            {needsTicker && remainingTime !== null && remainingTime > 0 && !showPalette && !needsNudge && (
+                <div className="fixed bottom-5 right-5 z-[2147483645] bg-slate-900/95 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-4 border border-slate-700/50 backdrop-blur-xl hover:scale-105 transition-transform cursor-default"
+                     style={{ animation: 'slideUp 0.3s ease-out' }}>
+                    <div className="flex items-center gap-2.5">
+                        <Brain className="w-5 h-5 text-indigo-400" style={{ animation: 'pulseGlow 2s ease-in-out infinite' }} />
                         <div className="flex flex-col">
-                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider leading-none mb-1">{chrome.i18n.getMessage("deepWork")}</span>
-                            <span className="text-xl font-bold font-mono leading-none tracking-tight">{formatTime(remainingTime)}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">{chrome.i18n.getMessage("deepWork")}</span>
+                            <span className="text-xl font-bold leading-none tracking-tight tabular-nums" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                                {formatTime(remainingTime)}
+                            </span>
                         </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800 rounded-b-2xl overflow-hidden">
-                        <div 
-                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500" 
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-800 rounded-b-2xl overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000"
                             style={{ width: `${(remainingTime / (settings.deepWorkModeDuration * 60)) * 100}%` }}
                         />
                     </div>

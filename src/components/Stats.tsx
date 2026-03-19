@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, Clock, Flame, TrendingUp, Trophy, Star, Award, Zap } from 'lucide-react';
-import { db, Task, Settings, getSettings } from '@/lib/db';
+import { X, CheckCircle, Flame, TrendingUp, Trophy, Star, Award, Clock, Target } from 'lucide-react';
+import { db, Settings, getSettings } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { LEVEL_THRESHOLDS, getUserLevel, getPointsToNextLevel, DEFAULT_ACHIEVEMENTS, calculateStreak } from '@/lib/gamification';
+import { LEVEL_THRESHOLDS, getUserLevel, getPointsToNextLevel, DEFAULT_ACHIEVEMENTS } from '@/lib/gamification';
 
 interface StatsProps {
     onClose: () => void;
@@ -11,9 +11,29 @@ interface StatsProps {
 export default function Stats({ onClose }: StatsProps) {
     const allTasks = useLiveQuery(() => db.tasks.toArray()) || [];
     const [settings, setSettings] = useState<Settings | null>(null);
+    const [weeklyData, setWeeklyData] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
 
     useEffect(() => {
         getSettings().then(setSettings);
+        // Calculate weekly completion data
+        const now = new Date();
+        const data: number[] = [];
+        for (let i = 6; i >= 0; i--) {
+            const day = new Date(now);
+            day.setDate(day.getDate() - i);
+            day.setHours(0, 0, 0, 0);
+            const nextDay = new Date(day);
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            db.tasks.filter(t =>
+                !!t.isCompleted && !!t.completedAt &&
+                new Date(t.completedAt) >= day &&
+                new Date(t.completedAt) < nextDay
+            ).count().then(count => {
+                data[6 - i] = count;
+                if (i === 0) setWeeklyData([...data]);
+            });
+        }
     }, []);
 
     const completed = allTasks.filter(t => t.isCompleted);
@@ -44,40 +64,50 @@ export default function Stats({ onClose }: StatsProps) {
     const unlockedAchievements = achievements.filter(a => a.unlocked);
     const streakDays = settings?.streakCount ?? 0;
 
+    const maxWeekly = Math.max(...weeklyData, 1);
+    const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    const todayIdx = new Date().getDay();
+    // Shift so today is last
+    const orderedLabels: string[] = [];
+    for (let i = 6; i >= 0; i--) {
+        const idx = (todayIdx - i + 7) % 7;
+        orderedLabels.push(dayLabels[idx === 0 ? 6 : idx - 1]);
+    }
+
     return (
-        <div className="absolute inset-0 bg-gray-50 flex flex-col z-50">
+        <div className="absolute inset-0 bg-slate-50 dark:bg-slate-900 flex flex-col z-50 animate-fade-in">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b bg-white">
-                <h2 className="text-lg font-bold text-gray-900">{chrome.i18n.getMessage("statsHeader")}</h2>
-                <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded text-gray-500">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("statsHeader")}</h2>
+                <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-500">
                     <X className="w-5 h-5" />
                 </button>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 slim-scrollbar">
 
-                {/* Gamification Level Card */}
+                {/* Level Card */}
                 {settings?.gamificationEnabled && (
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-4 text-white shadow-sm">
+                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg shadow-indigo-500/20">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
-                                <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
-                                <h3 className="text-lg font-bold">{chrome.i18n.getMessage("statsLevel")} {currentLevel.level}</h3>
+                                <Star className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                                <h3 className="text-base font-bold">{chrome.i18n.getMessage("statsLevel")} {currentLevel.level}</h3>
                             </div>
-                            <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded uppercase tracking-wider">
+                            <span className="text-[10px] font-bold bg-white/20 px-2 py-1 rounded-lg uppercase tracking-wider backdrop-blur-sm">
                                 {currentLevel.title}
                             </span>
                         </div>
 
                         <div className="mb-1">
-                            <div className="flex justify-between text-xs font-medium mb-1.5 opacity-90">
+                            <div className="flex justify-between text-[11px] font-medium mb-1.5 opacity-80">
                                 <span>{settings.totalPoints} XP</span>
                                 {currentLevel.level < 10 && (
                                     <span>{pointsToNextLevel} to next</span>
                                 )}
                             </div>
-                            <div className="w-full bg-black/20 rounded-full h-2.5 overflow-hidden backdrop-blur-sm">
+                            <div className="w-full bg-black/20 rounded-full h-2 overflow-hidden backdrop-blur-sm">
                                 <div
                                     className="bg-gradient-to-r from-yellow-300 to-yellow-500 h-full rounded-full transition-all duration-700 ease-out"
                                     style={{ width: `${progressPercentage}%` }}
@@ -87,62 +117,86 @@ export default function Stats({ onClose }: StatsProps) {
                     </div>
                 )}
 
-                {/* Main Stats Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-                        <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-1" />
-                        <p className="text-2xl font-bold text-gray-900">{completedToday}</p>
-                        <p className="text-xs text-gray-500 font-medium">{chrome.i18n.getMessage("statsDoneToday")}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-                        <Flame className={`w-6 h-6 mx-auto mb-1 ${streakDays > 0 ? 'text-orange-500 fill-orange-500' : 'text-gray-300'}`} />
-                        <p className="text-2xl font-bold text-gray-900">{streakDays}</p>
-                        <p className="text-xs text-gray-500 font-medium">{chrome.i18n.getMessage("statsDayStreak")}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-                        <TrendingUp className="w-6 h-6 text-blue-500 mx-auto mb-1" />
-                        <p className="text-2xl font-bold text-gray-900">{completedTasks}</p>
-                        <p className="text-xs text-gray-500 font-medium">{chrome.i18n.getMessage("statsTotalDone")}</p>
-                    </div>
-
-                    <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-gray-100">
-                        <Trophy className="w-6 h-6 text-yellow-500 mx-auto mb-1" />
-                        <p className="text-2xl font-bold text-gray-900">{unlockedAchievements.length}</p>
-                        <p className="text-xs text-gray-500 font-medium">{chrome.i18n.getMessage("statsAchievements")}</p>
+                {/* Weekly Activity Chart */}
+                <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">This Week</h3>
+                    <div className="flex items-end justify-between gap-1 h-20">
+                        {weeklyData.map((count, i) => (
+                            <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                                <div className="w-full flex justify-center">
+                                    <div
+                                        className={`w-full max-w-[24px] rounded-t-lg transition-all duration-500 ${
+                                            i === 6 ? 'bg-indigo-500' : count > 0 ? 'bg-indigo-200 dark:bg-indigo-700' : 'bg-slate-100 dark:bg-slate-700'
+                                        }`}
+                                        style={{ height: `${Math.max(4, (count / maxWeekly) * 64)}px` }}
+                                    />
+                                </div>
+                                <span className={`text-[9px] font-bold ${
+                                    i === 6 ? 'text-indigo-500' : 'text-slate-400 dark:text-slate-500'
+                                }`}>{orderedLabels[i]}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Achievements List */}
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+                        <CheckCircle className="w-5 h-5 text-green-500 mx-auto mb-1" />
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">{completedToday}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{chrome.i18n.getMessage("statsDoneToday")}</p>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+                        <Flame className={`w-5 h-5 mx-auto mb-1 ${streakDays > 0 ? 'text-orange-500 fill-orange-500' : 'text-slate-300 dark:text-slate-600'}`} />
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">{streakDays}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{chrome.i18n.getMessage("statsDayStreak")}</p>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+                        <TrendingUp className="w-5 h-5 text-blue-500 mx-auto mb-1" />
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">{completionRate}%</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Completion</p>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-3 text-center shadow-sm border border-slate-100 dark:border-slate-700">
+                        <Clock className="w-5 h-5 text-purple-500 mx-auto mb-1" />
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">{Math.round((settings?.totalFocusMinutes || 0) / 60 * 10) / 10}h</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Focus Time</p>
+                    </div>
+                </div>
+
+                {/* Achievements */}
                 {settings?.gamificationEnabled && (
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Award className="w-5 h-5 text-indigo-600" />
-                            <h3 className="font-bold text-gray-900">{chrome.i18n.getMessage("statsAchievements")}</h3>
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <Award className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("statsAchievements")}</h3>
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-md">
+                                {unlockedAchievements.length}/{achievements.length}
+                            </span>
                         </div>
 
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <div className="grid grid-cols-4 gap-2">
                             {achievements.map(achievement => (
                                 <div
                                     key={achievement.id}
-                                    className={`p-3 rounded-lg border transition-all ${
+                                    className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all ${
                                         achievement.unlocked
-                                            ? 'bg-yellow-50/50 border-yellow-200'
-                                            : 'bg-gray-50 border-gray-100 opacity-60 grayscale'
+                                            ? 'bg-yellow-50 dark:bg-yellow-900/20'
+                                            : 'opacity-40 grayscale'
                                     }`}
+                                    title={`${achievement.name}: ${achievement.description}`}
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <div className="text-2xl leading-none mt-0.5">{achievement.icon}</div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold text-gray-900">{achievement.name}</p>
-                                            <p className="text-xs text-gray-500 leading-tight mt-0.5">{achievement.description}</p>
-                                        </div>
-                                        <div className="flex flex-col items-end gap-1">
-                                            <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-1.5 py-0.5 rounded">+{achievement.points}</span>
-                                            {achievement.unlocked && <CheckCircle className="w-4 h-4 text-green-500" />}
-                                        </div>
-                                    </div>
+                                    <span className="text-2xl">{achievement.icon}</span>
+                                    <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 text-center leading-tight truncate w-full">
+                                        {achievement.name}
+                                    </span>
+                                    {achievement.unlocked && (
+                                        <span className="text-[8px] font-bold text-yellow-600 dark:text-yellow-400">+{achievement.points}</span>
+                                    )}
                                 </div>
                             ))}
                         </div>

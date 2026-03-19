@@ -81,7 +81,7 @@ declare module "wxt/browser" {
       options?: GetMessageOptions,
     ): string;
     /**
-     * "Protect your time, build your legacy. A smart task manager with soul."
+     * "All-in-one focus toolkit: smart tasks, Pomodoro timer, site blocker, gamification — 100% local, no account needed."
      */
     getMessage(
       messageName: "extDesc",

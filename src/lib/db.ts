@@ -17,6 +17,7 @@ export interface Task {
     tags?: string[];
     points?: number;
     completedOnTime?: boolean;
+    url?: string; // saved page URL
 }
 
 export interface Achievement {
@@ -27,6 +28,16 @@ export interface Achievement {
   points: number;
   unlocked: boolean;
   unlockedAt?: Date;
+}
+
+export interface FocusSession {
+  id?: number;
+  startedAt: Date;
+  endedAt?: Date;
+  duration: number; // planned duration in minutes
+  actualDuration?: number; // actual duration in minutes
+  completed: boolean;
+  type: 'work' | 'break';
 }
 
 export interface Settings {
@@ -44,20 +55,53 @@ export interface Settings {
     deepWorkModeBreakDuration: number;
     isDeepWorkActive?: boolean;
     deepWorkEndTime?: number | null;
+    // New features
+    theme: 'light' | 'dark' | 'system';
+    onboardingCompleted: boolean;
+    hardLockMode: boolean;
+    ambientSound: 'none' | 'rain' | 'lofi' | 'cafe' | 'whitenoise';
+    scheduledBlocking: {
+        enabled: boolean;
+        startHour: number;
+        endHour: number;
+        days: number[]; // 0=Sun, 1=Mon, ... 6=Sat
+    };
+    siteCategories: {
+        social: string[];
+        news: string[];
+        entertainment: string[];
+        shopping: string[];
+    };
+    dailyFocusGoal: string;
+    dailyFocusDate: string; // ISO date string
+    totalFocusMinutes: number;
+    completedSessions: number;
 }
 
 class AyaMirDB extends Dexie {
     tasks!: Table<Task>;
+    focusSessions!: Table<FocusSession>;
 
     constructor() {
         super('ayamir');
         this.version(2).stores({
             tasks: '++id, title, startTime, isCompleted, createdAt'
         });
+        this.version(3).stores({
+            tasks: '++id, title, startTime, isCompleted, createdAt',
+            focusSessions: '++id, startedAt, completed, type'
+        });
     }
 }
 
 export const db = new AyaMirDB();
+
+export const SITE_CATEGORIES = {
+    social: ['facebook.com', 'twitter.com', 'x.com', 'instagram.com', 'tiktok.com', 'snapchat.com', 'linkedin.com', 'pinterest.com', 'threads.net'],
+    news: ['reddit.com', 'news.ycombinator.com', 'digg.com', 'buzzfeed.com', 'cnn.com', 'bbc.com', 'foxnews.com'],
+    entertainment: ['youtube.com', 'netflix.com', 'twitch.tv', 'hulu.com', 'disneyplus.com', 'primevideo.com', '9gag.com'],
+    shopping: ['amazon.com', 'ebay.com', 'aliexpress.com', 'walmart.com', 'etsy.com', 'wish.com'],
+};
 
 export const DEFAULT_SETTINGS: Settings = {
     blacklist: ['facebook.com', 'twitter.com', 'reddit.com', 'youtube.com'],
@@ -70,7 +114,28 @@ export const DEFAULT_SETTINGS: Settings = {
     streakCount: 0,
     achievements: [],
     deepWorkModeDuration: 25,
-    deepWorkModeBreakDuration: 5
+    deepWorkModeBreakDuration: 5,
+    // New defaults
+    theme: 'system',
+    onboardingCompleted: false,
+    hardLockMode: false,
+    ambientSound: 'none',
+    scheduledBlocking: {
+        enabled: false,
+        startHour: 9,
+        endHour: 17,
+        days: [1, 2, 3, 4, 5], // Mon-Fri
+    },
+    siteCategories: {
+        social: [],
+        news: [],
+        entertainment: [],
+        shopping: [],
+    },
+    dailyFocusGoal: '',
+    dailyFocusDate: '',
+    totalFocusMinutes: 0,
+    completedSessions: 0,
 };
 
 // Helper functions
@@ -80,7 +145,8 @@ export async function getSettings(): Promise<Settings> {
         await storage.setItem('local:settings', DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
     }
-    return settings;
+    // Merge with defaults to ensure new fields exist
+    return { ...DEFAULT_SETTINGS, ...settings };
 }
 
 export async function updateSettings(settings: Partial<Settings>): Promise<void> {
