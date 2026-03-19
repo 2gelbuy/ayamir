@@ -28,8 +28,8 @@ export default defineConfig({
             },
             open_command_palette: {
                 suggested_key: {
-                    default: 'Ctrl+Shift+Space',
-                    mac: 'Command+Shift+Space'
+                    default: 'Alt+Shift+N',
+                    mac: 'MacCtrl+Shift+N'
                 },
                 description: '__MSG_openPalette__'
             }
