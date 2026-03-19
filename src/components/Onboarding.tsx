@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Target, Brain, Trophy, Zap, ArrowRight, Check } from 'lucide-react';
+import { Target, Brain, Zap, Shield, ArrowRight, Check } from 'lucide-react';
 import { updateSettings } from '@/lib/db';
 
 interface OnboardingProps {
@@ -41,6 +41,18 @@ const steps = [
             { icon: '⌨️', text: 'Ctrl+Shift+E to open AyaMir' },
             { icon: '⚡', text: 'Ctrl+Shift+Space for quick task' },
             { icon: '🎯', text: 'Press ? inside popup for all shortcuts' },
+        ]
+    },
+    {
+        icon: Shield,
+        gradient: 'from-green-500 to-emerald-600',
+        title: '100% Private',
+        subtitle: 'Your data never leaves your browser.',
+        description: 'No accounts, no servers, no tracking. Everything stays on your device. Unlike other extensions, we never see your data.',
+        features: [
+            { icon: '🔒', text: 'All data stored locally in your browser' },
+            { icon: '🚫', text: 'Zero network requests — works offline' },
+            { icon: '👁️', text: 'Enable in Incognito for full site blocking' },
         ]
     },
 ];

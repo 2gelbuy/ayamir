@@ -1,7 +1,27 @@
-import { useState, useEffect } from 'react';
-import { Play, Square, Brain, X, Lock, Unlock, Volume2, VolumeX, Coffee, Minus, Plus } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Play, Square, Brain, X, Lock, Unlock, Volume2, VolumeX, Coffee, Minus, Plus, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings, db } from '@/lib/db';
 import { playAmbientSound, stopAmbientSound } from '@/lib/sounds';
+
+function playCompletionSound() {
+  try {
+    const ctx = new AudioContext();
+    // Pleasant two-tone chime
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.8);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.8);
+    });
+  } catch {}
+}
 
 export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -34,7 +54,15 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           setRemainingTime(Math.floor((end - now) / 1000));
         } else {
           setRemainingTime(0);
-          // Session complete - log it
+          // Session complete — play sound + notification
+          playCompletionSound();
+          chrome.notifications.create({
+            type: 'basic',
+            iconUrl: chrome.runtime.getURL('/icon/128.png'),
+            title: 'AyaMir — Session Complete!',
+            message: `Great work! You focused for ${settings.deepWorkModeDuration} minutes. Time for a ${settings.deepWorkModeBreakDuration}-minute break.`,
+            priority: 2,
+          });
           db.focusSessions.add({
             startedAt: new Date(end - settings.deepWorkModeDuration * 60 * 1000),
             endedAt: new Date(end),
@@ -65,7 +93,9 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
 
   if (!settings) return null;
 
-  const handleStart = async () => {
+  const [showHardLockConfirm, setShowHardLockConfirm] = useState(false);
+
+  const doStart = async () => {
     const durationMs = selectedDuration * 60 * 1000;
     const endTime = Date.now() + durationMs;
     await updateSettings({
@@ -77,10 +107,19 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
       ambientSound: selectedSound as Settings['ambientSound'],
     });
     setSettings(await getSettings());
+    setShowHardLockConfirm(false);
 
     if (selectedSound !== 'none') {
       playAmbientSound(selectedSound);
       setSoundPlaying(true);
+    }
+  };
+
+  const handleStart = async () => {
+    if (hardLock) {
+      setShowHardLockConfirm(true);
+    } else {
+      await doStart();
     }
   };
 
@@ -282,14 +321,43 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
               </button>
             </div>
 
+            {/* Hard Lock Confirmation */}
+            {showHardLockConfirm && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-200 dark:border-amber-900/30 space-y-2 animate-slide-up">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <p className="text-xs font-bold text-amber-700 dark:text-amber-400">Hard Lock is ON</p>
+                </div>
+                <p className="text-[11px] text-amber-600/80 dark:text-amber-500/70 leading-relaxed">
+                  You will NOT be able to cancel this {selectedDuration}-minute session once it starts. Are you sure?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowHardLockConfirm(false)}
+                    className="flex-1 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={doStart}
+                    className="flex-1 py-2 bg-amber-500 text-white text-xs font-semibold rounded-xl hover:bg-amber-600 transition-colors"
+                  >
+                    Lock In
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Start button */}
-            <button
-              onClick={handleStart}
-              className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 font-semibold shadow-lg shadow-indigo-500/25"
-            >
-              <Play className="w-5 h-5 fill-current" />
-              Start Deep Work
-            </button>
+            {!showHardLockConfirm && (
+              <button
+                onClick={handleStart}
+                className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 font-semibold shadow-lg shadow-indigo-500/25"
+              >
+                <Play className="w-5 h-5 fill-current" />
+                Start Deep Work
+              </button>
+            )}
           </div>
         ) : (
           <div className="w-full space-y-3">

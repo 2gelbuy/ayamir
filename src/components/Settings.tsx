@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw } from 'lucide-react';
+import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
 
@@ -221,6 +221,25 @@ export default function Settings({ onClose }: SettingsProps) {
                             </div>
                             <Toggle checked={settings.gamificationEnabled} onChange={v => setSettings({ ...settings, gamificationEnabled: v })} />
                         </div>
+
+                        {/* Incognito Reminder */}
+                        <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-200 dark:border-amber-900/30">
+                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">Enable in Incognito</p>
+                            <p className="text-[11px] text-amber-600/70 dark:text-amber-500/70 leading-relaxed">
+                                Site blocking doesn't work in Incognito by default. Go to chrome://extensions, find AyaMir, and enable "Allow in Incognito" for full protection.
+                            </p>
+                        </div>
+
+                        {/* Privacy Badge */}
+                        <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-900/30">
+                            <div className="flex items-center gap-2 mb-1">
+                                <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                <p className="text-xs font-semibold text-green-700 dark:text-green-400">100% Private & Local</p>
+                            </div>
+                            <p className="text-[11px] text-green-600/70 dark:text-green-500/70 leading-relaxed">
+                                Your data never leaves your browser. No accounts, no servers, no tracking. Everything is stored locally in IndexedDB and Chrome Storage.
+                            </p>
+                        </div>
                     </>
                 )}
 
@@ -336,6 +355,40 @@ export default function Settings({ onClose }: SettingsProps) {
                                     );
                                 })}
                             </div>
+                        </div>
+
+                        {/* Import/Export Blacklist */}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    navigator.clipboard.writeText(settings.blacklist.join('\n'));
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                <Copy className="w-3.5 h-3.5" />
+                                Copy List
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const text = await navigator.clipboard.readText();
+                                        const domains = text.split(/[\n,;]+/)
+                                            .map(d => d.trim().replace(/^https?:\/\//, '').replace(/\/.*$/, ''))
+                                            .filter(d => d && d.includes('.'));
+                                        if (domains.length > 0) {
+                                            const newDomains = domains.filter(d => !settings.blacklist.includes(d));
+                                            setSettings({
+                                                ...settings,
+                                                blacklist: [...settings.blacklist, ...newDomains]
+                                            });
+                                        }
+                                    } catch {}
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                <ClipboardPaste className="w-3.5 h-3.5" />
+                                Paste List
+                            </button>
                         </div>
 
                         {/* Custom Blacklist */}
