@@ -1,6 +1,6 @@
-# EdgeTask Extension
+# AyaMir Extension
 
-EdgeTask is a smart task management extension for Microsoft Edge that helps you stay productive with a humorous approach to task management.
+AyaMir is a smart task management extension for Microsoft Edge that helps you stay productive with a humorous approach to task management.
 
 ## Features
 
@@ -30,8 +30,8 @@ EdgeTask is a smart task management extension for Microsoft Edge that helps you 
 
 1. Clone this repository:
    ```
-   git clone https://github.com/your-username/edgetask-extension.git
-   cd edgetask-extension
+   git clone https://github.com/your-username/ayamir-extension.git
+   cd ayamir-extension
    ```
 
 2. Install dependencies:
@@ -98,7 +98,7 @@ After making changes to the source code, run `npm run build` to rebuild the exte
 
 You can export and import your data from the options page:
 
-1. Right-click the EdgeTask icon in the toolbar
+1. Right-click the AyaMir icon in the toolbar
 2. Select "Options"
 3. Use the "Export Data" and "Import Data" buttons
 

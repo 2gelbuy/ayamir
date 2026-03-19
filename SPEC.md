@@ -1,4 +1,4 @@
-# EdgeTask — SPEC (machine-friendly)
+# AyaMir — SPEC (machine-friendly)
 
 This SPEC.md extracts the `Spec Kit` from the PRD and translates it into concise engineering contracts, data shapes, messaging, telemetry events and acceptance tests for implementation and CI.
 
@@ -54,14 +54,14 @@ Storage keys:
 - All messages require acknowledgement: { ok: boolean, error?: string }
 
 ## 5) Telemetry (minimal schema)
-- Prefix: `edgetask.`
+- Prefix: `ayamir.`
 - Event examples:
-  - `edgetask.panel.opened` { source }
-  - `edgetask.task.created` { taskIdHash, titleLength }
-  - `edgetask.notification.shown` { taskIdHash?, timing }
-  - `edgetask.notification.clicked` { taskIdHash?, action }
-  - `edgetask.nudge.shown` { domain }
-  - `edgetask.settings.changed` { key }
+  - `ayamir.panel.opened` { source }
+  - `ayamir.task.created` { taskIdHash, titleLength }
+  - `ayamir.notification.shown` { taskIdHash?, timing }
+  - `ayamir.notification.clicked` { taskIdHash?, action }
+  - `ayamir.nudge.shown` { domain }
+  - `ayamir.settings.changed` { key }
 - Privacy: do NOT send raw task titles unless user explicitly opt-in to anonymized telemetry; prefer hashed tokens or length buckets.
 
 ## 6) Acceptance tests (unit + E2E)
@@ -97,4 +97,4 @@ Storage keys:
 3. Load `dist/` as unpacked extension in Chrome (for local testing)
 
 ---
-Created from EdgeTask PRD Spec Kit (October 2025).
+Created from AyaMir PRD Spec Kit (October 2025).

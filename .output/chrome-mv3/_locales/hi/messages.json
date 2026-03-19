@@ -1,0 +1,338 @@
+{
+  "extName": {
+    "message": "AyaMir"
+  },
+  "extDesc": {
+    "message": "अपना समय बचाएं, अपनी विरासत बनाएं। आत्मा के साथ एक स्मार्ट टास्क मैनेजर।"
+  },
+  "openAyamir": {
+    "message": "AyaMir खोलें"
+  },
+  "openPalette": {
+    "message": "क्विक टास्क पैलेट खोलें"
+  },
+  "activeTasks": {
+    "message": "सक्रिय कार्य"
+  },
+  "activeTaskSingle": {
+    "message": "सक्रिय कार्य"
+  },
+  "deepWorkTitle": {
+    "message": "डीप वर्क (d)"
+  },
+  "statsTitle": {
+    "message": "आंकड़े और XP (v)"
+  },
+  "settingsTitle": {
+    "message": "सेटिंग्स (s)"
+  },
+  "filterSmart": {
+    "message": "स्मार्ट"
+  },
+  "filterActive": {
+    "message": "सक्रिय"
+  },
+  "filterAll": {
+    "message": "सभी"
+  },
+  "filterCompleted": {
+    "message": "पूरे हुए"
+  },
+  "quickTaskPlaceholder": {
+    "message": "एक त्वरित कार्य जोड़ें..."
+  },
+  "taskInputPlaceholder": {
+    "message": "क्या करने की आवश्यकता है?"
+  },
+  "enterSubmit": {
+    "message": "एंटर"
+  },
+  "escToClose": {
+    "message": "बंद करने के लिए ESC दबाएं"
+  },
+  "priorityLow": {
+    "message": "निम्न"
+  },
+  "priorityMedium": {
+    "message": "मध्यम"
+  },
+  "priorityHigh": {
+    "message": "उच्च"
+  },
+  "priorityUrgent": {
+    "message": "अति आवश्यक"
+  },
+  "deepWorkActive": {
+    "message": "डीप वर्क सक्रिय"
+  },
+  "focusModeActive": {
+    "message": "फोकस मोड सक्रिय"
+  },
+  "deepWorkMessage": {
+    "message": "आप फोकस सत्र के बीच में हैं। अपना क्रम न तोड़ें।"
+  },
+  "focusModeMessage": {
+    "message": "आपके पास पूरे करने के लिए कार्य हैं। क्या आप वाकई यहां समय बिताना चाहते हैं?"
+  },
+  "closeTabGetToWork": {
+    "message": "टैब बंद करें और काम पर लग जाएं"
+  },
+  "continueAnyway": {
+    "message": "मुझे काम के लिए इसकी बहुत आवश्यकता है (जारी रखें)"
+  },
+  "typeToProceed": {
+    "message": "आगे बढ़ने के लिए निम्नलिखित पाठ को बिल्कुल वैसा ही टाइप करें:"
+  },
+  "typeTextAbove": {
+    "message": "ऊपर दिया गया पाठ टाइप करें..."
+  },
+  "cancel": {
+    "message": "रद्द करें"
+  },
+  "unlockSite": {
+    "message": "साइट अनलॉक करें"
+  },
+  "deepWork": {
+    "message": "डीप वर्क"
+  },
+  "addTask": {
+    "message": "कार्य जोड़ें"
+  },
+  "noTasksFound": {
+    "message": "कोई कार्य नहीं मिला।"
+  },
+  "noActiveTasks": {
+    "message": "कोई सक्रिय कार्य नहीं! आपने सब कुछ कर लिया है।"
+  },
+  "noCompletedTasks": {
+    "message": "आपने अभी तक कोई कार्य पूरा नहीं किया है।"
+  },
+  "getToWork": {
+    "message": "काम पर लग जाओ!"
+  },
+  "addFirstTask": {
+    "message": "ऊपर अपना पहला कार्य जोड़ें।"
+  },
+  "checkBackLater": {
+    "message": "बाद में वापस आएं।"
+  },
+  "minShort": {
+    "message": "मिनट"
+  },
+  "settingsHeader": {
+    "message": "सेटिंग्स"
+  },
+  "settingsGeneral": {
+    "message": "सामान्य"
+  },
+  "settingsGamification": {
+    "message": "गेमिफिकेशन"
+  },
+  "settingsNotifications": {
+    "message": "सूचनाएं"
+  },
+  "settingsFocusMode": {
+    "message": "फोकस मोड"
+  },
+  "settingsFocusModeDesc": {
+    "message": "विचलित करने वाली साइटों पर संकेत दिखाएं"
+  },
+  "settingsDeepWorkDuration": {
+    "message": "डीप वर्क अवधि (मिनट)"
+  },
+  "settingsBlacklist": {
+    "message": "ब्लैकलिस्ट की गई साइटें"
+  },
+  "settingsAddDomain": {
+    "message": "डोमेन जोड़ें (उदा. youtube.com)"
+  },
+  "settingsWhitelist": {
+    "message": "श्वेतसूची (अनुमत सबडोमेन)"
+  },
+  "statsHeader": {
+    "message": "आपके आंकड़े"
+  },
+  "statsLevel": {
+    "message": "स्तर"
+  },
+  "statsTotalXp": {
+    "message": "कुल XP"
+  },
+  "statsCurrentStreak": {
+    "message": "वर्तमान क्रम"
+  },
+  "statsDays": {
+    "message": "दिन"
+  },
+  "statsAchievements": {
+    "message": "उपलब्धियां"
+  },
+  "statsNoAchievements": {
+    "message": "अभी तक कोई उपलब्धि नहीं। काम करते रहें!"
+  },
+  "deepWorkStart": {
+    "message": "सत्र प्रारंभ करें"
+  },
+  "deepWorkStop": {
+    "message": "सत्र रोकें"
+  },
+  "deepWorkBreak": {
+    "message": "ब्रेक लें"
+  },
+  "quote1": {
+    "message": "मैं दीर्घकालिक लक्ष्यों के बजाय अल्पकालिक आराम चुन रहा हूं।"
+  },
+  "quote2": {
+    "message": "टालमटोल समय का चोर है और अवसर की कब्र है।"
+  },
+  "quote3": {
+    "message": "अनुशासन वह है जो आप अभी चाहते हैं और जो आप सबसे ज्यादा चाहते हैं, उसके बीच चयन करना।"
+  },
+  "statsDoneToday": {
+    "message": "आज पूरे किए"
+  },
+  "statsDayStreak": {
+    "message": "दिनों का क्रम"
+  },
+  "statsTotalDone": {
+    "message": "कुल पूरे किए"
+  },
+  "settingsNotificationsDesc": {
+    "message": "कार्यों से 10, 5, और 0 मिनट पहले याद दिलाएं"
+  },
+  "settingsBlockedSites": {
+    "message": "ब्लॉक की गई साइटें"
+  },
+  "settingsSave": {
+    "message": "सेटिंग्स सहेजें"
+  },
+  "statsToNextLevel": {
+    "message": "अगले स्तर के लिए"
+  },
+  "levelBeginner": {
+    "message": "शुरुआती"
+  },
+  "levelNovice": {
+    "message": "नौसिखिया"
+  },
+  "levelApprentice": {
+    "message": "प्रशिक्षु"
+  },
+  "levelJourneyman": {
+    "message": "कारीगर"
+  },
+  "levelExpert": {
+    "message": "विशेषज्ञ"
+  },
+  "levelMaster": {
+    "message": "उस्ताद"
+  },
+  "levelGrandmaster": {
+    "message": "ग्रैंडमास्टर"
+  },
+  "levelLegend": {
+    "message": "किंवदंती"
+  },
+  "levelMythic": {
+    "message": "पौराणिक"
+  },
+  "levelTranscendent": {
+    "message": "पारलौकिक"
+  },
+  "achvFirstTaskName": {
+    "message": "पहला कदम"
+  },
+  "achvFirstTaskDesc": {
+    "message": "अपना पहला कार्य पूरा करें"
+  },
+  "achvStreak3Name": {
+    "message": "उत्साह में"
+  },
+  "achvStreak3Desc": {
+    "message": "3 दिन का क्रम बनाए रखें"
+  },
+  "achvStreak7Name": {
+    "message": "अजेय"
+  },
+  "achvStreak7Desc": {
+    "message": "7 दिन का क्रम बनाए रखें"
+  },
+  "achvStreak30Name": {
+    "message": "पौराणिक"
+  },
+  "achvStreak30Desc": {
+    "message": "30 दिन का क्रम बनाए रखें"
+  },
+  "achvEarlyBirdName": {
+    "message": "अर्ली बर्ड"
+  },
+  "achvEarlyBirdDesc": {
+    "message": "सुबह 9 बजे से पहले कार्य पूरा करें"
+  },
+  "achvNightOwlName": {
+    "message": "नाइट आउल"
+  },
+  "achvNightOwlDesc": {
+    "message": "रात 10 बजे के बाद कार्य पूरा करें"
+  },
+  "achvSpeedDemonName": {
+    "message": "स्पीड डेमन"
+  },
+  "achvSpeedDemonDesc": {
+    "message": "10 मिनट के भीतर कार्य पूरा करें"
+  },
+  "achvPerfectTimingName": {
+    "message": "परफेक्ट टाइमिंग"
+  },
+  "achvPerfectTimingDesc": {
+    "message": "निर्धारित समय पर कार्य पूरा करें"
+  },
+  "msgReminder10_1": {
+    "message": "\"{task}\" में 10 मिनट। जो भी कर रहे हैं उसे समेटने का समय।"
+  },
+  "msgReminder10_2": {
+    "message": "10 मिनट में: \"{task}\"। समय बीत रहा है।"
+  },
+  "msgReminder10_3": {
+    "message": "\"{task}\" में 10 मिनट। बस एक दोस्ताना याद।"
+  },
+  "msgReminder5_1": {
+    "message": "\"{task}\" में 5 मिनट। यह गंभीर हो रहा है।"
+  },
+  "msgReminder5_2": {
+    "message": "5 मिनट में: \"{task}\"। कोई दबाव नहीं... लेकिन है।"
+  },
+  "msgReminder5_3": {
+    "message": "\"{task}\" में 5 मिनट। फोन देखना बंद करें।"
+  },
+  "msgReminder0_1": {
+    "message": "\"{task}\" का समय! कोई बहाना नहीं।"
+  },
+  "msgReminder0_2": {
+    "message": "\"{task}\" अभी है। सच्चाई का क्षण आ गया है।"
+  },
+  "msgReminder0_3": {
+    "message": "🚨 \"{task}\" का समय हो गया! आगे बढ़ें!"
+  },
+  "msgNudge_1": {
+    "message": "अरे, क्या आपको \"{task}\" नहीं करना चाहिए?"
+  },
+  "msgNudge_2": {
+    "message": "यह मुझे \"{task}\" जैसा नहीं लगता..."
+  },
+  "msgNudge_3": {
+    "message": "फोकस मोड चालू है। \"{task}\" आपका इंतजार कर रहा है।"
+  },
+  "msgNudge_4": {
+    "message": "क्या आपको यकीन है कि यह उत्पादक है? \"{task}\" हाय कह रहा है।"
+  },
+  "msgTaskComplete_1": {
+    "message": "हो गया! सूची में एक चीज कम।"
+  },
+  "msgTaskComplete_2": {
+    "message": "कार्य कुचला गया! आज आप शानदार कर रहे हैं।"
+  },
+  "msgTaskComplete_3": {
+    "message": "पूरा हुआ! उत्पादकता देवता प्रसन्न हैं।"
+  }
+}

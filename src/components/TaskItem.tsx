@@ -1,374 +1,187 @@
-import { useState, useRef, useEffect } from 'react';
-import { CheckCircle2, Circle, Target, Trash2, Clock, CreditCard as Edit2, X, Check, GripVertical, Bell, Copy } from 'lucide-react';
-import { format } from 'date-fns';
-import { Task, db } from '../lib/db';
-import { useStore } from '../store/useStore';
-import { updateStatsOnTaskCompletion } from '../lib/gamification';
-import { showSnoozeDialog } from '../lib/snooze';
+import { useState } from 'react';
+import { Check, Circle, Trash2, Clock, Bell, Edit2 } from 'lucide-react';
+import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
+import { Task, db } from '@/lib/db';
+import { updateStatsOnTaskCompletion } from '@/lib/gamification';
 
 interface TaskItemProps {
-  task: Task;
-  onUpdate: () => void;
-  onDragStart?: (task: Task) => void;
-  onDragEnd?: () => void;
+    task: Task;
 }
 
-export default function TaskItem({ task, onUpdate, onDragStart, onDragEnd }: TaskItemProps) {
-  const { focusedTask, setFocusedTask } = useStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(task.title);
-  const [editTime, setEditTime] = useState(
-    task.startTime ? format(new Date(task.startTime), "yyyy-MM-dd'T'HH:mm") : ''
-  );
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartY, setDragStartY] = useState(0);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [showQuickActions, setShowQuickActions] = useState(false);
-  
-  const taskRef = useRef<HTMLDivElement>(null);
+export default function TaskItem({ task }: TaskItemProps) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(task.title);
 
-  const isFocused = focusedTask?.id === task.id;
-  const isOverdue = task.startTime && new Date(task.startTime) < new Date();
+    const isOverdue = task.startTime && new Date(task.startTime) < new Date() && !task.isCompleted;
 
-  const handleComplete = async () => {
-    if (task.id) {
-      const updatedTask = {
-        ...task,
-        isCompleted: true,
-        completedAt: new Date()
-      };
-      
-      await db.tasks.update(task.id, updatedTask);
-      
-      // Update gamification stats
-      await updateStatsOnTaskCompletion(updatedTask);
-      
-      if (isFocused) {
-        setFocusedTask(null);
-      }
-      onUpdate();
-    }
-  };
+    const handleComplete = async () => {
+        if (task.id) {
+            const isCompletedNow = !task.isCompleted;
+            const completedAt = isCompletedNow ? new Date() : undefined;
+            
+            await db.tasks.update(task.id, {
+                isCompleted: isCompletedNow,
+                completedAt
+            });
 
-  const handleDelete = async () => {
-    if (task.id && confirm('Delete this task?')) {
-      await db.tasks.delete(task.id);
-      if (isFocused) {
-        setFocusedTask(null);
-      }
-      onUpdate();
-    }
-  };
-
-  const handleFocus = async () => {
-    if (isFocused) {
-      setFocusedTask(null);
-      if (task.id) {
-        await db.tasks.update(task.id, { isFocused: false });
-      }
-    } else {
-      const allTasks = await db.tasks.toArray();
-      for (const t of allTasks) {
-        if (t.id && t.isFocused) {
-          await db.tasks.update(t.id, { isFocused: false });
+            if (isCompletedNow) {
+                await updateStatsOnTaskCompletion({
+                    ...task,
+                    isCompleted: true,
+                    completedAt
+                });
+            }
         }
-      }
-
-      setFocusedTask(task);
-      if (task.id) {
-        await db.tasks.update(task.id, { isFocused: true });
-      }
-    }
-    onUpdate();
-  };
-
-  const handleSaveEdit = async () => {
-    if (task.id && editTitle.trim()) {
-      await db.tasks.update(task.id, {
-        title: editTitle.trim(),
-        startTime: editTime ? new Date(editTime) : null
-      });
-      setIsEditing(false);
-      onUpdate();
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditTitle(task.title);
-    setEditTime(task.startTime ? format(new Date(task.startTime), "yyyy-MM-dd'T'HH:mm") : '');
-    setIsEditing(false);
-  };
-
-  const handleSnooze = async () => {
-    if (task.id) {
-      showSnoozeDialog(task.id, onUpdate);
-    }
-  };
-
-  const handleDuplicate = async () => {
-    if (task.title) {
-      const newTask = {
-        title: task.title,
-        startTime: task.startTime ? new Date(task.startTime) : null,
-        isFocused: false,
-        isCompleted: false,
-        createdAt: new Date()
-      };
-      
-      await db.tasks.add(newTask);
-      onUpdate();
-    }
-  };
-
-  // Drag handlers
-  const handleDragStart = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStartY(e.clientY);
-    setDragOffset(0);
-    
-    if (taskRef.current) {
-      taskRef.current.style.position = 'relative';
-      taskRef.current.style.zIndex = '1000';
-    }
-    
-    if (onDragStart) {
-      onDragStart(task);
-    }
-  };
-
-  const handleDragMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    
-    const offset = e.clientY - dragStartY;
-    setDragOffset(offset);
-    
-    if (taskRef.current) {
-      taskRef.current.style.transform = `translateY(${offset}px)`;
-    }
-  };
-
-  const handleDragEnd = async () => {
-    if (!isDragging) return;
-    
-    setIsDragging(false);
-    
-    if (taskRef.current) {
-      taskRef.current.style.position = '';
-      taskRef.current.style.zIndex = '';
-      taskRef.current.style.transform = '';
-    }
-    
-    // Determine if we should move the task up or down
-    if (Math.abs(dragOffset) > 50) {
-      // Move task based on drag direction
-      const moveUp = dragOffset < 0;
-      // Implementation would depend on the parent component's task list
-      // This is a simplified version
-      console.log(`Move task ${moveUp ? 'up' : 'down'}`);
-    }
-    
-    setDragOffset(0);
-    
-    if (onDragEnd) {
-      onDragEnd();
-    }
-  };
-
-  // Touch handlers for swipe gestures
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    setDragStartY(touch.clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    const offset = touch.clientY - dragStartY;
-    
-    if (Math.abs(offset) > 10) {
-      setShowQuickActions(false);
-    }
-  };
-
-  const handleTouchEnd = async (e: React.TouchEvent) => {
-    const touch = e.changedTouches[0];
-    const offset = touch.clientY - dragStartY;
-    
-    // Swipe right to complete
-    if (offset < -50 && Math.abs(offset) > 50) {
-      await handleComplete();
-    }
-    // Swipe left to snooze
-    else if (offset > 50 && Math.abs(offset) > 50) {
-      await handleSnooze();
-    }
-  };
-
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        handleDragEnd();
-      }
     };
-    
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handleDragMove(e as any);
-      }
+
+    const handleDelete = async () => {
+        if (task.id && confirm('Delete this task?')) {
+            await db.tasks.delete(task.id);
+        }
     };
-    
-    if (isDragging) {
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-    }
-    
-    return () => {
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
+
+    const handleSnooze = async () => {
+        if (task.id) {
+            const newTime = new Date(Date.now() + 10 * 60 * 1000);
+            await db.tasks.update(task.id, {
+                startTime: newTime,
+                notifiedAt10: false,
+                notifiedAt5: false,
+                notifiedAt0: false
+            });
+        }
     };
-  }, [isDragging, dragStartY]);
 
-  if (isEditing) {
-    return (
-      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-indigo-500">
-        <input
-          type="text"
-          value={editTitle}
-          onChange={(e) => setEditTitle(e.target.value)}
-          className="w-full px-2 py-1 mb-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-          autoFocus
-        />
-        <input
-          type="datetime-local"
-          value={editTime}
-          onChange={(e) => setEditTime(e.target.value)}
-          className="w-full px-2 py-1 mb-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-        />
-        <div className="flex gap-2">
-          <button
-            onClick={handleSaveEdit}
-            className="flex-1 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center gap-1"
-          >
-            <Check className="w-4 h-4" />
-            Save
-          </button>
-          <button
-            onClick={handleCancelEdit}
-            className="flex-1 px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 flex items-center justify-center gap-1"
-          >
-            <X className="w-4 h-4" />
-            Cancel
-          </button>
-        </div>
-      </div>
-    );
-  }
+    const handleSaveEdit = async () => {
+        if (task.id && editTitle.trim()) {
+            await db.tasks.update(task.id, { title: editTitle.trim() });
+            setIsEditing(false);
+        }
+    };
 
-  return (
-    <div
-      ref={taskRef}
-      className={`p-3 rounded-lg border transition-all ${
-        isFocused
-          ? 'bg-green-50 dark:bg-green-900/20 border-green-500'
-          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-      } ${isDragging ? 'shadow-lg opacity-90' : ''}`}
-      onMouseDown={handleDragStart}
-      onMouseMove={handleDragMove}
-      onMouseUp={handleDragEnd}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseEnter={() => setShowQuickActions(true)}
-      onMouseLeave={() => setShowQuickActions(false)}
-    >
-      <div className="flex items-start gap-3">
-        <button
-          onClick={handleComplete}
-          className="mt-0.5 text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors"
-        >
-          {task.isCompleted ? (
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-          ) : (
-            <Circle className="w-5 h-5" />
-          )}
-        </button>
+    const formatTaskTime = (date: Date) => {
+        if (isToday(date)) return `Today, ${format(date, 'h:mm a')}`;
+        if (isTomorrow(date)) return `Tomorrow, ${format(date, 'h:mm a')}`;
+        if (isYesterday(date)) return `Yesterday, ${format(date, 'h:mm a')}`;
+        return format(date, 'MMM d, h:mm a');
+    };
 
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words">
-            {task.title}
-          </h3>
+    const priorityColors = {
+        urgent: 'bg-red-100 text-red-700 border-red-200',
+        high: 'bg-orange-100 text-orange-700 border-orange-200',
+        medium: 'bg-blue-100 text-blue-700 border-blue-200',
+        low: 'bg-slate-100 text-slate-600 border-slate-200',
+        undefined: 'hidden'
+    };
 
-          {task.startTime && (
-            <div
-              className={`flex items-center gap-1 mt-1 text-xs ${
-                isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
-              }`}
-            >
-              <Clock className="w-3 h-3" />
-              {format(new Date(task.startTime), 'MMM d, h:mm a')}
-              {isOverdue && <span className="font-medium ml-1">(Overdue)</span>}
+    if (isEditing) {
+        return (
+            <div className="p-3 bg-white rounded-2xl border border-indigo-200 shadow-sm shadow-indigo-500/10 mx-4 animate-in fade-in">
+                <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm mb-3 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                    autoFocus
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveEdit();
+                        if (e.key === 'Escape') setIsEditing(false);
+                    }}
+                />
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleSaveEdit}
+                        className="flex-1 py-2 bg-slate-900 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition-colors"
+                    >
+                        Save
+                    </button>
+                    <button
+                        onClick={() => setIsEditing(false)}
+                        className="flex-1 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-xl hover:bg-slate-200 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
-          )}
+        );
+    }
+
+    return (
+        <div className={`group relative mx-4 p-3 rounded-2xl transition-all duration-300 border ${
+            task.isCompleted
+                ? 'bg-transparent border-transparent opacity-60'
+                : isOverdue
+                    ? 'bg-red-50/50 border-red-100 hover:shadow-sm hover:border-red-200'
+                    : 'bg-white border-slate-100 hover:border-slate-200 hover:shadow-sm hover:shadow-slate-200/50'
+        }`}>
+            <div className="flex items-start gap-3">
+                {/* Custom Checkbox */}
+                <button
+                    onClick={handleComplete}
+                    className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                        task.isCompleted
+                            ? 'bg-indigo-500 border-indigo-500 scale-95'
+                            : 'border-slate-300 hover:border-indigo-400 bg-transparent'
+                    }`}
+                >
+                    {task.isCompleted && <Check className="w-3.5 h-3.5 text-white stroke-[3]" />}
+                </button>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 pt-0.5">
+                    <p className={`text-sm font-medium leading-tight transition-all duration-300 ${
+                        task.isCompleted ? 'line-through text-slate-400 decoration-slate-300' : 'text-slate-800'
+                    }`}>
+                        {task.title}
+                    </p>
+                    
+                    {/* Meta info row */}
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                        {task.priority && task.priority !== 'undefined' && !task.isCompleted && (
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${priorityColors[task.priority]}`}>
+                                {task.priority}
+                            </span>
+                        )}
+                        
+                        {task.startTime && (
+                            <div className={`flex items-center gap-1 text-[11px] font-medium ${
+                                task.isCompleted ? 'text-slate-400' : isOverdue ? 'text-red-600' : 'text-slate-500'
+                            }`}>
+                                <Clock className="w-3 h-3" />
+                                {formatTaskTime(new Date(task.startTime))}
+                                {isOverdue && !task.isCompleted && <span className="ml-0.5 font-bold">(Overdue)</span>}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Hover Actions */}
+                <div className={`flex items-center gap-1 transition-opacity duration-200 ${task.isCompleted ? 'opacity-0 pointer-events-none' : 'opacity-0 lg:group-hover:opacity-100'} sm:opacity-100`}>
+                    {task.startTime && !task.isCompleted && (
+                        <button
+                            onClick={handleSnooze}
+                            className="p-1.5 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors"
+                            title="Snooze 10 min"
+                        >
+                            <Bell className="w-4 h-4" />
+                        </button>
+                    )}
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                        title="Edit"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div className="flex items-center gap-1">
-          {/* Drag handle */}
-          <div
-            className="p-1.5 text-gray-400 cursor-move"
-            title="Drag to reorder"
-          >
-            <GripVertical className="w-4 h-4" />
-          </div>
-
-          {/* Quick actions - shown on hover */}
-          {showQuickActions && (
-            <>
-              <button
-                onClick={handleSnooze}
-                className="p-1.5 text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                title="Snooze 10 minutes"
-              >
-                <Bell className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={handleDuplicate}
-                className="p-1.5 text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                title="Duplicate task"
-              >
-                <Copy className="w-4 h-4" />
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={handleFocus}
-            className={`p-1.5 rounded transition-colors ${
-              isFocused
-                ? 'bg-green-600 text-white'
-                : 'text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-            title={isFocused ? 'Remove focus' : 'Set as focus task'}
-          >
-            <Target className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={() => setIsEditing(true)}
-            className="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-            title="Edit task"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-            title="Delete task"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

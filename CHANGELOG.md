@@ -1,6 +1,22 @@
 # Changelog
 
-All notable changes to EdgeTask will be documented in this file.
+All notable changes to AyaMir will be documented in this file.
+
+## [1.1.1] - 2024-12-14
+
+### Security
+- Fixed XSS vulnerability in `visualFeedback.ts` by replacing innerHTML with textContent
+- Fixed innerHTML usage in `edgePanel.ts` close button
+- Moved `identity` permission to `optional_permissions` (CWS compliance)
+- Removed `http://*/*` from `web_accessible_resources` matches
+
+### Added
+- `PRIVACY.md` for Chrome Web Store compliance
+- `.env.example` for developer onboarding
+
+### Fixed
+- npm audit vulnerabilities (6 → 2 remaining moderate in esbuild/vite)
+- Removed unnecessary `declare const chrome` in sync.ts
 
 ## [1.1.0] - 2025-12-09
 

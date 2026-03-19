@@ -1,89 +1,29 @@
-import { useState } from 'react';
-import { Task } from '../lib/db';
+import { Task } from '@/lib/db';
 import TaskItem from './TaskItem';
-import { db } from '../lib/db';
+import { ClipboardList } from 'lucide-react';
 
 interface TaskListProps {
-  tasks: Task[];
-  onTasksChange: () => void;
+    tasks: Task[];
 }
 
-export default function TaskList({ tasks, onTasksChange }: TaskListProps) {
-  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+export default function TaskList({ tasks }: TaskListProps) {
+    if (tasks.length === 0) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 h-full">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                    <ClipboardList className="w-8 h-8 text-slate-300" />
+                </div>
+                <p className="text-sm font-semibold text-slate-600">All caught up!</p>
+                <p className="text-xs mt-1 text-slate-400">Add a new task above to get started</p>
+            </div>
+        );
+    }
 
-  if (tasks.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <p className="text-lg">No tasks yet</p>
-        <p className="text-sm mt-2">Add a task to get started</p>
-      </div>
-    );
-  }
-
-  const handleDragStart = (task: Task) => {
-    setDraggedTask(task);
-  };
-
-  const handleDragOver = (index: number) => {
-    setDragOverIndex(index);
-  };
-
-  const handleDragEnd = async () => {
-    if (!draggedTask || dragOverIndex === null) {
-      setDraggedTask(null);
-      setDragOverIndex(null);
-      return;
-    }
-
-    const draggedIndex = tasks.findIndex(t => t.id === draggedTask.id);
-
-    // Don't do anything if the task is being dropped in its original position
-    if (draggedIndex === dragOverIndex) {
-      setDraggedTask(null);
-      setDragOverIndex(null);
-      return;
-    }
-
-    // Create a new array with the reordered tasks
-    const newTasks = [...tasks];
-    newTasks.splice(draggedIndex, 1);
-    newTasks.splice(dragOverIndex, 0, draggedTask);
-
-    // Update the order in the database
-    try {
-      // Update each task with its new order
-      for (let i = 0; i < newTasks.length; i++) {
-        if (newTasks[i].id !== undefined) {
-          await db.tasks.update(newTasks[i].id as number, { order: i });
-        }
-      }
-
-      onTasksChange();
-    } catch (error) {
-      console.error('Error reordering tasks:', error);
-    }
-
-    setDraggedTask(null);
-    setDragOverIndex(null);
-  };
-
-  return (
-    <div className="space-y-2">
-      {tasks.map((task, index) => (
-        <div
-          key={task.id}
-          className={dragOverIndex === index ? 'border-t-2 border-b-2 border-indigo-500 -my-1 py-1' : ''}
-          onDragOver={() => handleDragOver(index)}
-        >
-          <TaskItem
-            task={task}
-            onUpdate={onTasksChange}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          />
+        <div className="flex-1 overflow-y-auto pb-4 space-y-2.5 no-scrollbar h-full pt-1">
+            {tasks.map((task) => (
+                <TaskItem key={task.id} task={task} />
+            ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 }

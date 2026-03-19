@@ -1,8 +1,8 @@
-# EdgeTask Installation Guide
+# AyaMir Installation Guide
 
 ## Load the Extension in Chrome
 
-Follow these steps to install EdgeTask in your Chrome browser:
+Follow these steps to install AyaMir in your Chrome browser:
 
 ### Step 1: Build the Extension
 
@@ -32,16 +32,16 @@ In the top-right corner of the Extensions page, toggle on **Developer mode**.
 
 ### Step 5: Verify Installation
 
-You should see the EdgeTask extension card appear with:
+You should see the AyaMir extension card appear with:
 - Extension icon
-- Name: "EdgeTask"
+- Name: "AyaMir"
 - Version: 1.0.0
 - Description: "Browser productivity tool with a humorous approach to task management"
 
-### Step 6: Start Using EdgeTask
+### Step 6: Start Using AyaMir
 
 #### Option A: Click the Extension Icon
-- Click the EdgeTask icon in your Chrome toolbar
+- Click the AyaMir icon in your Chrome toolbar
 - The side panel will open with the task management interface
 
 #### Option B: Use Keyboard Shortcut
@@ -117,7 +117,7 @@ You should see the EdgeTask extension card appear with:
 
 ### Console Errors
 - Right-click the extension icon → Inspect popup → Check Console tab
-- Or go to `chrome://extensions/` → Click "Errors" button on EdgeTask card
+- Or go to `chrome://extensions/` → Click "Errors" button on AyaMir card
 
 ## Updating the Extension
 
@@ -125,12 +125,12 @@ After making code changes:
 
 1. Run `npm run build` again
 2. Go to `chrome://extensions/`
-3. Click the reload icon on the EdgeTask card
+3. Click the reload icon on the AyaMir card
 4. The extension will reload with your changes
 
 ## Permissions Explained
 
-EdgeTask requires these permissions:
+AyaMir requires these permissions:
 
 - **storage** - Save tasks and settings locally
 - **notifications** - Show reminder notifications
@@ -143,10 +143,10 @@ All permissions are used solely for the extension's core functionality. No data 
 
 ## Uninstalling
 
-To remove EdgeTask:
+To remove AyaMir:
 
 1. Go to `chrome://extensions/`
-2. Find the EdgeTask card
+2. Find the AyaMir card
 3. Click "Remove"
 4. Confirm removal
 
