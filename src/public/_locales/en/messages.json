@@ -334,5 +334,32 @@
   },
   "msgTaskComplete_3": {
     "message": "Checked off! The productivity gods are pleased."
-  }
+  },
+  "onb1Title": { "message": "Welcome to AyaMir" },
+  "onb1Subtitle": { "message": "Protect your time, build your legacy." },
+  "onb1Desc": { "message": "A smart task manager that blocks distractions, tracks your focus, and rewards your productivity." },
+  "onb1Feat1": { "message": "Smart task management with priorities" },
+  "onb1Feat2": { "message": "Deep Work sessions with site blocking" },
+  "onb1Feat3": { "message": "XP, levels, and achievements" },
+  "onb2Title": { "message": "Deep Work Mode" },
+  "onb2Subtitle": { "message": "Enter the flow state." },
+  "onb2Desc": { "message": "Timed focus sessions. Distracting sites get blocked. Typing challenge to bypass." },
+  "onb2Feat1": { "message": "Customizable work/break intervals" },
+  "onb2Feat2": { "message": "Hard lock mode — no escape until done" },
+  "onb2Feat3": { "message": "Ambient sounds to stay in the zone" },
+  "onb3Title": { "message": "Command Palette" },
+  "onb3Subtitle": { "message": "Add tasks from anywhere." },
+  "onb3Desc": { "message": "Press Ctrl+Shift+Space on any page to add a task instantly." },
+  "onb3Feat1": { "message": "Ctrl+Shift+E to open AyaMir" },
+  "onb3Feat2": { "message": "Ctrl+Shift+Space for quick task" },
+  "onb3Feat3": { "message": "Right-click any page to save as task" },
+  "onb4Title": { "message": "100% Private" },
+  "onb4Subtitle": { "message": "Your data never leaves your browser." },
+  "onb4Desc": { "message": "No accounts, no servers, no tracking. Everything stays on your device." },
+  "onb4Feat1": { "message": "All data stored locally in your browser" },
+  "onb4Feat2": { "message": "Zero network requests — works offline" },
+  "onb4Feat3": { "message": "Enable in Incognito for full site blocking" },
+  "onbContinue": { "message": "Continue" },
+  "onbGetStarted": { "message": "Get Started" },
+  "onbSkip": { "message": "Skip" }
 }

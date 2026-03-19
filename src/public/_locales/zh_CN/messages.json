@@ -334,5 +334,32 @@
   },
   "msgTaskComplete_3": {
     "message": "已勾选！效率之神很满意。"
-  }
+  },
+  "onb1Title": { "message": "欢迎使用 AyaMir" },
+  "onb1Subtitle": { "message": "守护时间，创造传奇。" },
+  "onb1Desc": { "message": "一个智能任务管理器：屏蔽干扰、追踪专注、奖励效率。" },
+  "onb1Feat1": { "message": "带优先级的智能任务管理" },
+  "onb1Feat2": { "message": "Deep Work 专注模式 + 网站屏蔽" },
+  "onb1Feat3": { "message": "经验值、等级和成就系统" },
+  "onb2Title": { "message": "Deep Work 模式" },
+  "onb2Subtitle": { "message": "进入心流状态。" },
+  "onb2Desc": { "message": "定时专注。干扰网站自动屏蔽。打字挑战解锁。" },
+  "onb2Feat1": { "message": "自定义工作/休息间隔" },
+  "onb2Feat2": { "message": "硬锁模式 — 开始后无法取消" },
+  "onb2Feat3": { "message": "白噪音/雨声等环境音" },
+  "onb3Title": { "message": "命令面板" },
+  "onb3Subtitle": { "message": "在任何页面添加任务。" },
+  "onb3Desc": { "message": "按 Ctrl+Shift+Space 即可在任何页面快速添加任务。" },
+  "onb3Feat1": { "message": "Ctrl+Shift+E 打开 AyaMir" },
+  "onb3Feat2": { "message": "Ctrl+Shift+Space 快速添加" },
+  "onb3Feat3": { "message": "右键任何页面保存为任务" },
+  "onb4Title": { "message": "100% 隐私" },
+  "onb4Subtitle": { "message": "数据永不离开你的浏览器。" },
+  "onb4Desc": { "message": "无需账号，无服务器，无追踪。一切存储在本地。" },
+  "onb4Feat1": { "message": "所有数据本地存储在浏览器中" },
+  "onb4Feat2": { "message": "零网络请求 — 离线可用" },
+  "onb4Feat3": { "message": "在无痕模式中启用以完全屏蔽" },
+  "onbContinue": { "message": "继续" },
+  "onbGetStarted": { "message": "开始使用" },
+  "onbSkip": { "message": "跳过" }
 }

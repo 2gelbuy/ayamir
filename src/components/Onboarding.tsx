@@ -6,53 +6,55 @@ interface OnboardingProps {
     onComplete: () => void;
 }
 
+const t = (key: string) => chrome.i18n.getMessage(key) || key;
+
 const steps = [
     {
         icon: Target,
         gradient: 'from-indigo-500 to-purple-600',
-        title: 'Welcome to AyaMir',
-        subtitle: 'Protect your time, build your legacy.',
-        description: 'A smart task manager that blocks distractions, tracks your focus, and rewards your productivity.',
+        titleKey: 'onb1Title',
+        subtitleKey: 'onb1Subtitle',
+        descKey: 'onb1Desc',
         features: [
-            { icon: '✅', text: 'Smart task management with priorities' },
-            { icon: '🧠', text: 'Deep Work sessions with site blocking' },
-            { icon: '🏆', text: 'XP, levels, and achievements' },
+            { icon: '✅', key: 'onb1Feat1' },
+            { icon: '🧠', key: 'onb1Feat2' },
+            { icon: '🏆', key: 'onb1Feat3' },
         ]
     },
     {
         icon: Brain,
         gradient: 'from-blue-500 to-indigo-600',
-        title: 'Deep Work Mode',
-        subtitle: 'Enter the flow state.',
-        description: 'Start a timed focus session. Distracting sites get blocked. A typing challenge is the only way through.',
+        titleKey: 'onb2Title',
+        subtitleKey: 'onb2Subtitle',
+        descKey: 'onb2Desc',
         features: [
-            { icon: '⏱️', text: 'Customizable work/break intervals' },
-            { icon: '🔒', text: 'Hard lock mode — no escape until done' },
-            { icon: '🎵', text: 'Ambient sounds to stay in the zone' },
+            { icon: '⏱️', key: 'onb2Feat1' },
+            { icon: '🔒', key: 'onb2Feat2' },
+            { icon: '🎵', key: 'onb2Feat3' },
         ]
     },
     {
         icon: Zap,
         gradient: 'from-purple-500 to-pink-600',
-        title: 'Quick Command Palette',
-        subtitle: 'Add tasks from anywhere.',
-        description: 'Press Ctrl+Shift+Space on any page to add a task instantly. No need to open the popup.',
+        titleKey: 'onb3Title',
+        subtitleKey: 'onb3Subtitle',
+        descKey: 'onb3Desc',
         features: [
-            { icon: '⌨️', text: 'Ctrl+Shift+E to open AyaMir' },
-            { icon: '⚡', text: 'Ctrl+Shift+Space for quick task' },
-            { icon: '🎯', text: 'Press ? inside popup for all shortcuts' },
+            { icon: '⌨️', key: 'onb3Feat1' },
+            { icon: '⚡', key: 'onb3Feat2' },
+            { icon: '🖱️', key: 'onb3Feat3' },
         ]
     },
     {
         icon: Shield,
         gradient: 'from-green-500 to-emerald-600',
-        title: '100% Private',
-        subtitle: 'Your data never leaves your browser.',
-        description: 'No accounts, no servers, no tracking. Everything stays on your device. Unlike other extensions, we never see your data.',
+        titleKey: 'onb4Title',
+        subtitleKey: 'onb4Subtitle',
+        descKey: 'onb4Desc',
         features: [
-            { icon: '🔒', text: 'All data stored locally in your browser' },
-            { icon: '🚫', text: 'Zero network requests — works offline' },
-            { icon: '👁️', text: 'Enable in Incognito for full site blocking' },
+            { icon: '🔒', key: 'onb4Feat1' },
+            { icon: '🚫', key: 'onb4Feat2' },
+            { icon: '👁️', key: 'onb4Feat3' },
         ]
     },
 ];
@@ -71,66 +73,67 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         }
     };
 
+    const handleSkip = async () => {
+        await updateSettings({ onboardingCompleted: true });
+        onComplete();
+    };
+
     return (
         <div className="absolute inset-0 bg-white dark:bg-slate-900 flex flex-col z-50 animate-fade-in">
             {/* Progress dots */}
-            <div className="flex justify-center gap-2 pt-6 pb-2">
+            <div className="flex justify-center gap-2 pt-4 pb-1">
                 {steps.map((_, i) => (
                     <div
                         key={i}
                         className={`h-1.5 rounded-full transition-all duration-300 ${
-                            i === step ? 'w-8 bg-indigo-500' : i < step ? 'w-1.5 bg-indigo-300' : 'w-1.5 bg-slate-200 dark:bg-slate-700'
+                            i === step ? 'w-6 bg-indigo-500' : i < step ? 'w-1.5 bg-indigo-300' : 'w-1.5 bg-slate-200 dark:bg-slate-700'
                         }`}
                     />
                 ))}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${current.gradient} flex items-center justify-center mb-6 shadow-lg animate-bounce-in`}>
-                    <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+            {/* Content — compact layout */}
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center min-h-0">
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${current.gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <Icon className="w-7 h-7 text-white" strokeWidth={1.5} />
                 </div>
 
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{current.title}</h2>
-                <p className="text-sm font-medium text-indigo-500 dark:text-indigo-400 mb-3">{current.subtitle}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-8">{current.description}</p>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-0.5">{t(current.titleKey)}</h2>
+                <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400 mb-2">{t(current.subtitleKey)}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-5 max-w-[280px]">{t(current.descKey)}</p>
 
-                <div className="w-full space-y-3">
+                <div className="w-full space-y-2">
                     {current.features.map((feat, i) => (
                         <div
                             key={i}
-                            className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-left animate-slide-up"
-                            style={{ animationDelay: `${i * 100}ms` }}
+                            className="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-800 px-3 py-2.5 rounded-xl text-left"
                         >
-                            <span className="text-lg">{feat.icon}</span>
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{feat.text}</span>
+                            <span className="text-base">{feat.icon}</span>
+                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{t(feat.key)}</span>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Bottom */}
-            <div className="p-6 space-y-3">
+            {/* Bottom buttons — always visible */}
+            <div className="p-4 pt-3 space-y-2 flex-shrink-0">
                 <button
                     onClick={handleNext}
-                    className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25"
+                    className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25"
                 >
                     {step < steps.length - 1 ? (
-                        <>Continue <ArrowRight className="w-4 h-4" /></>
+                        <>{t('onbContinue')} <ArrowRight className="w-4 h-4" /></>
                     ) : (
-                        <>Get Started <Check className="w-4 h-4" /></>
+                        <>{t('onbGetStarted')} <Check className="w-4 h-4" /></>
                     )}
                 </button>
 
                 {step < steps.length - 1 && (
                     <button
-                        onClick={async () => {
-                            await updateSettings({ onboardingCompleted: true });
-                            onComplete();
-                        }}
-                        className="w-full py-2 text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        onClick={handleSkip}
+                        className="w-full py-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     >
-                        Skip onboarding
+                        {t('onbSkip')}
                     </button>
                 )}
             </div>

@@ -334,5 +334,32 @@
   },
   "msgTaskComplete_3": {
     "message": "¡Completado! Los dioses de la productividad están complacidos."
-  }
+  },
+  "onb1Title": { "message": "Bienvenido a AyaMir" },
+  "onb1Subtitle": { "message": "Protege tu tiempo, construye tu legado." },
+  "onb1Desc": { "message": "Un gestor de tareas que bloquea distracciones, rastrea tu enfoque y premia tu productividad." },
+  "onb1Feat1": { "message": "Gestión de tareas con prioridades" },
+  "onb1Feat2": { "message": "Sesiones Deep Work con bloqueo de sitios" },
+  "onb1Feat3": { "message": "XP, niveles y logros" },
+  "onb2Title": { "message": "Modo Deep Work" },
+  "onb2Subtitle": { "message": "Entra en estado de flujo." },
+  "onb2Desc": { "message": "Sesiones con temporizador. Los sitios distractores se bloquean. Desafío de escritura para desbloquear." },
+  "onb2Feat1": { "message": "Intervalos trabajo/descanso personalizables" },
+  "onb2Feat2": { "message": "Modo bloqueo — sin escape hasta terminar" },
+  "onb2Feat3": { "message": "Sonidos ambientales para concentrarte" },
+  "onb3Title": { "message": "Paleta de Comandos" },
+  "onb3Subtitle": { "message": "Añade tareas desde cualquier lugar." },
+  "onb3Desc": { "message": "Pulsa Ctrl+Shift+Space en cualquier página para añadir una tarea al instante." },
+  "onb3Feat1": { "message": "Ctrl+Shift+E para abrir AyaMir" },
+  "onb3Feat2": { "message": "Ctrl+Shift+Space para tarea rápida" },
+  "onb3Feat3": { "message": "Clic derecho en cualquier página para guardar como tarea" },
+  "onb4Title": { "message": "100% Privado" },
+  "onb4Subtitle": { "message": "Tus datos nunca salen de tu navegador." },
+  "onb4Desc": { "message": "Sin cuentas, sin servidores, sin rastreo. Todo se queda en tu dispositivo." },
+  "onb4Feat1": { "message": "Todos los datos almacenados localmente" },
+  "onb4Feat2": { "message": "Cero solicitudes de red — funciona offline" },
+  "onb4Feat3": { "message": "Actívalo en Incógnito para bloqueo completo" },
+  "onbContinue": { "message": "Continuar" },
+  "onbGetStarted": { "message": "Empezar" },
+  "onbSkip": { "message": "Omitir" }
 }

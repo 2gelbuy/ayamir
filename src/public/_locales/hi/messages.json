@@ -334,5 +334,32 @@
   },
   "msgTaskComplete_3": {
     "message": "पूरा हुआ! उत्पादकता देवता प्रसन्न हैं।"
-  }
+  },
+  "onb1Title": { "message": "AyaMir में आपका स्वागत है" },
+  "onb1Subtitle": { "message": "अपना समय बचाएं, विरासत बनाएं।" },
+  "onb1Desc": { "message": "एक स्मार्ट टास्क मैनेजर जो विकर्षण रोकता है, फोकस ट्रैक करता है और उत्पादकता पुरस्कृत करता है।" },
+  "onb1Feat1": { "message": "प्राथमिकता के साथ स्मार्ट कार्य प्रबंधन" },
+  "onb1Feat2": { "message": "साइट ब्लॉकिंग के साथ Deep Work सत्र" },
+  "onb1Feat3": { "message": "XP, स्तर और उपलब्धियां" },
+  "onb2Title": { "message": "Deep Work मोड" },
+  "onb2Subtitle": { "message": "फ्लो स्टेट में प्रवेश करें।" },
+  "onb2Desc": { "message": "टाइमर सत्र। विचलित करने वाली साइटें ब्लॉक। बायपास के लिए टाइपिंग चैलेंज।" },
+  "onb2Feat1": { "message": "अनुकूलन योग्य कार्य/विश्राम अंतराल" },
+  "onb2Feat2": { "message": "हार्ड लॉक — पूरा होने तक कोई बच नहीं" },
+  "onb2Feat3": { "message": "एकाग्रता के लिए परिवेश ध्वनियां" },
+  "onb3Title": { "message": "कमांड पैलेट" },
+  "onb3Subtitle": { "message": "कहीं से भी कार्य जोड़ें।" },
+  "onb3Desc": { "message": "किसी भी पेज पर Ctrl+Shift+Space दबाकर तुरंत कार्य जोड़ें।" },
+  "onb3Feat1": { "message": "Ctrl+Shift+E — AyaMir खोलें" },
+  "onb3Feat2": { "message": "Ctrl+Shift+Space — त्वरित कार्य" },
+  "onb3Feat3": { "message": "किसी भी पेज पर राइट-क्लिक — कार्य के रूप में सहेजें" },
+  "onb4Title": { "message": "100% निजी" },
+  "onb4Subtitle": { "message": "आपका डेटा ब्राउज़र से बाहर नहीं जाता।" },
+  "onb4Desc": { "message": "कोई अकाउंट नहीं, कोई सर्वर नहीं, कोई ट्रैकिंग नहीं। सब कुछ आपके डिवाइस पर।" },
+  "onb4Feat1": { "message": "सभी डेटा ब्राउज़र में स्थानीय रूप से संग्रहीत" },
+  "onb4Feat2": { "message": "शून्य नेटवर्क अनुरोध — ऑफ़लाइन काम करता है" },
+  "onb4Feat3": { "message": "पूर्ण ब्लॉकिंग के लिए इनकॉग्निटो में सक्षम करें" },
+  "onbContinue": { "message": "जारी रखें" },
+  "onbGetStarted": { "message": "शुरू करें" },
+  "onbSkip": { "message": "छोड़ें" }
 }
