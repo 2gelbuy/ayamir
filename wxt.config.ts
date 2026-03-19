@@ -18,6 +18,10 @@ export default defineConfig({
             'alarms',
             'contextMenus'
         ],
+        web_accessible_resources: [{
+            resources: ['sounds/*.wav'],
+            matches: ['<all_urls>']
+        }],
         commands: {
             _execute_action: {
                 suggested_key: {
