@@ -55,6 +55,7 @@ AyaMir is a premium, local-first Chrome extension for productivity based on the 
 <!-- AUTO:GIT_LOG -->
 ## Recent Commits
 ```
+fe118f9 auto: .env.production, .gemini/context.md, .gitignore, .output/chrome-mv3/_...
 5a2e77d auto: .output/chrome-mv3/_locales/en/messages.json, .output/chrome-mv3/asse...
 e5c7de7 feat(core): rebranding to AyaMir, content script lazy-loading, and full i18n localization
 5899ddf Clean up repository: remove build artifacts, logs, and archives
@@ -64,7 +65,6 @@ bcdbc09 Bump package.json version to 1.1.0
 39f0659 Release v1.1.0
 c6d786f Create v1.1.0 tag
 a1386b5 Add CHANGELOG.md
-c99f8be v1.1.0: Security fixes and stability improvements
 ```
 <!-- /AUTO:GIT_LOG -->
 
@@ -73,30 +73,6 @@ c99f8be v1.1.0: Security fixes and stability improvements
 ## Uncommitted Changes
 Branch: `main`
 ```
-D  .env.production
-D  .gemini/context.md
- M .gitignore
-D  .output/chrome-mv3/_locales/en/messages.json
-D  .output/chrome-mv3/_locales/es/messages.json
-D  .output/chrome-mv3/_locales/hi/messages.json
-D  .output/chrome-mv3/_locales/ru/messages.json
-D  .output/chrome-mv3/_locales/zh_CN/messages.json
-D  .output/chrome-mv3/assets/popup-DkT6pr0Y.css
-D  .output/chrome-mv3/background.js
-D  .output/chrome-mv3/chunks/popup-Cr-cshmj.js
-D  .output/chrome-mv3/content-scripts/content.css
-D  .output/chrome-mv3/content-scripts/content.js
-D  .output/chrome-mv3/icon/128.png
-D  .output/chrome-mv3/icon/16.png
-D  .output/chrome-mv3/icon/48.png
-D  .output/chrome-mv3/icon/icon.svg
-D  .output/chrome-mv3/manifest.json
-D  .output/chrome-mv3/popup.html
-D  .test-user-data/BrowserMetrics/BrowserMetrics-69BA4C77-450C.pma
-D  .test-user-data/Crashpad/settings.dat
-D  ".test-user-data/Default/Account Web Data"
-D  ".test-user-data/Default/Account Web Data-journal"
-D  ".test-user-data/Default/Affiliation Database"
-D  ".test-user-data/Default/Affiliation Database-journal"
+M AI_STATUS.md
 ```
 <!-- /AUTO:GIT_STATUS -->
