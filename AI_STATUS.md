@@ -55,6 +55,7 @@ AyaMir is a premium, local-first Chrome extension for productivity based on the 
 <!-- AUTO:GIT_LOG -->
 ## Recent Commits
 ```
+f1023d1 auto: AI_STATUS.md, src/components/DeepWorkMode.tsx, src/components/Onboard...
 ea81d37 auto: AI_STATUS.md
 68d1d69 auto: AI_STATUS.md
 7752af9 auto: AI_STATUS.md
@@ -64,7 +65,6 @@ b222e72 auto: AI_STATUS.md, src/components/Onboarding.tsx, src/public/_locales/e
 29fc616 auto: AI_STATUS.md, src/components/DeepWorkMode.tsx, src/components/Onboard...
 0e12cd4 auto: AI_STATUS.md
 1068980 auto: AI_STATUS.md
-2f633d2 auto: AI_STATUS.md, src/entrypoints/background.ts, src/entrypoints/content.tsx
 ```
 <!-- /AUTO:GIT_LOG -->
 
@@ -74,16 +74,5 @@ b222e72 auto: AI_STATUS.md, src/components/Onboarding.tsx, src/public/_locales/e
 Branch: `main`
 ```
 M AI_STATUS.md
- M src/components/DeepWorkMode.tsx
- M src/components/Onboarding.tsx
- M src/components/Settings.tsx
- M src/components/Stats.tsx
- M src/components/TaskInput.tsx
- M src/components/TaskItem.tsx
- M src/entrypoints/popup/App.tsx
- M src/public/_locales/es/messages.json
- M src/public/_locales/hi/messages.json
- M src/public/_locales/zh_CN/messages.json
- M src/styles/global.css
 ```
 <!-- /AUTO:GIT_STATUS -->
