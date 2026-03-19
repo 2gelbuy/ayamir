@@ -55,6 +55,7 @@ AyaMir is a premium, local-first Chrome extension for productivity based on the 
 <!-- AUTO:GIT_LOG -->
 ## Recent Commits
 ```
+b222e72 auto: AI_STATUS.md, src/components/Onboarding.tsx, src/public/_locales/en/m...
 29fc616 auto: AI_STATUS.md, src/components/DeepWorkMode.tsx, src/components/Onboard...
 0e12cd4 auto: AI_STATUS.md
 1068980 auto: AI_STATUS.md
@@ -64,7 +65,6 @@ AyaMir is a premium, local-first Chrome extension for productivity based on the 
 fe118f9 auto: .env.production, .gemini/context.md, .gitignore, .output/chrome-mv3/_...
 5a2e77d auto: .output/chrome-mv3/_locales/en/messages.json, .output/chrome-mv3/asse...
 e5c7de7 feat(core): rebranding to AyaMir, content script lazy-loading, and full i18n localization
-5899ddf Clean up repository: remove build artifacts, logs, and archives
 ```
 <!-- /AUTO:GIT_LOG -->
 
@@ -74,11 +74,14 @@ e5c7de7 feat(core): rebranding to AyaMir, content script lazy-loading, and full 
 Branch: `main`
 ```
 M AI_STATUS.md
- M src/components/Onboarding.tsx
+ M src/components/DailyFocus.tsx
+ M src/components/KeyboardHelp.tsx
+ M src/components/Settings.tsx
+ M src/components/TaskInput.tsx
+ M src/components/TaskList.tsx
+ M src/entrypoints/content.tsx
+ M src/entrypoints/popup/App.tsx
  M src/public/_locales/en/messages.json
- M src/public/_locales/es/messages.json
- M src/public/_locales/hi/messages.json
  M src/public/_locales/ru/messages.json
- M src/public/_locales/zh_CN/messages.json
 ```
 <!-- /AUTO:GIT_STATUS -->

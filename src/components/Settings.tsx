@@ -128,18 +128,20 @@ export default function Settings({ onClose }: SettingsProps) {
 
     if (!settings) return null;
 
+    const t = (key: string, fallback?: string) => chrome.i18n.getMessage(key) || fallback || key;
+
     const sections = [
-        { id: 'general' as const, icon: Monitor, label: 'General' },
-        { id: 'blocking' as const, icon: Shield, label: 'Blocking' },
-        { id: 'focus' as const, icon: Clock, label: 'Focus' },
-        { id: 'data' as const, icon: Download, label: 'Data' },
+        { id: 'general' as const, icon: Monitor, label: t('tabGeneral', 'General') },
+        { id: 'blocking' as const, icon: Shield, label: t('tabBlocking', 'Blocking') },
+        { id: 'focus' as const, icon: Clock, label: t('tabFocus', 'Focus') },
+        { id: 'data' as const, icon: Download, label: t('tabData', 'Data') },
     ];
 
     const categoryIcons: Record<string, { emoji: string; label: string }> = {
-        social: { emoji: '💬', label: 'Social Media' },
-        news: { emoji: '📰', label: 'News & Forums' },
-        entertainment: { emoji: '🎬', label: 'Entertainment' },
-        shopping: { emoji: '🛒', label: 'Shopping' },
+        social: { emoji: '💬', label: t('catSocial', 'Social Media') },
+        news: { emoji: '📰', label: t('catNews', 'News & Forums') },
+        entertainment: { emoji: '🎬', label: t('catEntertainment', 'Entertainment') },
+        shopping: { emoji: '🛒', label: t('catShopping', 'Shopping') },
     };
 
     return (
@@ -160,7 +162,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         onClick={() => setActiveSection(s.id)}
                         className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all border-b-2 ${
                             activeSection === s.id
-                                ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                ? 'border-teal-500 text-teal-600 dark:text-teal-400'
                                 : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                         }`}
                     >
@@ -176,7 +178,7 @@ export default function Settings({ onClose }: SettingsProps) {
                     <>
                         {/* Theme */}
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Theme</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">{t('themeLabel')}</label>
                             <div className="flex gap-2">
                                 {(['light', 'dark', 'system'] as const).map(t => (
                                     <button
@@ -184,7 +186,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                         onClick={() => setSettings({ ...settings, theme: t })}
                                         className={`flex-1 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
                                             settings.theme === t
-                                                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                                                ? 'bg-teal-500 text-white shadow-md shadow-teal-500/20'
                                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                     >
@@ -215,8 +217,8 @@ export default function Settings({ onClose }: SettingsProps) {
                                     <Gamepad2 className="w-4 h-4 text-purple-500" />
                                 </div>
                                 <div>
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">Gamification</span>
-                                    <span className="text-[11px] text-slate-400">XP, levels, and achievements</span>
+                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">{t('gamificationLabel')}</span>
+                                    <span className="text-[11px] text-slate-400">{t('gamificationDesc')}</span>
                                 </div>
                             </div>
                             <Toggle checked={settings.gamificationEnabled} onChange={v => setSettings({ ...settings, gamificationEnabled: v })} />
@@ -224,9 +226,9 @@ export default function Settings({ onClose }: SettingsProps) {
 
                         {/* Incognito Reminder */}
                         <div className="p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl border border-amber-200 dark:border-amber-900/30">
-                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">Enable in Incognito</p>
+                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">{t('incognitoTitle')}</p>
                             <p className="text-[11px] text-amber-600/70 dark:text-amber-500/70 leading-relaxed">
-                                Site blocking doesn't work in Incognito by default. Go to chrome://extensions, find AyaMir, and enable "Allow in Incognito" for full protection.
+                                {t('incognitoDesc')}
                             </p>
                         </div>
 
@@ -234,10 +236,10 @@ export default function Settings({ onClose }: SettingsProps) {
                         <div className="p-3 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-900/30">
                             <div className="flex items-center gap-2 mb-1">
                                 <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                <p className="text-xs font-semibold text-green-700 dark:text-green-400">100% Private & Local</p>
+                                <p className="text-xs font-semibold text-green-700 dark:text-green-400">{t('privacyTitle')}</p>
                             </div>
                             <p className="text-[11px] text-green-600/70 dark:text-green-500/70 leading-relaxed">
-                                Your data never leaves your browser. No accounts, no servers, no tracking. Everything is stored locally in IndexedDB and Chrome Storage.
+                                {t('privacyDesc')}
                             </p>
                         </div>
                     </>
@@ -258,8 +260,8 @@ export default function Settings({ onClose }: SettingsProps) {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">Scheduled Blocking</span>
-                                    <span className="text-[11px] text-slate-400">Auto-block during work hours</span>
+                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">{t('scheduledBlocking')}</span>
+                                    <span className="text-[11px] text-slate-400">{t('scheduledBlockingDesc')}</span>
                                 </div>
                                 <Toggle
                                     checked={settings.scheduledBlocking.enabled}
@@ -316,7 +318,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                                     }}
                                                     className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
                                                         isActive
-                                                            ? 'bg-indigo-500 text-white'
+                                                            ? 'bg-teal-500 text-white'
                                                             : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                                                     }`}
                                                 >
@@ -331,7 +333,7 @@ export default function Settings({ onClose }: SettingsProps) {
 
                         {/* Category Blocking */}
                         <div>
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Quick Block Categories</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">{t('quickBlockCategories')}</label>
                             <div className="grid grid-cols-2 gap-2">
                                 {Object.entries(categoryIcons).map(([key, { emoji, label }]) => {
                                     const sites = SITE_CATEGORIES[key as keyof typeof SITE_CATEGORIES];
@@ -366,7 +368,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                 className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                             >
                                 <Copy className="w-3.5 h-3.5" />
-                                Copy List
+                                {t('copyList')}
                             </button>
                             <button
                                 onClick={async () => {
@@ -387,7 +389,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                 className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                             >
                                 <ClipboardPaste className="w-3.5 h-3.5" />
-                                Paste List
+                                {t('pasteList')}
                             </button>
                         </div>
 
@@ -407,7 +409,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                 />
                                 <button
                                     onClick={addDomain}
-                                    className="px-3 py-2 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors"
+                                    className="px-3 py-2 bg-teal-500 text-white rounded-xl hover:bg-indigo-600 transition-colors"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
@@ -434,7 +436,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         {/* Deep Work Duration */}
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
-                                Default Session Duration
+                                {t('sessionDuration')}
                             </label>
                             <div className="flex gap-2">
                                 {[15, 25, 45, 60, 90].map(d => (
@@ -443,7 +445,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                         onClick={() => setSettings({ ...settings, deepWorkModeDuration: d })}
                                         className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${
                                             settings.deepWorkModeDuration === d
-                                                ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                                                ? 'bg-teal-500 text-white shadow-md shadow-teal-500/20'
                                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                     >
@@ -456,7 +458,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         {/* Break Duration */}
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
-                                Default Break Duration
+                                {t('breakDuration')}
                             </label>
                             <div className="flex gap-2">
                                 {[3, 5, 10, 15].map(d => (
@@ -478,16 +480,16 @@ export default function Settings({ onClose }: SettingsProps) {
                         {/* Hard Lock */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">Hard Lock Mode</span>
-                                <span className="text-[11px] text-slate-400">Can't cancel sessions once started</span>
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">{t('hardLockLabel')}</span>
+                                <span className="text-[11px] text-slate-400">{t('hardLockDesc')}</span>
                             </div>
                             <Toggle checked={settings.hardLockMode} onChange={v => setSettings({ ...settings, hardLockMode: v })} />
                         </div>
 
-                        {/* Default Ambient Sound */}
+                        {/* {t('ambientSoundLabel')} */}
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
-                                Default Ambient Sound
+                                {t('ambientSoundLabel')}
                             </label>
                             <div className="flex gap-2">
                                 {[
@@ -502,7 +504,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                         onClick={() => setSettings({ ...settings, ambientSound: s.id as SettingsType['ambientSound'] })}
                                         className={`flex-1 flex flex-col items-center gap-1 py-2 rounded-xl text-xs font-bold transition-all ${
                                             settings.ambientSound === s.id
-                                                ? 'bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400'
+                                                ? 'bg-teal-50 dark:bg-teal-900/30 border border-teal-200 dark:border-teal-700 text-teal-600 dark:text-teal-400'
                                                 : 'bg-slate-50 dark:bg-slate-800 border border-transparent text-slate-500 dark:text-slate-400'
                                         }`}
                                     >
@@ -526,8 +528,8 @@ export default function Settings({ onClose }: SettingsProps) {
                                     <Download className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Export Data</p>
-                                    <p className="text-[11px] text-slate-400">Download all tasks, settings & stats</p>
+                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('exportData')}</p>
+                                    <p className="text-[11px] text-slate-400">{t('exportDataDesc')}</p>
                                 </div>
                             </button>
 
@@ -539,8 +541,8 @@ export default function Settings({ onClose }: SettingsProps) {
                                     <Upload className="w-5 h-5 text-green-500" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">Import Data</p>
-                                    <p className="text-[11px] text-slate-400">Restore from a backup file</p>
+                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('importData')}</p>
+                                    <p className="text-[11px] text-slate-400">{t('importDataDesc')}</p>
                                 </div>
                             </button>
 
@@ -552,15 +554,15 @@ export default function Settings({ onClose }: SettingsProps) {
                                     <RotateCcw className="w-5 h-5 text-red-500" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-sm font-semibold text-red-600 dark:text-red-400">Reset Everything</p>
-                                    <p className="text-[11px] text-red-400 dark:text-red-500">Delete all data and start fresh</p>
+                                    <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('resetAll')}</p>
+                                    <p className="text-[11px] text-red-400 dark:text-red-500">{t('resetAllDesc')}</p>
                                 </div>
                             </button>
                         </div>
 
                         <div className="text-center pt-4 space-y-1">
                             <p className="text-xs text-slate-400">AyaMir v1.2.0</p>
-                            <p className="text-[10px] text-slate-300 dark:text-slate-600">All data stored locally in your browser</p>
+                            <p className="text-[10px] text-slate-300 dark:text-slate-600">{t('localDataNote')}</p>
                         </div>
                     </>
                 )}
@@ -571,7 +573,7 @@ export default function Settings({ onClose }: SettingsProps) {
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800">
                     <button
                         onClick={handleSave}
-                        className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold text-sm shadow-md shadow-indigo-500/20"
+                        className="w-full py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold text-sm shadow-md shadow-teal-500/20"
                     >
                         {chrome.i18n.getMessage("settingsSave") || 'Save Settings'}
                     </button>

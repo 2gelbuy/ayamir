@@ -86,7 +86,7 @@ export default function TaskInput() {
                 <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 z-50 animate-slide-down">
                     <div className="space-y-3">
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Reminder</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{chrome.i18n.getMessage('reminderLabel') || 'Reminder'}</label>
                             <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-700/50 p-2 rounded-xl border border-slate-100 dark:border-slate-600">
                                 <Clock className="w-4 h-4 text-slate-400" />
                                 <input
@@ -99,7 +99,7 @@ export default function TaskInput() {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Priority</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{chrome.i18n.getMessage('priorityLabel') || 'Priority'}</label>
                             <div className="flex gap-1.5">
                                 {(['low', 'medium', 'high', 'urgent'] as const).map((p) => (
                                     <button

@@ -1,22 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
-import { getSettings, updateSettings } from '@/lib/db';
+import { updateSettings } from '@/lib/db';
+
+const t = (key: string) => chrome.i18n.getMessage(key) || key;
 
 interface DailyFocusProps {
     onClose: () => void;
 }
 
-const prompts = [
-    "What's your #1 priority today?",
-    "What will make today a success?",
-    "What's the one thing that matters most?",
-    "If you could only finish one thing today...",
-    "What deserves your full focus today?",
-];
-
 export default function DailyFocus({ onClose }: DailyFocusProps) {
     const [goal, setGoal] = useState('');
-    const [prompt] = useState(() => prompts[Math.floor(Math.random() * prompts.length)]);
+    const [prompt] = useState(() => {
+        const prompts = [t('dailyFocusPrompt1'), t('dailyFocusPrompt2'), t('dailyFocusPrompt3')];
+        return prompts[Math.floor(Math.random() * prompts.length)];
+    });
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -38,7 +35,7 @@ export default function DailyFocus({ onClose }: DailyFocusProps) {
     };
 
     return (
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 flex flex-col z-50 animate-fade-in">
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-800 flex flex-col z-50 animate-fade-in">
             <div className="flex justify-end p-4">
                 <button
                     onClick={onClose}
@@ -53,7 +50,7 @@ export default function DailyFocus({ onClose }: DailyFocusProps) {
                     <Sparkles className="w-8 h-8 text-yellow-300" />
                 </div>
 
-                <p className="text-white/70 text-sm font-medium mb-2">Daily Focus</p>
+                <p className="text-white/70 text-sm font-medium mb-2">{t('dailyFocusLabel')}</p>
                 <h2 className="text-xl font-bold text-white text-center mb-8 leading-snug">{prompt}</h2>
 
                 <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -62,26 +59,24 @@ export default function DailyFocus({ onClose }: DailyFocusProps) {
                         type="text"
                         value={goal}
                         onChange={e => setGoal(e.target.value)}
-                        placeholder="e.g. Ship the landing page..."
+                        placeholder={t('dailyFocusPlaceholder')}
                         className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder:text-white/30 text-sm font-medium outline-none focus:border-white/40 focus:ring-2 focus:ring-white/10 transition-all"
                     />
                     <button
                         type="submit"
-                        className="w-full py-3.5 bg-white text-indigo-600 rounded-2xl font-bold text-sm hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg"
+                        className="w-full py-3.5 bg-white text-teal-700 rounded-2xl font-bold text-sm hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-lg"
                     >
                         {goal.trim() ? (
-                            <>Lock In <ArrowRight className="w-4 h-4" /></>
+                            <>{t('dailyFocusLockIn')} <ArrowRight className="w-4 h-4" /></>
                         ) : (
-                            'Skip for now'
+                            t('dailyFocusSkip')
                         )}
                     </button>
                 </form>
             </div>
 
             <div className="p-6 text-center">
-                <p className="text-white/30 text-xs">
-                    This helps you stay focused throughout the day
-                </p>
+                <p className="text-white/30 text-xs">{t('dailyFocusHelper')}</p>
             </div>
         </div>
     );

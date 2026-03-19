@@ -111,7 +111,7 @@ export default function App() {
             {settings?.gamificationEnabled && (
                 <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 absolute top-0 left-0 z-50">
                     <div
-                        className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 transition-all duration-1000 ease-out"
+                        className="h-full bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-500 transition-all duration-1000 ease-out"
                         style={{ width: `${progressPercentage}%` }}
                     />
                 </div>
@@ -121,14 +121,14 @@ export default function App() {
             <header className="pt-5 pb-3 px-5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-700/60 sticky top-0 z-40">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-600 flex items-center justify-center shadow-md shadow-teal-500/20">
                             <Target className="w-5 h-5 text-white" strokeWidth={2.5} />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
                                 <h1 className="text-base font-bold text-slate-900 dark:text-white tracking-tight leading-none">AyaMir</h1>
                                 {settings?.gamificationEnabled && (
-                                    <span className="text-[10px] font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-1.5 py-0.5 rounded-md leading-none">
+                                    <span className="text-[10px] font-bold bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-1.5 py-0.5 rounded-md leading-none">
                                         Lv.{currentLevel.level}
                                     </span>
                                 )}
@@ -184,12 +184,12 @@ export default function App() {
                 {/* Daily Focus Banner */}
                 {settings?.dailyFocusGoal && settings.dailyFocusDate === new Date().toISOString().split('T')[0] && (
                     <div
-                        className="mt-2.5 px-3 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800/50 cursor-pointer hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors"
+                        className="mt-2.5 px-3 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-xl border border-teal-100 dark:border-teal-800/50 cursor-pointer hover:border-teal-200 dark:hover:border-teal-700 transition-colors"
                         onClick={() => setShowDailyFocus(true)}
                     >
                         <div className="flex items-center gap-2">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-500 flex-shrink-0" />
-                            <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300 truncate">
+                            <Sparkles className="w-3.5 h-3.5 text-teal-500 flex-shrink-0" />
+                            <p className="text-xs font-medium text-teal-700 dark:text-teal-300 truncate">
                                 {settings.dailyFocusGoal}
                             </p>
                         </div>
@@ -235,7 +235,7 @@ export default function App() {
                     className="flex items-center gap-1.5 text-[10px] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >
                     <Keyboard className="w-3 h-3" />
-                    Press ? for shortcuts
+                    {chrome.i18n.getMessage('keyboardHint') || 'Press ? for shortcuts'}
                 </button>
             </div>
 

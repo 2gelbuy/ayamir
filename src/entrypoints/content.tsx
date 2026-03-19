@@ -45,10 +45,11 @@ function injectBlockOverlay(settings: any) {
   if (document.getElementById('ayamir-block-overlay')) return;
 
   const isDeepWork = settings?.isDeepWorkActive;
+  const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
   const quotes = [
-    'I am choosing short-term comfort over long-term goals.',
-    'Procrastination is the thief of time and the grave of opportunity.',
-    'Discipline is choosing between what you want now and what you want most.',
+    t('quote1', 'I am choosing short-term comfort over long-term goals.'),
+    t('quote2', 'Procrastination is the thief of time and the grave of opportunity.'),
+    t('quote3', 'Discipline is choosing between what you want now and what you want most.'),
   ];
 
   const overlay = document.createElement('div');
@@ -56,7 +57,7 @@ function injectBlockOverlay(settings: any) {
   Object.assign(overlay.style, {
     position: 'fixed', inset: '0', zIndex: '2147483647',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    background: 'linear-gradient(135deg, #0f172a, #1e1b4b)',
+    background: 'linear-gradient(135deg, #0f172a, #134e4a)',
     fontFamily: 'system-ui, -apple-system, sans-serif',
     color: '#fff',
   });
@@ -79,31 +80,31 @@ function injectBlockOverlay(settings: any) {
         </svg>
       </div>
       <h1 style="font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-0.5px">
-        ${isDeepWork ? 'Deep Work Active' : 'Focus Mode Active'}
+        ${isDeepWork ? t('blockDeepWorkActive', 'Deep Work Active') : t('blockFocusActive', 'Focus Mode Active')}
       </h1>
       <p style="color:rgba(255,255,255,0.4);font-size:15px;margin:0 0 8px;line-height:1.5">
         ${isDeepWork
-          ? 'You are in a focus session. Stay on track.'
-          : 'You have tasks to complete. Is this site really needed?'}
+          ? t('blockDeepWorkMsg', 'You are in a focus session. Stay on track.')
+          : t('blockFocusMsg', 'You have tasks to complete. Is this site really needed?')}
       </p>
       ${timerHtml}
       <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px">
         <button id="ayamir-close-tab" style="width:100%;padding:16px;border:0;border-radius:16px;background:${isDeepWork ? '#4f46e5' : 'rgba(255,255,255,0.1)'};color:#fff;font-size:15px;font-weight:600;cursor:pointer">
-          Close Tab & Get to Work
+          ${t('blockCloseTab', 'Close Tab & Get to Work')}
         </button>
         <button id="ayamir-continue" style="width:100%;padding:12px;border:0;background:transparent;color:rgba(255,255,255,0.25);font-size:13px;cursor:pointer">
-          I really need this for work (Continue)
+          ${t('blockContinue', 'I really need this for work (Continue)')}
         </button>
       </div>
       <div id="ayamir-challenge" style="display:none;text-align:left;margin-top:24px">
         <div style="padding:16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:16px;font-size:13px;color:#fca5a5;margin-bottom:16px">
-          Type the following text exactly to proceed:<br><br>
+          ${t('blockTypePrompt', 'Type the following text exactly to proceed:')}<br><br>
           <strong id="ayamir-quote" style="color:rgba(255,255,255,0.85);user-select:none"></strong>
         </div>
-        <textarea id="ayamir-challenge-input" rows="3" style="width:100%;padding:16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;color:#fff;font-size:13px;resize:none;outline:none;box-sizing:border-box" placeholder="Type the text above..."></textarea>
+        <textarea id="ayamir-challenge-input" rows="3" style="width:100%;padding:16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;color:#fff;font-size:13px;resize:none;outline:none;box-sizing:border-box" placeholder="${t('blockTypePlaceholder', 'Type the text above...')}"></textarea>
         <div style="display:flex;gap:12px;margin-top:12px">
-          <button id="ayamir-challenge-cancel" style="flex:1;padding:12px;border:0;border-radius:16px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer">Cancel</button>
-          <button id="ayamir-challenge-submit" disabled style="flex:1;padding:12px;border:0;border-radius:16px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.15);font-size:13px;cursor:not-allowed">Unlock Site</button>
+          <button id="ayamir-challenge-cancel" style="flex:1;padding:12px;border:0;border-radius:16px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);font-size:13px;cursor:pointer">${t('cancel', 'Cancel')}</button>
+          <button id="ayamir-challenge-submit" disabled style="flex:1;padding:12px;border:0;border-radius:16px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.15);font-size:13px;cursor:not-allowed">${t('blockUnlock', 'Unlock Site')}</button>
         </div>
       </div>
     </div>
