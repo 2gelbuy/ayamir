@@ -31,3 +31,22 @@ tsc_errors*.txt
 VERSION
 *.sw?
 .env
+.env.production
+
+# Build outputs
+.output/
+.wxt/
+
+# Test artifacts
+.test-user-data/
+test-results/
+playwright-report/
+
+# Backup / deprecated
+_backup_future_features/
+
+# AI agent config (auto-generated per machine)
+AGENTS.md
+GEMINI.md
+CLAUDE.md
+.gemini/
