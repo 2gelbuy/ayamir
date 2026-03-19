@@ -1,7 +1,18 @@
 <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="128" height="128" rx="24" fill="#4F46E5"/>
-  <path d="M64 32C46.3269 32 32 46.3269 32 64C32 81.6731 46.3269 96 64 96C81.6731 96 96 81.6731 96 64C96 46.3269 81.6731 32 64 32Z" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="64" cy="64" r="8" fill="white"/>
-  <path d="M64 40V56" stroke="white" stroke-width="4" stroke-linecap="round"/>
-  <path d="M80 64L68 64" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D9488"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
+  <!-- Shield -->
+  <path d="M64 24L36 36V60C36 78.78 48.18 96.12 64 102C79.82 96.12 92 78.78 92 60V36L64 24Z" fill="white" fill-opacity="0.2" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Clock circle -->
+  <circle cx="64" cy="62" r="16" stroke="white" stroke-width="3"/>
+  <!-- Clock hands -->
+  <line x1="64" y1="62" x2="64" y2="52" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <line x1="64" y1="62" x2="72" y2="62" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Clock center dot -->
+  <circle cx="64" cy="62" r="2" fill="white"/>
 </svg>
