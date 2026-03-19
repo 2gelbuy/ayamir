@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Target, Settings as SettingsIcon, BarChart3, Zap, Brain, Sun, Moon, Sparkles, Keyboard } from 'lucide-react';
 import { db, Settings as SettingsType, getSettings, updateSettings } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import TaskInput from '@/components/TaskInput';
 import TaskList from '@/components/TaskList';
-import Settings from '@/components/Settings';
-import Stats from '@/components/Stats';
-import DeepWorkMode from '@/components/DeepWorkMode';
-import Onboarding from '@/components/Onboarding';
-import DailyFocus from '@/components/DailyFocus';
-import KeyboardHelp from '@/components/KeyboardHelp';
 import { sortTasksByPriority } from '@/lib/smartQueue';
 import { LEVEL_THRESHOLDS, getUserLevel } from '@/lib/gamification';
 import { applyTheme } from '@/lib/theme';
+
+// Lazy-loaded modals — not in initial bundle
+const Settings = lazy(() => import('@/components/Settings'));
+const Stats = lazy(() => import('@/components/Stats'));
+const DeepWorkMode = lazy(() => import('@/components/DeepWorkMode'));
+const Onboarding = lazy(() => import('@/components/Onboarding'));
+const DailyFocus = lazy(() => import('@/components/DailyFocus'));
+const KeyboardHelp = lazy(() => import('@/components/KeyboardHelp'));
 
 export default function App() {
     const tasks = useLiveQuery(() => db.tasks.toArray()) || [];
@@ -239,13 +241,15 @@ export default function App() {
                 </button>
             </div>
 
-            {/* Modals */}
-            {showSettings && <Settings onClose={() => { setShowSettings(false); getSettings().then(setSettings); }} />}
-            {showStats && <Stats onClose={() => setShowStats(false)} />}
-            {showDeepWork && <DeepWorkMode onClose={() => { setShowDeepWork(false); getSettings().then(setSettings); }} />}
-            {showOnboarding && <Onboarding onComplete={() => { setShowOnboarding(false); setShowDailyFocus(true); getSettings().then(setSettings); }} />}
-            {showDailyFocus && <DailyFocus onClose={() => { setShowDailyFocus(false); getSettings().then(setSettings); }} />}
-            {showKeyboardHelp && <KeyboardHelp onClose={() => setShowKeyboardHelp(false)} />}
+            {/* Modals — lazy loaded */}
+            <Suspense fallback={null}>
+                {showSettings && <Settings onClose={() => { setShowSettings(false); getSettings().then(setSettings); }} />}
+                {showStats && <Stats onClose={() => setShowStats(false)} />}
+                {showDeepWork && <DeepWorkMode onClose={() => { setShowDeepWork(false); getSettings().then(setSettings); }} />}
+                {showOnboarding && <Onboarding onComplete={() => { setShowOnboarding(false); setShowDailyFocus(true); getSettings().then(setSettings); }} />}
+                {showDailyFocus && <DailyFocus onClose={() => { setShowDailyFocus(false); getSettings().then(setSettings); }} />}
+                {showKeyboardHelp && <KeyboardHelp onClose={() => setShowKeyboardHelp(false)} />}
+            </Suspense>
         </div>
     );
 }

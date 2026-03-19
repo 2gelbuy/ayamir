@@ -138,23 +138,43 @@ export const DEFAULT_SETTINGS: Settings = {
     completedSessions: 0,
 };
 
-// Helper functions
-export async function getSettings(): Promise<Settings> {
-    const settings = await storage.getItem<Settings>('local:settings');
-    if (!settings) {
-        await storage.setItem('local:settings', DEFAULT_SETTINGS);
-        return DEFAULT_SETTINGS;
-    }
-    // Deep merge with defaults to ensure nested objects have new fields
+// ── Settings cache (avoids re-reading storage on every alarm tick) ──
+let settingsCache: Settings | null = null;
+
+// Listen for storage changes to invalidate cache
+if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area === 'local' && changes['settings']) {
+            settingsCache = null; // invalidate — next getSettings() will re-read
+        }
+    });
+}
+
+function mergeSettings(stored: Settings | null): Settings {
+    if (!stored) return { ...DEFAULT_SETTINGS };
     return {
         ...DEFAULT_SETTINGS,
-        ...settings,
-        scheduledBlocking: { ...DEFAULT_SETTINGS.scheduledBlocking, ...settings.scheduledBlocking },
-        siteCategories: { ...DEFAULT_SETTINGS.siteCategories, ...settings.siteCategories },
+        ...stored,
+        scheduledBlocking: { ...DEFAULT_SETTINGS.scheduledBlocking, ...stored.scheduledBlocking },
+        siteCategories: { ...DEFAULT_SETTINGS.siteCategories, ...stored.siteCategories },
     };
 }
 
-export async function updateSettings(settings: Partial<Settings>): Promise<void> {
+export async function getSettings(): Promise<Settings> {
+    if (settingsCache) return settingsCache;
+    const stored = await storage.getItem<Settings>('local:settings');
+    if (!stored) {
+        await storage.setItem('local:settings', DEFAULT_SETTINGS);
+        settingsCache = { ...DEFAULT_SETTINGS };
+        return settingsCache;
+    }
+    settingsCache = mergeSettings(stored);
+    return settingsCache;
+}
+
+export async function updateSettings(partial: Partial<Settings>): Promise<void> {
     const current = await getSettings();
-    await storage.setItem('local:settings', { ...current, ...settings });
+    const updated = { ...current, ...partial };
+    settingsCache = updated;
+    await storage.setItem('local:settings', updated);
 }

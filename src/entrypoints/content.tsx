@@ -169,7 +169,7 @@ function injectBlockOverlay(settings: any) {
     if (timerEl) {
       blockInterval = setInterval(() => {
         const rem = Math.max(0, Math.floor((settings.deepWorkEndTime - Date.now()) / 1000));
-        if (rem <= 0) { clearInterval(interval); return; }
+        if (rem <= 0) { clearInterval(blockInterval!); return; }
         const m = String(Math.floor(rem / 60)).padStart(2, '0');
         const s = String(rem % 60).padStart(2, '0');
         timerEl.textContent = `${m}:${s}`;

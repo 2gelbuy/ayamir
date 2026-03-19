@@ -1,6 +1,7 @@
 import { db, getSettings, updateSettings } from '@/lib/db';
 import { getHumorMessage } from '@/lib/humor';
 import { updateStatsOnTaskCompletion } from '@/lib/gamification';
+import { MSG } from '@/lib/messages';
 
 export default defineBackground(() => {
     // sw-register-listeners-toplevel: all listeners at top level
@@ -110,12 +111,12 @@ export default defineBackground(() => {
         // H-1: Only accept messages from our own extension
         if (sender.id !== chrome.runtime.id) return;
 
-        if (message.action === 'closeTab' && sender.tab?.id) {
+        if (message.action === MSG.CLOSE_TAB && sender.tab?.id) {
             chrome.tabs.remove(sender.tab.id);
             return;
         }
 
-        if (message.action === 'createTask') {
+        if (message.action === MSG.CREATE_TASK) {
             // C-1: Validate and sanitize task before writing to DB
             const raw = message.task;
             if (!raw || typeof raw.title !== 'string' || !raw.title.trim()) {
@@ -139,7 +140,7 @@ export default defineBackground(() => {
         }
 
         // Content script asks if current page should be blocked
-        if (message.action === 'checkPage') {
+        if (message.action === MSG.CHECK_PAGE) {
             getSettings().then(settings => {
                 // M-1: Use authoritative sender tab URL, not message payload
                 let hostname = '';
@@ -183,7 +184,7 @@ export default defineBackground(() => {
                 if (chrome.runtime.lastError) return;
                 const tabId = tabs[0]?.id;
                 if (tabId) {
-                    chrome.tabs.sendMessage(tabId, { action: 'toggleCommandPalette' }, () => {
+                    chrome.tabs.sendMessage(tabId, { action: MSG.TOGGLE_PALETTE }, () => {
                         // msg-check-lasterror: ignore if tab has no listener
                         if (chrome.runtime.lastError) {
                             // Content script not loaded yet — that's OK
