@@ -167,7 +167,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                             </div>
                         )}
 
-                        {task.url && (
+                        {task.url && /^https?:\/\//.test(task.url) && (
                             <a
                                 href={task.url}
                                 target="_blank"

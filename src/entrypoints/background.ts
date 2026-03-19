@@ -26,7 +26,7 @@ export default defineBackground(() => {
         let url = '';
 
         if (info.menuItemId === 'ayamir-save-selection' && info.selectionText) {
-            title = info.selectionText.trim();
+            title = info.selectionText.trim().substring(0, 500);
             url = tab?.url || '';
         } else if (info.menuItemId === 'ayamir-save-page') {
             if (info.linkUrl) {
@@ -39,13 +39,14 @@ export default defineBackground(() => {
         }
 
         if (title) {
+            const safeUrl = url && /^https?:\/\//.test(url) ? url.substring(0, 2000) : undefined;
             await db.tasks.add({
                 title,
                 startTime: null,
                 isCompleted: false,
                 createdAt: new Date(),
                 priority: 'medium',
-                url: url || undefined,
+                url: safeUrl,
             });
 
             chrome.notifications.create({
@@ -104,27 +105,46 @@ export default defineBackground(() => {
         chrome.notifications.clear(notificationId);
     });
 
-    // Message handler — sw-return-true-async for all async paths
+    // Message handler — with sender validation
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        // H-1: Only accept messages from our own extension
+        if (sender.id !== chrome.runtime.id) return;
+
         if (message.action === 'closeTab' && sender.tab?.id) {
             chrome.tabs.remove(sender.tab.id);
             return;
         }
 
         if (message.action === 'createTask') {
-            db.tasks.add(message.task).then(() => {
+            // C-1: Validate and sanitize task before writing to DB
+            const raw = message.task;
+            if (!raw || typeof raw.title !== 'string' || !raw.title.trim()) {
+                sendResponse({ success: false, error: 'Invalid task' });
+                return true;
+            }
+            const safeTask = {
+                title: raw.title.trim().substring(0, 500),
+                startTime: raw.startTime ? new Date(raw.startTime) : null,
+                isCompleted: false,
+                createdAt: new Date(),
+                priority: ['low', 'medium', 'high', 'urgent'].includes(raw.priority) ? raw.priority : 'medium',
+                url: typeof raw.url === 'string' && /^https?:\/\//.test(raw.url) ? raw.url.substring(0, 2000) : undefined,
+            };
+            db.tasks.add(safeTask).then(() => {
                 sendResponse({ success: true });
-            }).catch(error => {
-                console.error('Failed to create task:', error);
-                sendResponse({ success: false, error: String(error) });
+            }).catch(() => {
+                sendResponse({ success: false, error: 'DB error' });
             });
-            return true; // async response
+            return true;
         }
 
         // Content script asks if current page should be blocked
         if (message.action === 'checkPage') {
             getSettings().then(settings => {
-                const hostname = message.hostname || '';
+                // M-1: Use authoritative sender tab URL, not message payload
+                let hostname = '';
+                try { hostname = new URL(sender.tab?.url || '').hostname; } catch {}
+                if (!hostname) hostname = message.hostname || '';
                 const isSiteBlocked = settings.blacklist.some(
                     (domain: string) => hostname === domain || hostname.endsWith(`.${domain}`)
                 );
