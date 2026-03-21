@@ -128,6 +128,15 @@ export const getUserLevel = (totalPoints: number): typeof LEVEL_THRESHOLDS[0] =>
   return LEVEL_THRESHOLDS[0];
 };
 
+// Get progress percentage toward next level (0-100)
+export const getLevelProgressPercent = (totalPoints: number): number => {
+  const currentLevel = getUserLevel(totalPoints);
+  if (currentLevel.level >= LEVEL_THRESHOLDS.length) return 100;
+  const nextThreshold = LEVEL_THRESHOLDS[currentLevel.level]?.pointsRequired;
+  if (!nextThreshold) return 100;
+  return ((totalPoints - currentLevel.pointsRequired) / (nextThreshold - currentLevel.pointsRequired)) * 100;
+};
+
 // Get points needed to reach next level
 export const getPointsToNextLevel = (totalPoints: number): number => {
   const currentLevel = getUserLevel(totalPoints);
@@ -143,39 +152,36 @@ export const getPointsToNextLevel = (totalPoints: number): number => {
   return nextLevel.pointsRequired - totalPoints;
 };
 
-// Calculate current streak
+// Calculate current streak — single query, no N+1
 export const calculateStreak = async (): Promise<number> => {
   const today = startOfDay(new Date());
-  let streak = 0;
-  let currentDate = today;
-
-  // Check if any tasks were completed today
-  const todayTasks = await db.tasks
+  // Fetch all completed tasks from last 90 days max (reasonable streak cap)
+  const lookback = subDays(today, 90);
+  const completedTasks = await db.tasks
     .where('completedAt')
-    .between(startOfDay(today), endOfDay(today))
+    .between(lookback, endOfDay(today))
     .toArray();
 
-  if (todayTasks.length === 0) {
-    // No tasks completed today, check yesterday
+  if (completedTasks.length === 0) return 0;
+
+  // Build a set of date strings that have completions
+  const daysWithCompletions = new Set<string>();
+  for (const task of completedTasks) {
+    if (task.completedAt) {
+      daysWithCompletions.add(startOfDay(new Date(task.completedAt)).toISOString());
+    }
+  }
+
+  // Count consecutive days backward from today (or yesterday if no tasks today)
+  let currentDate = today;
+  if (!daysWithCompletions.has(currentDate.toISOString())) {
     currentDate = subDays(today, 1);
   }
 
-  // Count consecutive days with completed tasks
-  while (true) {
-    const dayStart = startOfDay(currentDate);
-    const dayEnd = endOfDay(currentDate);
-
-    const tasksCompletedOnDay = await db.tasks
-      .where('completedAt')
-      .between(dayStart, dayEnd)
-      .toArray();
-
-    if (tasksCompletedOnDay.length > 0) {
-      streak++;
-      currentDate = subDays(currentDate, 1);
-    } else {
-      break;
-    }
+  let streak = 0;
+  while (daysWithCompletions.has(startOfDay(currentDate).toISOString())) {
+    streak++;
+    currentDate = subDays(currentDate, 1);
   }
 
   return streak;

@@ -4,6 +4,8 @@ import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
 import { Task, db } from '@/lib/db';
 import { updateStatsOnTaskCompletion } from '@/lib/gamification';
 
+const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+
 interface TaskItemProps {
     task: Task;
 }
@@ -102,13 +104,13 @@ export default function TaskItem({ task }: TaskItemProps) {
                         onClick={handleSaveEdit}
                         className="flex-1 py-2 bg-slate-900 dark:bg-teal-600 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-teal-700 transition-colors"
                     >
-                        Save
+                        {t('saveBtn', 'Save')}
                     </button>
                     <button
                         onClick={() => setIsEditing(false)}
                         className="flex-1 py-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
                     >
-                        Cancel
+                        {t('cancel', 'Cancel')}
                     </button>
                 </div>
             </div>
@@ -129,6 +131,9 @@ export default function TaskItem({ task }: TaskItemProps) {
                 {/* Custom Checkbox */}
                 <button
                     onClick={handleComplete}
+                    role="checkbox"
+                    aria-checked={task.isCompleted}
+                    aria-label={task.isCompleted ? t('uncheckTask', 'Undo complete') : t('checkTask', 'Mark complete')}
                     className={`flex-shrink-0 mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                         justCompleted
                             ? 'bg-green-500 border-green-500 scale-110'
@@ -194,7 +199,8 @@ export default function TaskItem({ task }: TaskItemProps) {
                         <button
                             onClick={handleSnooze}
                             className="p-1.5 text-slate-400 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
-                            title="Snooze 10 min"
+                            aria-label={t('notifSnooze', 'Snooze 10min')}
+                            title={t('notifSnooze', 'Snooze 10min')}
                         >
                             <Bell className="w-3.5 h-3.5" />
                         </button>
@@ -202,14 +208,16 @@ export default function TaskItem({ task }: TaskItemProps) {
                     <button
                         onClick={() => setIsEditing(true)}
                         className="p-1.5 text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
-                        title="Edit"
+                        aria-label={t('editBtn', 'Edit')}
+                        title={t('editBtn', 'Edit')}
                     >
                         <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                         onClick={handleDelete}
                         className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Delete"
+                        aria-label={t('deleteBtn', 'Delete')}
+                        title={t('deleteBtn', 'Delete')}
                     >
                         <Trash2 className="w-3.5 h-3.5" />
                     </button>

@@ -21,14 +21,6 @@ No accounts. No cloud. No tracking. Everything stays on your device.
 
 ---
 
-<!-- Screenshots: replace these placeholders with actual screenshots -->
-<!-- To add: run the extension, take screenshots, save to .github/screenshots/ -->
-<p align="center">
-  <img src=".github/screenshots/popup-light.png" alt="AyaMir Light Mode" width="360" />
-  &nbsp;&nbsp;
-  <img src=".github/screenshots/popup-dark.png" alt="AyaMir Dark Mode" width="360" />
-</p>
-
 ---
 
 ## Install
@@ -58,7 +50,6 @@ No accounts. No cloud. No tracking. Everything stays on your device.
 |---------|-------------|
 | **Scheduled Blocking** | Auto-block distracting sites during configurable work hours & days |
 | **Hard Lock Mode** | Cannot cancel the Deep Work timer once started |
-| **Ambient Sounds** | Rain, Ocean, Nature, Fire &mdash; Web Audio API, zero network requests |
 | **Focus Analytics** | Total sessions, focus hours, 7-day activity chart |
 
 ### Personalization

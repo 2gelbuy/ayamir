@@ -15,7 +15,7 @@ const shortcuts = [
     { keys: ['?'], actionKey: 'shortcutHelp' },
     { keys: ['Esc'], actionKey: 'shortcutClose' },
     { keys: ['Ctrl+Shift+E'], actionKey: 'shortcutOpen' },
-    { keys: ['Ctrl+Shift+Space'], actionKey: 'shortcutPalette' },
+    { keys: ['Ctrl+Shift+K'], actionKey: 'shortcutPalette' },
 ];
 
 export default function KeyboardHelp({ onClose }: KeyboardHelpProps) {

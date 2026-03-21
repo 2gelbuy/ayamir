@@ -461,5 +461,11 @@
   "sessionCompleteMsg": { "message": "Отличная работа! Время для перерыва." },
   "feedbackSectionLabel": { "message": "Помогите нам стать лучше" },
   "feedbackBtn": { "message": "Обратная связь" },
-  "rateBtn": { "message": "Оценить" }
+  "rateBtn": { "message": "Оценить" },
+  "saveBtn": { "message": "Сохранить" },
+  "editBtn": { "message": "Редактировать" },
+  "deleteBtn": { "message": "Удалить" },
+  "checkTask": { "message": "Отметить как выполненное" },
+  "uncheckTask": { "message": "Отменить выполнение" },
+  "thisWeekLabel": { "message": "Эта неделя" }
 }

@@ -461,5 +461,11 @@
   "sessionCompleteMsg": { "message": "बहुत अच्छा काम! अब ब्रेक लेने का समय है।" },
   "feedbackSectionLabel": { "message": "हमें बेहतर बनने में मदद करें" },
   "feedbackBtn": { "message": "प्रतिक्रिया भेजें" },
-  "rateBtn": { "message": "रेटिंग दें" }
+  "rateBtn": { "message": "रेटिंग दें" },
+  "saveBtn": { "message": "सहेजें" },
+  "editBtn": { "message": "संपादित करें" },
+  "deleteBtn": { "message": "हटाएं" },
+  "checkTask": { "message": "पूर्ण चिह्नित करें" },
+  "uncheckTask": { "message": "पूर्ण रद्द करें" },
+  "thisWeekLabel": { "message": "इस सप्ताह" }
 }

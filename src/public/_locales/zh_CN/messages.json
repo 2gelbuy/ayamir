@@ -461,5 +461,11 @@
   "sessionCompleteMsg": { "message": "干得好！休息一下吧。" },
   "feedbackSectionLabel": { "message": "帮助我们改进" },
   "feedbackBtn": { "message": "发送反馈" },
-  "rateBtn": { "message": "评分" }
+  "rateBtn": { "message": "评分" },
+  "saveBtn": { "message": "保存" },
+  "editBtn": { "message": "编辑" },
+  "deleteBtn": { "message": "删除" },
+  "checkTask": { "message": "标记完成" },
+  "uncheckTask": { "message": "取消完成" },
+  "thisWeekLabel": { "message": "本周" }
 }

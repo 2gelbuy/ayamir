@@ -461,5 +461,11 @@
   "sessionCompleteMsg": { "message": "¡Buen trabajo! Hora de descansar." },
   "feedbackSectionLabel": { "message": "Ayúdanos a mejorar" },
   "feedbackBtn": { "message": "Enviar opinión" },
-  "rateBtn": { "message": "Calificar" }
+  "rateBtn": { "message": "Calificar" },
+  "saveBtn": { "message": "Guardar" },
+  "editBtn": { "message": "Editar" },
+  "deleteBtn": { "message": "Eliminar" },
+  "checkTask": { "message": "Marcar como completada" },
+  "uncheckTask": { "message": "Desmarcar completada" },
+  "thisWeekLabel": { "message": "Esta Semana" }
 }

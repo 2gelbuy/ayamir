@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, Flame, TrendingUp, Trophy, Star, Award, Clock, Target } from 'lucide-react';
+import { X, CheckCircle, Flame, TrendingUp, Trophy, Star, Award, Clock } from 'lucide-react';
 import { db, Settings, getSettings } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { LEVEL_THRESHOLDS, getUserLevel, getPointsToNextLevel, DEFAULT_ACHIEVEMENTS } from '@/lib/gamification';
+import { LEVEL_THRESHOLDS, getUserLevel, getPointsToNextLevel, getLevelProgressPercent, DEFAULT_ACHIEVEMENTS } from '@/lib/gamification';
 
 interface StatsProps {
     onClose: () => void;
@@ -15,25 +15,29 @@ export default function Stats({ onClose }: StatsProps) {
 
     useEffect(() => {
         getSettings().then(setSettings);
-        // Calculate weekly completion data with Promise.all
+        // Single query for weekly data instead of 7 separate queries
         const now = new Date();
-        const promises = [];
-        for (let i = 6; i >= 0; i--) {
-            const day = new Date(now);
-            day.setDate(day.getDate() - i);
-            day.setHours(0, 0, 0, 0);
-            const nextDay = new Date(day);
-            nextDay.setDate(nextDay.getDate() + 1);
+        const weekStart = new Date(now);
+        weekStart.setDate(weekStart.getDate() - 6);
+        weekStart.setHours(0, 0, 0, 0);
+        const weekEnd = new Date(now);
+        weekEnd.setHours(23, 59, 59, 999);
 
-            promises.push(
-                db.tasks.filter(t =>
-                    !!t.isCompleted && !!t.completedAt &&
-                    new Date(t.completedAt) >= day &&
-                    new Date(t.completedAt) < nextDay
-                ).count()
-            );
-        }
-        Promise.all(promises).then(counts => setWeeklyData(counts));
+        db.tasks.filter(t =>
+            !!t.isCompleted && !!t.completedAt &&
+            new Date(t.completedAt) >= weekStart &&
+            new Date(t.completedAt) <= weekEnd
+        ).toArray().then(tasks => {
+            const counts = [0, 0, 0, 0, 0, 0, 0];
+            for (const t of tasks) {
+                if (!t.completedAt) continue;
+                const d = new Date(t.completedAt);
+                const daysAgo = Math.floor((now.getTime() - d.getTime()) / 86400000);
+                const idx = 6 - Math.min(daysAgo, 6);
+                if (idx >= 0 && idx < 7) counts[idx]++;
+            }
+            setWeeklyData(counts);
+        });
     }, []);
 
     const completed = allTasks.filter(t => t.isCompleted);
@@ -55,10 +59,7 @@ export default function Stats({ onClose }: StatsProps) {
 
     const currentLevel = getUserLevel(settings?.totalPoints ?? 0);
     const pointsToNextLevel = getPointsToNextLevel(settings?.totalPoints ?? 0);
-    const progressPercentage = currentLevel.level < 10
-        ? (((settings?.totalPoints ?? 0) - currentLevel.pointsRequired) /
-            (LEVEL_THRESHOLDS[currentLevel.level].pointsRequired - currentLevel.pointsRequired)) * 100
-        : 100;
+    const progressPercentage = getLevelProgressPercent(settings?.totalPoints ?? 0);
 
     const achievements = settings?.achievements || DEFAULT_ACHIEVEMENTS;
     const unlockedAchievements = achievements.filter(a => a.unlocked);
@@ -119,7 +120,7 @@ export default function Stats({ onClose }: StatsProps) {
 
                 {/* Weekly Activity Chart */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
-                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">{chrome.i18n.getMessage('statsCurrentStreak') ? 'This Week' : 'This Week'}</h3>
+                    <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">{chrome.i18n.getMessage('thisWeekLabel') || 'This Week'}</h3>
                     <div className="flex items-end justify-between gap-1 h-20">
                         {weeklyData.map((count, i) => (
                             <div key={i} className="flex-1 flex flex-col items-center gap-1">

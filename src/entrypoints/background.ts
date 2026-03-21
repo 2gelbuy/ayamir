@@ -234,9 +234,12 @@ async function checkScheduledBlocking() {
         now.getHours() < settings.scheduledBlocking.endHour;
 
     if (isWorkHours && !settings.focusEnabled) {
-        await updateSettings({ focusEnabled: true });
-    } else if (!isWorkHours && settings.focusEnabled) {
-        // Auto-disable focus mode when work hours end
+        // Only auto-enable if user didn't manually disable it
+        if (!settings.focusEnabledManually) {
+            await updateSettings({ focusEnabled: true });
+        }
+    } else if (!isWorkHours && settings.focusEnabled && !settings.focusEnabledManually) {
+        // Only auto-disable if it was auto-enabled (not manually toggled by user)
         await updateSettings({ focusEnabled: false });
     }
 }

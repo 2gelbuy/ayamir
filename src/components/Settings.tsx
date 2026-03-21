@@ -110,11 +110,23 @@ export default function Settings({ onClose }: SettingsProps) {
                     }
                     await updateSettings(safe);
                 }
-                // Validate tasks — must be arrays with required fields
+                // Validate tasks — sanitize all fields
                 if (Array.isArray(data.tasks)) {
-                    const validTasks = data.tasks.filter((t: any) =>
-                        t && typeof t.title === 'string' && t.title.length > 0 && t.title.length < 1000
-                    );
+                    const VALID_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
+                    const validTasks = data.tasks
+                        .filter((t: any) => t && typeof t.title === 'string' && t.title.length > 0 && t.title.length < 1000)
+                        .map((t: any) => ({
+                            title: String(t.title).trim().substring(0, 500),
+                            startTime: t.startTime ? new Date(t.startTime) : null,
+                            isCompleted: !!t.isCompleted,
+                            createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
+                            completedAt: t.completedAt ? new Date(t.completedAt) : undefined,
+                            priority: VALID_PRIORITIES.includes(t.priority) ? t.priority : 'medium',
+                            url: typeof t.url === 'string' && /^https?:\/\//.test(t.url) ? t.url.substring(0, 2000) : undefined,
+                            tags: Array.isArray(t.tags) ? t.tags.filter((tag: any) => typeof tag === 'string').map((tag: string) => tag.substring(0, 50)) : undefined,
+                            estimatedDuration: typeof t.estimatedDuration === 'number' && t.estimatedDuration > 0 ? Math.min(t.estimatedDuration, 1440) : undefined,
+                            points: typeof t.points === 'number' ? Math.max(0, Math.min(t.points, 10000)) : undefined,
+                        }));
                     await db.transaction('rw', db.tasks, async () => {
                         await db.tasks.clear();
                         await db.tasks.bulkAdd(validTasks);
@@ -296,7 +308,7 @@ export default function Settings({ onClose }: SettingsProps) {
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300 block">{chrome.i18n.getMessage("settingsFocusMode")}</span>
                                 <span className="text-[11px] text-slate-400">{chrome.i18n.getMessage("settingsFocusModeDesc")}</span>
                             </div>
-                            <Toggle checked={settings.focusEnabled} onChange={v => setSettings({ ...settings, focusEnabled: v })} />
+                            <Toggle checked={settings.focusEnabled} onChange={v => setSettings({ ...settings, focusEnabled: v, focusEnabledManually: true })} />
                         </div>
 
                         {/* Scheduled Blocking */}
@@ -439,7 +451,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         {/* Custom Blacklist */}
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
-                                Blocked Sites ({settings.blacklist.length})
+                                {t('settingsBlockedSites', 'Blocked Sites')} ({settings.blacklist.length})
                             </label>
                             <div className="flex gap-2 mb-2">
                                 <input
@@ -576,7 +588,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         </div>
 
                         <div className="text-center pt-4 space-y-1">
-                            <p className="text-xs text-slate-400">AyaMir v1.2.0</p>
+                            <p className="text-xs text-slate-400">AyaMir v1.0.0</p>
                             <p className="text-[10px] text-slate-300 dark:text-slate-600">{t('localDataNote')}</p>
                         </div>
                     </>

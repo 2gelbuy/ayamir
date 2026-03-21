@@ -44,6 +44,7 @@ export interface Settings {
     blacklist: string[];
     whitelist: string[];
     focusEnabled: boolean;
+    focusEnabledManually?: boolean; // true when user toggles focus manually (not by schedule)
     notificationsEnabled: boolean;
     gamificationEnabled: boolean;
     totalPoints: number;
@@ -55,7 +56,6 @@ export interface Settings {
     deepWorkModeBreakDuration: number;
     isDeepWorkActive?: boolean;
     deepWorkEndTime?: number | null;
-    // New features
     theme: 'light' | 'dark' | 'system';
     onboardingCompleted: boolean;
     hardLockMode: boolean;
@@ -75,6 +75,14 @@ export interface Settings {
     dailyFocusDate: string; // ISO date string
     totalFocusMinutes: number;
     completedSessions: number;
+}
+
+/** Subset of settings sent to content script for block/ticker decisions */
+export interface ContentScriptSettings {
+    isDeepWorkActive?: boolean;
+    deepWorkEndTime?: number | null;
+    deepWorkModeDuration: number;
+    focusEnabled: boolean;
 }
 
 class AyaMirDB extends Dexie {
@@ -106,6 +114,7 @@ export const DEFAULT_SETTINGS: Settings = {
     blacklist: ['facebook.com', 'twitter.com', 'reddit.com', 'youtube.com'],
     whitelist: [],
     focusEnabled: true,
+    focusEnabledManually: false,
     notificationsEnabled: true,
     gamificationEnabled: true,
     totalPoints: 0,

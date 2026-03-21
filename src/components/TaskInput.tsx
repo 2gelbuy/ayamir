@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Clock, Calendar, ChevronDown } from 'lucide-react';
+import { Plus, Clock, ChevronDown } from 'lucide-react';
 import { db, Task } from '@/lib/db';
 
 export default function TaskInput() {

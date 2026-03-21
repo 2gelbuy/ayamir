@@ -2,6 +2,8 @@
 // The heavy React UI is injected programmatically only when needed.
 // This script itself has ZERO imports from React/Dexie/Tailwind.
 
+import type { ContentScriptSettings } from '@/lib/db';
+
 export default defineContentScript({
   matches: ['http://*/*', 'https://*/*'],
   runAt: 'document_idle',
@@ -42,7 +44,7 @@ export default defineContentScript({
 
 // ── Inline block overlay (no React, no Tailwind — pure DOM + inline styles) ──
 
-function injectBlockOverlay(settings: any) {
+function injectBlockOverlay(settings: ContentScriptSettings | null) {
   if (document.getElementById('ayamir-block-overlay')) return;
 
   const isDeepWork = settings?.isDeepWorkActive;
@@ -165,11 +167,12 @@ function injectBlockOverlay(settings: any) {
   });
 
   // Update timer every second if deep work
-  if (isDeepWork && settings.deepWorkEndTime) {
+  if (isDeepWork && settings?.deepWorkEndTime) {
+    const endTime = settings.deepWorkEndTime;
     const timerEl = overlay.querySelector('div[style*="font-size:48px"]');
     if (timerEl) {
       blockInterval = setInterval(() => {
-        const rem = Math.max(0, Math.floor((settings.deepWorkEndTime - Date.now()) / 1000));
+        const rem = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
         if (rem <= 0) { clearInterval(blockInterval!); return; }
         const m = String(Math.floor(rem / 60)).padStart(2, '0');
         const s = String(rem % 60).padStart(2, '0');
@@ -181,9 +184,10 @@ function injectBlockOverlay(settings: any) {
 
 // ── Floating Deep Work ticker (pure DOM) ──
 
-function injectTicker(settings: any) {
+function injectTicker(settings: ContentScriptSettings | null) {
   if (document.getElementById('ayamir-ticker')) return;
   if (!settings?.deepWorkEndTime) return;
+  const endTime = settings.deepWorkEndTime;
 
   const ticker = document.createElement('div');
   ticker.id = 'ayamir-ticker';
@@ -218,7 +222,7 @@ function injectTicker(settings: any) {
   const totalSec = settings.deepWorkModeDuration * 60;
 
   const interval = setInterval(() => {
-    const rem = Math.max(0, Math.floor((settings.deepWorkEndTime - Date.now()) / 1000));
+    const rem = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
     if (rem <= 0) { ticker.remove(); clearInterval(interval); return; }
     const m = String(Math.floor(rem / 60)).padStart(2, '0');
     const s = String(rem % 60).padStart(2, '0');

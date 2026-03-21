@@ -461,5 +461,11 @@
   "sessionCompleteMsg": { "message": "Great work! Time for a break." },
   "feedbackSectionLabel": { "message": "Help Us Improve" },
   "feedbackBtn": { "message": "Send Feedback" },
-  "rateBtn": { "message": "Rate Us" }
+  "rateBtn": { "message": "Rate Us" },
+  "saveBtn": { "message": "Save" },
+  "editBtn": { "message": "Edit" },
+  "deleteBtn": { "message": "Delete" },
+  "checkTask": { "message": "Mark complete" },
+  "uncheckTask": { "message": "Undo complete" },
+  "thisWeekLabel": { "message": "This Week" }
 }
