@@ -40,6 +40,7 @@ export default function DailyFocus({ onClose }: DailyFocusProps) {
                 <button
                     onClick={onClose}
                     className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white"
+                    aria-label="Close daily focus"
                 >
                     <X className="w-5 h-5" />
                 </button>

@@ -166,7 +166,7 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           <h1 className="text-lg font-bold">{chrome.i18n.getMessage("deepWorkHeader") || 'Deep Work'}</h1>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={onClose} className={`p-1.5 rounded-lg transition-colors ${
+          <button onClick={onClose} aria-label="Close deep work" className={`p-1.5 rounded-lg transition-colors ${
             settings.isDeepWorkActive ? 'hover:bg-white/10' : 'hover:bg-slate-200 dark:hover:bg-slate-700'
           }`}>
             <X className="w-5 h-5" />

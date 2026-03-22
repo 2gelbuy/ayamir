@@ -20,11 +20,15 @@ export default function TaskInput() {
             priority
         };
 
-        await db.tasks.add(newTask);
-        setTitle('');
-        setStartTime('');
-        setShowOptions(false);
-        setPriority('medium');
+        try {
+            await db.tasks.add(newTask);
+            setTitle('');
+            setStartTime('');
+            setShowOptions(false);
+            setPriority('medium');
+        } catch (err) {
+            console.error('Failed to add task:', err);
+        }
     };
 
     const priorityConfig = {

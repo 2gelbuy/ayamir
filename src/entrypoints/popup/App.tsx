@@ -73,10 +73,12 @@ export default function App() {
     }, []);
 
     const toggleTheme = async () => {
-        const newTheme = isDark ? 'light' : 'dark';
-        await updateSettings({ theme: newTheme });
-        document.documentElement.classList.toggle('dark');
-        setIsDark(!isDark);
+        // Cycle: light -> dark -> system -> light
+        const current = settings?.theme || 'system';
+        const next = current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light';
+        await updateSettings({ theme: next });
+        await applyTheme();
+        setIsDark(document.documentElement.classList.contains('dark'));
     };
 
     let filteredTasks = tasks.filter(task => {

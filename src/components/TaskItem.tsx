@@ -43,11 +43,12 @@ export default function TaskItem({ task }: TaskItemProps) {
         }
     }, [task.id, task.isCompleted, task.startTime, task.title, task.priority, task.completedAt]);
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (task.id) {
             setIsDeleting(true);
-            setTimeout(async () => {
-                await db.tasks.delete(task.id!);
+            const taskId = task.id;
+            setTimeout(() => {
+                db.tasks.delete(taskId).catch(err => console.error('Delete failed:', err));
             }, 200);
         }
     };
@@ -155,7 +156,7 @@ export default function TaskItem({ task }: TaskItemProps) {
 
                     {/* Meta info row */}
                     <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                        {task.priority && task.priority !== ('undefined' as string) && !task.isCompleted && (
+                        {task.priority && !task.isCompleted && (
                             <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md ${priorityConfig[task.priority]?.bg} ${priorityConfig[task.priority]?.text}`}>
                                 <div className={`w-1.5 h-1.5 rounded-full ${priorityConfig[task.priority]?.dot}`} />
                                 {task.priority}

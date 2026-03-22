@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck, MessageSquare, Star, ExternalLink } from 'lucide-react';
+import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck, MessageSquare, Star, ExternalLink, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
 
@@ -23,9 +23,12 @@ export default function Settings({ onClose }: SettingsProps) {
     const [settings, setSettings] = useState<SettingsType | null>(null);
     const [newDomain, setNewDomain] = useState('');
     const [activeSection, setActiveSection] = useState<'general' | 'blocking' | 'focus' | 'data'>('general');
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [importError, setImportError] = useState('');
+    const [pasteError, setPasteError] = useState('');
 
     useEffect(() => {
-        getSettings().then(setSettings);
+        getSettings().then(setSettings).catch(err => console.error('Failed to load settings:', err));
     }, []);
 
     const handleSave = async () => {
@@ -133,29 +136,36 @@ export default function Settings({ onClose }: SettingsProps) {
                     });
                 }
                 if (Array.isArray(data.sessions)) {
-                    const validSessions = data.sessions.filter((s: any) =>
-                        s && typeof s.duration === 'number' && typeof s.completed === 'boolean'
-                    );
+                    const validSessions = data.sessions
+                        .filter((s: any) => s && typeof s.duration === 'number' && typeof s.completed === 'boolean')
+                        .map((s: any) => ({
+                            startedAt: s.startedAt ? new Date(s.startedAt) : new Date(),
+                            endedAt: s.endedAt ? new Date(s.endedAt) : undefined,
+                            duration: Math.min(Math.max(Number(s.duration), 1), 480),
+                            actualDuration: typeof s.actualDuration === 'number' ? Math.min(s.actualDuration, 480) : undefined,
+                            completed: !!s.completed,
+                            type: s.type === 'break' ? 'break' as const : 'work' as const,
+                        }));
                     await db.transaction('rw', db.focusSessions, async () => {
                         await db.focusSessions.clear();
                         await db.focusSessions.bulkAdd(validSessions);
                     });
                 }
-                getSettings().then(setSettings);
+                getSettings().then(setSettings).catch(() => {});
+                setImportError('');
             } catch {
-                alert('Invalid backup file');
+                setImportError('Invalid backup file');
             }
         };
         input.click();
     };
 
     const resetAll = async () => {
-        if (confirm('This will delete all tasks, sessions, and settings. Are you sure?')) {
-            await db.tasks.clear();
-            await db.focusSessions.clear();
-            await updateSettings(DEFAULT_SETTINGS);
-            getSettings().then(setSettings);
-        }
+        await db.tasks.clear();
+        await db.focusSessions.clear();
+        await updateSettings(DEFAULT_SETTINGS);
+        setShowResetConfirm(false);
+        getSettings().then(setSettings).catch(() => {});
     };
 
     if (!settings) return null;
@@ -181,7 +191,7 @@ export default function Settings({ onClose }: SettingsProps) {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">{chrome.i18n.getMessage("settingsHeader")}</h2>
-                <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500">
+                <button onClick={onClose} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-500" aria-label="Close settings">
                     <X className="w-5 h-5" />
                 </button>
             </div>
@@ -212,17 +222,17 @@ export default function Settings({ onClose }: SettingsProps) {
                         <div>
                             <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">{t('themeLabel')}</label>
                             <div className="flex gap-2">
-                                {(['light', 'dark', 'system'] as const).map(t => (
+                                {(['light', 'dark', 'system'] as const).map(themeOption => (
                                     <button
-                                        key={t}
-                                        onClick={() => setSettings({ ...settings, theme: t })}
+                                        key={themeOption}
+                                        onClick={() => setSettings({ ...settings, theme: themeOption })}
                                         className={`flex-1 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
-                                            settings.theme === t
+                                            settings.theme === themeOption
                                                 ? 'bg-teal-500 text-white shadow-md shadow-teal-500/20'
                                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
                                         }`}
                                     >
-                                        {t}
+                                        {themeOption}
                                     </button>
                                 ))}
                             </div>
@@ -439,7 +449,10 @@ export default function Settings({ onClose }: SettingsProps) {
                                                 blacklist: [...settings.blacklist, ...newDomains]
                                             });
                                         }
-                                    } catch {}
+                                    } catch {
+                                        setPasteError('Clipboard access denied');
+                                        setTimeout(() => setPasteError(''), 3000);
+                                    }
                                 }}
                                 className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                             >
@@ -447,6 +460,10 @@ export default function Settings({ onClose }: SettingsProps) {
                                 {t('pasteList')}
                             </button>
                         </div>
+
+                        {pasteError && (
+                            <p className="text-[11px] text-red-500 font-medium">{pasteError}</p>
+                        )}
 
                         {/* Custom Blacklist */}
                         <div>
@@ -573,19 +590,51 @@ export default function Settings({ onClose }: SettingsProps) {
                                 </div>
                             </button>
 
-                            <button
-                                onClick={resetAll}
-                                className="w-full flex items-center gap-3 p-3.5 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
-                            >
-                                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                    <RotateCcw className="w-5 h-5 text-red-500" />
+                            {!showResetConfirm ? (
+                                <button
+                                    onClick={() => setShowResetConfirm(true)}
+                                    className="w-full flex items-center gap-3 p-3.5 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                                >
+                                    <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                        <RotateCcw className="w-5 h-5 text-red-500" />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('resetAll')}</p>
+                                        <p className="text-[11px] text-red-400 dark:text-red-500">{t('resetAllDesc')}</p>
+                                    </div>
+                                </button>
+                            ) : (
+                                <div className="p-3 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-200 dark:border-red-900/30 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                        <p className="text-xs font-bold text-red-700 dark:text-red-400">Delete all data?</p>
+                                    </div>
+                                    <p className="text-[11px] text-red-600/80 dark:text-red-500/70 leading-relaxed">
+                                        This will permanently delete all tasks, sessions, and settings. This cannot be undone.
+                                    </p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => setShowResetConfirm(false)}
+                                            className="flex-1 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700"
+                                        >
+                                            {t('cancel', 'Cancel')}
+                                        </button>
+                                        <button
+                                            onClick={resetAll}
+                                            className="flex-1 py-2 bg-red-500 text-white text-xs font-semibold rounded-xl hover:bg-red-600 transition-colors"
+                                        >
+                                            {t('resetAll')}
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="text-left">
-                                    <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('resetAll')}</p>
-                                    <p className="text-[11px] text-red-400 dark:text-red-500">{t('resetAllDesc')}</p>
-                                </div>
-                            </button>
+                            )}
                         </div>
+
+                        {importError && (
+                            <div className="p-2.5 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-900/30">
+                                <p className="text-xs font-semibold text-red-600 dark:text-red-400">{importError}</p>
+                            </div>
+                        )}
 
                         <div className="text-center pt-4 space-y-1">
                             <p className="text-xs text-slate-400">AyaMir v1.0.0</p>
