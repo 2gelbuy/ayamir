@@ -41,7 +41,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                 });
             }
         }
-    }, [task]);
+    }, [task.id, task.isCompleted, task.startTime, task.title, task.priority, task.completedAt]);
 
     const handleDelete = async () => {
         if (task.id) {

@@ -10,11 +10,15 @@ export async function applyTheme(): Promise<void> {
         root.classList.remove('dark');
     } else {
         // System preference
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            root.classList.add('dark');
-        } else {
-            root.classList.remove('dark');
-        }
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        root.classList.toggle('dark', mq.matches);
+        mq.addEventListener('change', (e) => {
+            getSettings().then(s => {
+                if (s.theme === 'system') {
+                    document.documentElement.classList.toggle('dark', e.matches);
+                }
+            });
+        }, { once: false });
     }
 }
 

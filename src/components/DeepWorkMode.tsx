@@ -5,8 +5,8 @@ import { getSettings, updateSettings, Settings, db } from '@/lib/db';
 function playCompletionSound() {
   try {
     const ctx = new AudioContext();
-    // Pleasant two-tone chime
     const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+    const lastNoteEnd = (notes.length - 1) * 0.15 + 0.8;
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -19,6 +19,7 @@ function playCompletionSound() {
       osc.start(ctx.currentTime + i * 0.15);
       osc.stop(ctx.currentTime + i * 0.15 + 0.8);
     });
+    setTimeout(() => ctx.close(), lastNoteEnd * 1000 + 100);
   } catch {}
 }
 

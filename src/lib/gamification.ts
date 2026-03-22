@@ -1,87 +1,49 @@
 import { Task, db, getSettings, updateSettings, Achievement } from './db';
 import { startOfDay, endOfDay, subDays } from 'date-fns';
 
-// Level thresholds (points required to reach each level)
-export const LEVEL_THRESHOLDS = [
-  { level: 1, pointsRequired: 0, title: chrome.i18n.getMessage('levelBeginner') || 'Beginner' },
-  { level: 2, pointsRequired: 50, title: chrome.i18n.getMessage('levelNovice') || 'Novice' },
-  { level: 3, pointsRequired: 150, title: chrome.i18n.getMessage('levelApprentice') || 'Apprentice' },
-  { level: 4, pointsRequired: 300, title: chrome.i18n.getMessage('levelJourneyman') || 'Journeyman' },
-  { level: 5, pointsRequired: 500, title: chrome.i18n.getMessage('levelExpert') || 'Expert' },
-  { level: 6, pointsRequired: 750, title: chrome.i18n.getMessage('levelMaster') || 'Master' },
-  { level: 7, pointsRequired: 1000, title: chrome.i18n.getMessage('levelGrandmaster') || 'Grandmaster' },
-  { level: 8, pointsRequired: 1500, title: chrome.i18n.getMessage('levelLegend') || 'Legend' },
-  { level: 9, pointsRequired: 2000, title: chrome.i18n.getMessage('levelMythic') || 'Mythic' },
-  { level: 10, pointsRequired: 3000, title: chrome.i18n.getMessage('levelTranscendent') || 'Transcendent' }
+const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+
+// Static data (no i18n at module level)
+const LEVEL_DATA = [
+  { level: 1, pointsRequired: 0, key: 'levelBeginner', fallback: 'Beginner' },
+  { level: 2, pointsRequired: 50, key: 'levelNovice', fallback: 'Novice' },
+  { level: 3, pointsRequired: 150, key: 'levelApprentice', fallback: 'Apprentice' },
+  { level: 4, pointsRequired: 300, key: 'levelJourneyman', fallback: 'Journeyman' },
+  { level: 5, pointsRequired: 500, key: 'levelExpert', fallback: 'Expert' },
+  { level: 6, pointsRequired: 750, key: 'levelMaster', fallback: 'Master' },
+  { level: 7, pointsRequired: 1000, key: 'levelGrandmaster', fallback: 'Grandmaster' },
+  { level: 8, pointsRequired: 1500, key: 'levelLegend', fallback: 'Legend' },
+  { level: 9, pointsRequired: 2000, key: 'levelMythic', fallback: 'Mythic' },
+  { level: 10, pointsRequired: 3000, key: 'levelTranscendent', fallback: 'Transcendent' },
+] as const;
+
+// Lazy getter — resolves i18n at call time, not module parse time
+export const LEVEL_THRESHOLDS = LEVEL_DATA.map(({ level, pointsRequired, key, fallback }) => ({
+  level,
+  pointsRequired,
+  get title() { return t(key, fallback); },
+}));
+
+const ACHIEVEMENT_DATA: Array<{ id: string; nameKey: string; nameFallback: string; descKey: string; descFallback: string; icon: string; points: number }> = [
+  { id: 'first-task', nameKey: 'achvFirstTaskName', nameFallback: 'First Steps', descKey: 'achvFirstTaskDesc', descFallback: 'Complete your first task', icon: '\u{1F3AF}', points: 10 },
+  { id: 'streak-3', nameKey: 'achvStreak3Name', nameFallback: 'On Fire', descKey: 'achvStreak3Desc', descFallback: 'Maintain a 3-day streak', icon: '\u{1F525}', points: 25 },
+  { id: 'streak-7', nameKey: 'achvStreak7Name', nameFallback: 'Unstoppable', descKey: 'achvStreak7Desc', descFallback: 'Maintain a 7-day streak', icon: '\u{1F4AA}', points: 50 },
+  { id: 'streak-30', nameKey: 'achvStreak30Name', nameFallback: 'Legendary', descKey: 'achvStreak30Desc', descFallback: 'Maintain a 30-day streak', icon: '\u{1F3C6}', points: 200 },
+  { id: 'early-bird', nameKey: 'achvEarlyBirdName', nameFallback: 'Early Bird', descKey: 'achvEarlyBirdDesc', descFallback: 'Complete a task before 9 AM', icon: '\u{1F305}', points: 15 },
+  { id: 'night-owl', nameKey: 'achvNightOwlName', nameFallback: 'Night Owl', descKey: 'achvNightOwlDesc', descFallback: 'Complete a task after 10 PM', icon: '\u{1F989}', points: 15 },
+  { id: 'speed-demon', nameKey: 'achvSpeedDemonName', nameFallback: 'Speed Demon', descKey: 'achvSpeedDemonDesc', descFallback: 'Complete a task within 10 minutes of starting', icon: '\u{26A1}', points: 20 },
+  { id: 'perfect-timing', nameKey: 'achvPerfectTimingName', nameFallback: 'Perfect Timing', descKey: 'achvPerfectTimingDesc', descFallback: 'Complete a task exactly at the scheduled time', icon: '\u{23F0}', points: 30 },
 ];
 
-// Default achievements
-export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
-  {
-    id: 'first-task',
-    name: chrome.i18n.getMessage('achvFirstTaskName') || 'First Steps',
-    description: chrome.i18n.getMessage('achvFirstTaskDesc') || 'Complete your first task',
-    icon: '🎯',
-    points: 10,
-    unlocked: false
-  },
-  {
-    id: 'streak-3',
-    name: chrome.i18n.getMessage('achvStreak3Name') || 'On Fire',
-    description: chrome.i18n.getMessage('achvStreak3Desc') || 'Maintain a 3-day streak',
-    icon: '🔥',
-    points: 25,
-    unlocked: false
-  },
-  {
-    id: 'streak-7',
-    name: chrome.i18n.getMessage('achvStreak7Name') || 'Unstoppable',
-    description: chrome.i18n.getMessage('achvStreak7Desc') || 'Maintain a 7-day streak',
-    icon: '💪',
-    points: 50,
-    unlocked: false
-  },
-  {
-    id: 'streak-30',
-    name: chrome.i18n.getMessage('achvStreak30Name') || 'Legendary',
-    description: chrome.i18n.getMessage('achvStreak30Desc') || 'Maintain a 30-day streak',
-    icon: '🏆',
-    points: 200,
-    unlocked: false
-  },
-  {
-    id: 'early-bird',
-    name: chrome.i18n.getMessage('achvEarlyBirdName') || 'Early Bird',
-    description: chrome.i18n.getMessage('achvEarlyBirdDesc') || 'Complete a task before 9 AM',
-    icon: '🌅',
-    points: 15,
-    unlocked: false
-  },
-  {
-    id: 'night-owl',
-    name: chrome.i18n.getMessage('achvNightOwlName') || 'Night Owl',
-    description: chrome.i18n.getMessage('achvNightOwlDesc') || 'Complete a task after 10 PM',
-    icon: '🦉',
-    points: 15,
-    unlocked: false
-  },
-  {
-    id: 'speed-demon',
-    name: chrome.i18n.getMessage('achvSpeedDemonName') || 'Speed Demon',
-    description: chrome.i18n.getMessage('achvSpeedDemonDesc') || 'Complete a task within 10 minutes of starting',
-    icon: '⚡',
-    points: 20,
-    unlocked: false
-  },
-  {
-    id: 'perfect-timing',
-    name: chrome.i18n.getMessage('achvPerfectTimingName') || 'Perfect Timing',
-    description: chrome.i18n.getMessage('achvPerfectTimingDesc') || 'Complete a task exactly at the scheduled time',
-    icon: '⏰',
-    points: 30,
-    unlocked: false
-  }
-];
+// Lazy getter — resolves i18n at call time
+export const DEFAULT_ACHIEVEMENTS: Achievement[] = ACHIEVEMENT_DATA.map(a => ({
+  id: a.id,
+  get name() { return t(a.nameKey, a.nameFallback); },
+  get description() { return t(a.descKey, a.descFallback); },
+  icon: a.icon,
+  points: a.points,
+  unlocked: false,
+}));
 
 // Calculate points for a task based on various factors
 export const calculateTaskPoints = (task: Task): number => {
@@ -227,6 +189,15 @@ export const checkAchievements = async (
     return diffMinutes <= 10;
   });
   if (speedTasks.length > 0) unlock('speed-demon');
+
+  // Perfect timing: completed within 2 minutes of scheduled start time
+  const perfectTimingTasks = todayTasks.filter(task => {
+    if (!task.startTime || !task.completedAt) return false;
+    const scheduled = new Date(task.startTime).getTime();
+    const completed = new Date(task.completedAt).getTime();
+    return Math.abs(completed - scheduled) <= 2 * 60000;
+  });
+  if (perfectTimingTasks.length > 0) unlock('perfect-timing');
 
   return updatedAchievements;
 };
