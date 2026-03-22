@@ -156,7 +156,8 @@ export const checkAchievements = async (
   streak: number,
   tasksCompletedToday: number
 ): Promise<Achievement[]> => {
-  const updatedAchievements = [...achievements];
+  // Deep copy to avoid mutating original objects (shallow copy shares refs)
+  const updatedAchievements = achievements.map(a => ({ ...a }));
 
   const unlock = (id: string) => {
     const ach = updatedAchievements.find(a => a.id === id);

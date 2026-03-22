@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Use Node.js 18
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 18
+          cache: 'npm'
 
       - name: Install
         run: npm ci
@@ -36,7 +37,7 @@ jobs:
         run: cd .output/chrome-mv3 && zip -r ../../ayamir-${{ github.ref_name }}-chrome.zip .
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@c062e08bd532815e2082a7e09ce9571a6e0ded39 # v2.2.1
         with:
           files: ayamir-${{ github.ref_name }}-chrome.zip
           generate_release_notes: true
@@ -44,7 +45,7 @@ jobs:
       - name: Upload to Chrome Web Store
         if: env.CWS_CLIENT_ID != ''
         run: |
-          npx -y chrome-webstore-upload-cli upload \
+          npx chrome-webstore-upload-cli@3.0.0 upload \
             --source ayamir-${{ github.ref_name }}-chrome.zip \
             --extension-id ${{ secrets.CWS_EXTENSION_ID }} \
             --client-id ${{ secrets.CWS_CLIENT_ID }} \

@@ -142,10 +142,13 @@ export default defineBackground(() => {
         // Content script asks if current page should be blocked
         if (message.action === MSG.CHECK_PAGE) {
             getSettings().then(settings => {
-                // M-1: Use authoritative sender tab URL, not message payload
+                // Use authoritative sender tab URL only — never trust message payload
                 let hostname = '';
                 try { hostname = new URL(sender.tab?.url || '').hostname; } catch {}
-                if (!hostname) hostname = message.hostname || '';
+                if (!hostname) {
+                    sendResponse({ needsBlock: false, needsTicker: false });
+                    return;
+                }
                 const isSiteBlocked = settings.blacklist.some(
                     (domain: string) => hostname === domain || hostname.endsWith(`.${domain}`)
                 );

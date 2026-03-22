@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Square, Brain, X, Lock, Unlock, Coffee, Minus, Plus, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings, db } from '@/lib/db';
 
