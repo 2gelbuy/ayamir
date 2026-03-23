@@ -636,7 +636,7 @@ export default function Settings({ onClose }: SettingsProps) {
                         )}
 
                         <div className="text-center pt-4 space-y-1">
-                            <p className="text-xs text-slate-400">AyaMir v1.0.0</p>
+                            <p className="text-xs text-slate-400">AyaMir v{chrome.runtime.getManifest().version}</p>
                             <p className="text-[10px] text-slate-300 dark:text-slate-600">{t('localDataNote')}</p>
                         </div>
                     </>

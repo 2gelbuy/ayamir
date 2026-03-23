@@ -45,36 +45,21 @@ export const DEFAULT_ACHIEVEMENTS: Achievement[] = ACHIEVEMENT_DATA.map(a => ({
   unlocked: false,
 }));
 
-// Calculate points for a task based on various factors
 export const calculateTaskPoints = (task: Task): number => {
-  let points = 10; // Base points for completing any task
+  let points = 10;
 
-  // Bonus points for completing on time
-  if (task.completedOnTime) {
-    points += 5;
-  }
+  if (task.completedOnTime) points += 5;
 
-  // Bonus points for completing quickly (within 30 minutes of start time)
   if (task.startTime && task.completedAt) {
-    const startTime = new Date(task.startTime);
-    const completedTime = new Date(task.completedAt);
-    const diffMinutes = (completedTime.getTime() - startTime.getTime()) / 60000;
-
-    if (diffMinutes <= 10) {
-      points += 10; // Speed bonus
-    } else if (diffMinutes <= 30) {
-      points += 5; // Quick completion bonus
-    }
+    const diffMinutes = (new Date(task.completedAt).getTime() - new Date(task.startTime).getTime()) / 60000;
+    if (diffMinutes <= 10) points += 10;
+    else if (diffMinutes <= 30) points += 5;
   }
 
-  // Bonus points for completing tasks during off-hours
   if (task.completedAt) {
     const hour = new Date(task.completedAt).getHours();
-    if (hour < 9) {
-      points += 5; // Early bird bonus
-    } else if (hour >= 22) {
-      points += 5; // Night owl bonus
-    }
+    if (hour < 9) points += 5;
+    else if (hour >= 22) points += 5;
   }
 
   return points;

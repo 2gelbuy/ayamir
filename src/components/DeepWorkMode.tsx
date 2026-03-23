@@ -55,13 +55,16 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
           clearInterval(interval);
           setRemainingTime(0);
           playCompletionSound();
-          chrome.notifications.create({
-            type: 'basic',
-            iconUrl: chrome.runtime.getURL('/icon/128.png'),
-            title: `AyaMir — ${chrome.i18n.getMessage('sessionCompleteTitle') || 'Session Complete!'}`,
-            message: chrome.i18n.getMessage('sessionCompleteMsg') || 'Great work! Time for a break.',
-            priority: 2,
-          });
+          try {
+            chrome.notifications.create({
+              type: 'basic',
+              iconUrl: chrome.runtime.getURL('/icon/128.png'),
+              title: `AyaMir — ${t('sessionCompleteTitle', 'Session Complete!')}`,
+              message: t('sessionCompleteMsg', 'Great work! Time for a break.'),
+              priority: 2,
+            });
+          } catch {}
+
           const duration = settings.deepWorkModeDuration;
           db.focusSessions.add({
             startedAt: new Date(end - duration * 60 * 1000),
