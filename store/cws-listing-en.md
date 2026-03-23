@@ -9,7 +9,7 @@ Pomodoro timer, task manager & site blocker in one extension. 100% local — no 
 ## Detailed Description
 AyaMir — the free all-in-one Chrome extension that combines a Pomodoro timer, smart task manager, website blocker, and gamification system into one powerful focus toolkit. No accounts. No cloud. No tracking. Everything stays on your device.
 
-Unlike StayFocusd, Cold Turkey, or Forest — AyaMir gives you task management + site blocking + focus timer + XP system all in one extension. No subscriptions, no data collection, no limits.
+Unlike StayFocusd, Cold Turkey, or Forest — AyaMir gives you task management + site blocking + focus timer + XP system all in one extension. No subscriptions, no data collection.
 
 KEY FEATURES
 
@@ -64,15 +64,15 @@ WHO IS AYAMIR FOR?
 - Anyone who wants a free, private alternative to StayFocusd, Cold Turkey, Forest, or Todoist
 
 WHAT MAKES AYAMIR DIFFERENT?
-- Free forever — no premium tier, no limits, no ads
-- Unlimited sites — block as many sites as you want (no 3-site limit like BlockSite)
+- Free — all core features at no cost, no ads
+- Unlimited sites — block as many as you want (no 3-site limit like BlockSite)
 - No account required — works in 10 seconds after install, zero setup
 - All-in-one — tasks + Pomodoro timer + site blocker + gamification
 - 100% offline — your data never leaves your browser
 - Open source — transparent, auditable, community-driven
 - Lightweight — under 700KB total, fast popup
 
-Free to use. No ads. No tracking. Just focus.
+No ads. No tracking. Just focus.
 
 ## Category
 Productivity > Workflow & Planning
