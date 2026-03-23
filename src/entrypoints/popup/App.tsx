@@ -73,9 +73,9 @@ export default function App() {
     }, []);
 
     const toggleTheme = async () => {
-        // Cycle: light -> dark -> system -> light
         const current = settings?.theme || 'system';
-        const next = current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light';
+        const next: 'light' | 'dark' | 'system' = current === 'light' ? 'dark' : current === 'dark' ? 'system' : 'light';
+        setSettings(prev => prev ? { ...prev, theme: next } : prev);
         await updateSettings({ theme: next });
         await applyTheme();
         setIsDark(document.documentElement.classList.contains('dark'));
