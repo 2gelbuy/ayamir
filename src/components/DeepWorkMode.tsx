@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Play, Square, Brain, X, Lock, Unlock, Coffee, Minus, Plus, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings, db } from '@/lib/db';
+import { t } from '@/lib/i18n';
 
 function playCompletionSound() {
   try {
@@ -69,16 +70,16 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
             actualDuration: duration,
             completed: true,
             type: 'work',
-          });
-          // Read fresh settings to avoid stale closure values
-          getSettings().then(fresh => {
+          }).catch(err => console.error('Failed to save session:', err));
+          getSettings().then(fresh =>
             updateSettings({
               isDeepWorkActive: false,
               deepWorkEndTime: null,
               totalFocusMinutes: (fresh.totalFocusMinutes || 0) + duration,
               completedSessions: (fresh.completedSessions || 0) + 1,
-            }).then(() => getSettings().then(setSettings));
-          });
+            })
+          ).then(() => getSettings().then(setSettings))
+           .catch(err => console.error('Failed to update settings:', err));
         }
       };
 
@@ -152,8 +153,6 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
   const progress = settings.isDeepWorkActive
     ? ((totalSeconds - remainingTime) / totalSeconds) * 100
     : 0;
-
-  const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
 
   const presetDurations = [15, 25, 45, 60, 90];
 

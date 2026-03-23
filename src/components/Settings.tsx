@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Shield, Bell, Gamepad2, Monitor, Clock, Download, Upload, RotateCcw, Copy, ClipboardPaste, ShieldCheck, MessageSquare, Star, ExternalLink, AlertTriangle } from 'lucide-react';
 import { getSettings, updateSettings, Settings as SettingsType, SITE_CATEGORIES, db, DEFAULT_SETTINGS } from '@/lib/db';
 import { applyTheme } from '@/lib/theme';
+import { t } from '@/lib/i18n';
 
 interface SettingsProps {
     onClose: () => void;
@@ -169,8 +170,6 @@ export default function Settings({ onClose }: SettingsProps) {
     };
 
     if (!settings) return null;
-
-    const t = (key: string, fallback?: string) => chrome.i18n.getMessage(key) || fallback || key;
 
     const sections = [
         { id: 'general' as const, icon: Monitor, label: t('tabGeneral', 'General') },

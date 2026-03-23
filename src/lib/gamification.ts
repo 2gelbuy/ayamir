@@ -1,7 +1,7 @@
 import { Task, db, getSettings, updateSettings, Achievement } from './db';
 import { startOfDay, endOfDay, subDays } from 'date-fns';
 
-const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+import { t } from './i18n';
 
 // Static data (no i18n at module level)
 const LEVEL_DATA = [
@@ -154,9 +154,8 @@ export const checkAchievements = async (
   achievements: Achievement[],
   totalPoints: number,
   streak: number,
-  tasksCompletedToday: number
+  todayTasks: Task[],
 ): Promise<Achievement[]> => {
-  // Deep copy to avoid mutating original objects (shallow copy shares refs)
   const updatedAchievements = achievements.map(a => ({ ...a }));
 
   const unlock = (id: string) => {
@@ -171,12 +170,6 @@ export const checkAchievements = async (
   if (streak >= 3) unlock('streak-3');
   if (streak >= 7) unlock('streak-7');
   if (streak >= 30) unlock('streak-30');
-  // task-marathon removed — no matching achievement definition
-
-  const today = new Date();
-  const todayStart = startOfDay(today);
-  const todayEnd = endOfDay(today);
-  const todayTasks = await db.tasks.where('completedAt').between(todayStart, todayEnd).toArray();
 
   const earlyMorningTasks = todayTasks.filter(task => task.completedAt && new Date(task.completedAt).getHours() < 9);
   if (earlyMorningTasks.length > 0) unlock('early-bird');
@@ -231,17 +224,17 @@ export const updateStatsOnTaskCompletion = async (task: Task): Promise<void> => 
     const newStreak = await calculateStreak();
 
     const today = startOfDay(new Date());
-    const tasksCompletedToday = await db.tasks.where('completedAt').between(today, endOfDay(today)).count();
+    const todayTasks = await db.tasks.where('completedAt').between(today, endOfDay(today)).toArray();
 
-    const currentAchievements = settings.achievements && settings.achievements.length > 0 
-      ? settings.achievements 
+    const currentAchievements = settings.achievements && settings.achievements.length > 0
+      ? settings.achievements
       : DEFAULT_ACHIEVEMENTS;
 
     const updatedAchievements = await checkAchievements(
       currentAchievements,
       newTotalPoints,
       newStreak,
-      tasksCompletedToday
+      todayTasks
     );
 
     // Filter to find newly unlocked ones for notification

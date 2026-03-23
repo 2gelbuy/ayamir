@@ -1,6 +1,5 @@
 import { X, Keyboard } from 'lucide-react';
-
-const t = (key: string) => chrome.i18n.getMessage(key) || key;
+import { t } from '@/lib/i18n';
 
 interface KeyboardHelpProps {
     onClose: () => void;

@@ -1,8 +1,7 @@
 import { Task } from '@/lib/db';
 import TaskItem from './TaskItem';
 import { ClipboardList, CheckCircle2, Inbox, Sparkles } from 'lucide-react';
-
-const t = (key: string) => chrome.i18n.getMessage(key) || key;
+import { t } from '@/lib/i18n';
 
 interface TaskListProps {
     tasks: Task[];

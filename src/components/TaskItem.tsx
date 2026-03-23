@@ -3,8 +3,7 @@ import { Check, Trash2, Clock, Bell, Edit2, Link } from 'lucide-react';
 import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
 import { Task, db } from '@/lib/db';
 import { updateStatsOnTaskCompletion } from '@/lib/gamification';
-
-const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+import { t } from '@/lib/i18n';
 
 interface TaskItemProps {
     task: Task;

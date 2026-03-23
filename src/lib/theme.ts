@@ -1,24 +1,32 @@
 import { getSettings } from './db';
 
+let themeListener: ((e: MediaQueryListEvent) => void) | null = null;
+
 export async function applyTheme(): Promise<void> {
     const settings = await getSettings();
     const root = document.documentElement;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Remove previous listener to prevent stacking
+    if (themeListener) {
+        mq.removeEventListener('change', themeListener);
+        themeListener = null;
+    }
 
     if (settings.theme === 'dark') {
         root.classList.add('dark');
     } else if (settings.theme === 'light') {
         root.classList.remove('dark');
     } else {
-        // System preference
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
         root.classList.toggle('dark', mq.matches);
-        mq.addEventListener('change', (e) => {
+        themeListener = (e) => {
             getSettings().then(s => {
                 if (s.theme === 'system') {
                     document.documentElement.classList.toggle('dark', e.matches);
                 }
             });
-        }, { once: false });
+        };
+        mq.addEventListener('change', themeListener);
     }
 }
 

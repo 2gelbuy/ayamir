@@ -4,8 +4,7 @@
 // All UI is built with createElement/textContent — no innerHTML for XSS safety.
 
 import type { ContentScriptSettings } from '@/lib/db';
-
-const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+import { t } from '@/lib/i18n';
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,

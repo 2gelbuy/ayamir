@@ -1,6 +1,11 @@
 import Dexie, { Table } from 'dexie';
 import { storage } from '#imports';
 
+export const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
+export type Priority = typeof PRIORITIES[number];
+export const MAX_TASK_TITLE_LENGTH = 500;
+export const SAFE_URL_RE = /^https?:\/\//;
+
 export interface Task {
     id?: number;
     title: string;

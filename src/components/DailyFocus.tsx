@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
 import { updateSettings } from '@/lib/db';
-
-const t = (key: string) => chrome.i18n.getMessage(key) || key;
+import { t } from '@/lib/i18n';
 
 interface DailyFocusProps {
     onClose: () => void;

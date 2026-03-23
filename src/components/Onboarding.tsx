@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Target, Brain, Zap, Shield, ArrowRight, Check } from 'lucide-react';
 import { updateSettings } from '@/lib/db';
+import { t } from '@/lib/i18n';
 
 interface OnboardingProps {
     onComplete: () => void;
 }
-
-const t = (key: string) => chrome.i18n.getMessage(key) || key;
 
 const steps = [
     {

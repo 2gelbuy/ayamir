@@ -1,7 +1,7 @@
 // Humor messages for AyaMir
 // Default tone only for MVP
 
-const t = (key: string, fallback: string) => chrome.i18n.getMessage(key) || fallback;
+import { t } from './i18n';
 
 const FALLBACKS = {
     reminder10: [
