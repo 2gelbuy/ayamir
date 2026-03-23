@@ -61,20 +61,24 @@ export default function DeepWorkMode({ onClose }: { onClose: () => void }) {
             message: chrome.i18n.getMessage('sessionCompleteMsg') || 'Great work! Time for a break.',
             priority: 2,
           });
+          const duration = settings.deepWorkModeDuration;
           db.focusSessions.add({
-            startedAt: new Date(end - settings.deepWorkModeDuration * 60 * 1000),
+            startedAt: new Date(end - duration * 60 * 1000),
             endedAt: new Date(end),
-            duration: settings.deepWorkModeDuration,
-            actualDuration: settings.deepWorkModeDuration,
+            duration,
+            actualDuration: duration,
             completed: true,
             type: 'work',
           });
-          updateSettings({
-            isDeepWorkActive: false,
-            deepWorkEndTime: null,
-            totalFocusMinutes: (settings.totalFocusMinutes || 0) + settings.deepWorkModeDuration,
-            completedSessions: (settings.completedSessions || 0) + 1,
-          }).then(() => getSettings().then(setSettings));
+          // Read fresh settings to avoid stale closure values
+          getSettings().then(fresh => {
+            updateSettings({
+              isDeepWorkActive: false,
+              deepWorkEndTime: null,
+              totalFocusMinutes: (fresh.totalFocusMinutes || 0) + duration,
+              completedSessions: (fresh.completedSessions || 0) + 1,
+            }).then(() => getSettings().then(setSettings));
+          });
         }
       };
 

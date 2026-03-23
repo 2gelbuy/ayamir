@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { storage } from 'wxt/storage';
+import { storage } from '#imports';
 
 export interface Task {
     id?: number;
