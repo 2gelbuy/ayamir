@@ -65,7 +65,8 @@ WHO IS AYAMIR FOR?
 
 WHAT MAKES AYAMIR DIFFERENT?
 - Free forever — no premium tier, no limits, no ads
-- No account required — works instantly after install
+- Unlimited sites — block as many sites as you want (no 3-site limit like BlockSite)
+- No account required — works in 10 seconds after install, zero setup
 - All-in-one — tasks + Pomodoro timer + site blocker + gamification
 - 100% offline — your data never leaves your browser
 - Open source — transparent, auditable, community-driven
