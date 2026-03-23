@@ -2,6 +2,7 @@ import { defineConfig } from 'wxt';
 
 export default defineConfig({
     srcDir: 'src',
+    publicDir: 'src/public',
     modules: ['@wxt-dev/module-react'],
     manifest: {
         name: '__MSG_extName__', default_locale: 'en',
