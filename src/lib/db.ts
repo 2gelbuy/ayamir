@@ -80,6 +80,7 @@ export interface Settings {
     dailyFocusDate: string; // ISO date string
     totalFocusMinutes: number;
     completedSessions: number;
+    reviewPromptDismissed?: boolean;
 }
 
 /** Subset of settings sent to content script for block/ticker decisions */

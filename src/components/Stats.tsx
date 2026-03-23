@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, CheckCircle, Flame, TrendingUp, Trophy, Star, Award, Clock } from 'lucide-react';
-import { db, Settings, getSettings } from '@/lib/db';
+import { X, CheckCircle, Flame, TrendingUp, Trophy, Star, Award, Clock, ExternalLink } from 'lucide-react';
+import { db, Settings, getSettings, updateSettings } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { LEVEL_THRESHOLDS, getUserLevel, getPointsToNextLevel, getLevelProgressPercent, DEFAULT_ACHIEVEMENTS } from '@/lib/gamification';
 
@@ -200,6 +200,43 @@ export default function Stats({ onClose }: StatsProps) {
                                     )}
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* CWS Review Prompt — shown after 5+ sessions, dismissible */}
+                {settings && !settings.reviewPromptDismissed && (settings.completedSessions ?? 0) >= 5 && (
+                    <div className="bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-2xl p-4 border border-teal-200 dark:border-teal-800">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                                <p className="text-sm font-semibold text-teal-800 dark:text-teal-200 mb-1">
+                                    {chrome.i18n.getMessage('reviewPromptTitle') || 'Enjoying AyaMir?'}
+                                </p>
+                                <p className="text-xs text-teal-600 dark:text-teal-400 mb-3">
+                                    {chrome.i18n.getMessage('reviewPromptDesc') || 'A quick rating helps others discover this tool.'}
+                                </p>
+                                <div className="flex gap-2">
+                                    <a
+                                        href={`https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-bold rounded-lg hover:bg-teal-700 transition-colors"
+                                    >
+                                        <Star className="w-3 h-3" />
+                                        {chrome.i18n.getMessage('reviewPromptRate') || 'Rate on Chrome Web Store'}
+                                    </a>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    updateSettings({ reviewPromptDismissed: true });
+                                    setSettings(prev => prev ? { ...prev, reviewPromptDismissed: true } : prev);
+                                }}
+                                className="p-1 hover:bg-teal-200/50 dark:hover:bg-teal-800/50 rounded text-teal-400"
+                                aria-label="Dismiss"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 )}

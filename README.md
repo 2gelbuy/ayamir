@@ -2,9 +2,9 @@
 
 <img src="src/public/icon/icon.svg" alt="AyaMir" width="96" height="96" />
 
-# AyaMir
+# AyaMir — Pomodoro Timer, Task Manager & Site Blocker
 
-**Protect your time, build your legacy.**
+**Free, local-first Chrome extension for deep focus. No accounts. No cloud. No tracking.**
 
 [![CI](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml/badge.svg)](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-1.0.0-teal)](https://github.com/2gelbuy/ayamir/releases/tag/v1.0.0)
@@ -12,14 +12,23 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
 [![Chrome Web Store](https://img.shields.io/badge/chrome-web%20store-4285F4?logo=googlechrome&logoColor=white)](#install)
 
-A local-first Chrome extension for productivity and deep focus.<br/>
-No accounts. No cloud. No tracking. Everything stays on your device.
+Combine Pomodoro timer, smart task management, website blocking, and gamification (XP, levels, achievements) — all in one extension. Everything stays on your device.
 
-[Install](#install) &bull; [Features](#features) &bull; [Development](#development) &bull; [Privacy](#privacy)
+[**Add to Chrome**](#install) &bull; [Features](#features) &bull; [Screenshots](#screenshots) &bull; [Development](#development) &bull; [Privacy](#privacy)
 
 </div>
 
 ---
+
+## Screenshots
+
+<div align="center">
+<img src="store/screenshots/01-smart-tasks.png" alt="AyaMir smart task manager" width="640" />
+<br/><br/>
+<img src="store/screenshots/02-deep-work.png" alt="AyaMir Pomodoro deep work mode" width="640" />
+<br/><br/>
+<img src="store/screenshots/03-site-blocker.png" alt="AyaMir site blocker" width="640" />
+</div>
 
 ---
 

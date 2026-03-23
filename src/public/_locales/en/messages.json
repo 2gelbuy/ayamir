@@ -1,9 +1,9 @@
 {
   "extName": {
-    "message": "AyaMir"
+    "message": "AyaMir - Pomodoro Timer, Tasks & Site Blocker"
   },
   "extDesc": {
-    "message": "All-in-one focus toolkit: smart tasks, Pomodoro timer, site blocker, gamification — 100% local, no account needed."
+    "message": "Pomodoro timer, task manager & site blocker in one extension. 100% local — no account, no cloud, no tracking. Earn XP."
   },
   "openAyamir": {
     "message": "Open AyaMir"

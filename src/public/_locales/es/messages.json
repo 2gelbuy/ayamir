@@ -1,9 +1,9 @@
 {
   "extName": {
-    "message": "AyaMir"
+    "message": "AyaMir - Pomodoro, tareas y bloqueador de sitios"
   },
   "extDesc": {
-    "message": "Protege tu tiempo, construye tu legado. Un gestor de tareas inteligente con alma."
+    "message": "Pomodoro, tareas y bloqueo de sitios en una extensión. 100% local — sin cuenta, sin nube, sin rastreo. Gana XP."
   },
   "openAyamir": {
     "message": "Abrir AyaMir"
