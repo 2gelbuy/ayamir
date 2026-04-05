@@ -1,9 +1,9 @@
 {
   "extName": {
-    "message": "AyaMir - Помодоро, задачи и блокировщик сайтов"
+    "message": "AyaMir - Pomodoro Timer, Tasks & Site Blocker"
   },
   "extDesc": {
-    "message": "Помодоро, задачи и блокировка сайтов в одном расширении. 100% локально — без аккаунта, без облака, без слежки."
+    "message": "Pomodoro timer, task manager & site blocker in one extension. 100% local — no account, no cloud, no tracking. Earn XP."
   },
   "openAyamir": {
     "message": "Открыть AyaMir"
@@ -337,25 +337,35 @@
   },
   "onb1Title": { "message": "Добро пожаловать в AyaMir" },
   "onb1Subtitle": { "message": "Береги время, строй наследие." },
-  "onb1Desc": { "message": "Умный таск-менеджер, который блокирует отвлечения, отслеживает фокус и награждает продуктивность." },
+  "onb1Desc": {
+    "message": "Умный таск-менеджер, который блокирует отвлечения, отслеживает фокус и награждает продуктивность."
+  },
   "onb1Feat1": { "message": "Управление задачами с приоритетами" },
   "onb1Feat2": { "message": "Deep Work сессии с блокировкой сайтов" },
   "onb1Feat3": { "message": "XP, уровни и достижения" },
   "onb2Title": { "message": "Режим Deep Work" },
   "onb2Subtitle": { "message": "Войди в состояние потока." },
-  "onb2Desc": { "message": "Сессии с таймером. Отвлекающие сайты блокируются. Чтобы обойти — набери текст вручную." },
+  "onb2Desc": {
+    "message": "Сессии с таймером. Отвлекающие сайты блокируются. Чтобы обойти — набери текст вручную."
+  },
   "onb2Feat1": { "message": "Настраиваемые интервалы работа/отдых" },
   "onb2Feat2": { "message": "Жёсткий режим — нельзя отменить сессию" },
-  "onb2Feat3": { "message": "Автоматическая блокировка сайтов во время сессий" },
+  "onb2Feat3": {
+    "message": "Автоматическая блокировка сайтов во время сессий"
+  },
   "onb3Title": { "message": "Палитра команд" },
   "onb3Subtitle": { "message": "Добавляй задачи откуда угодно." },
-  "onb3Desc": { "message": "Нажми Ctrl+Shift+K на любой странице, чтобы мгновенно добавить задачу." },
+  "onb3Desc": {
+    "message": "Нажми Ctrl+Shift+K на любой странице, чтобы мгновенно добавить задачу."
+  },
   "onb3Feat1": { "message": "Ctrl+Shift+E — открыть AyaMir" },
   "onb3Feat2": { "message": "Ctrl+Shift+K — быстрая задача" },
   "onb3Feat3": { "message": "Правый клик — сохранить страницу как задачу" },
   "onb4Title": { "message": "100% Приватность" },
   "onb4Subtitle": { "message": "Данные не покидают твой браузер." },
-  "onb4Desc": { "message": "Без аккаунтов, без серверов, без слежки. Всё хранится на твоём устройстве." },
+  "onb4Desc": {
+    "message": "Без аккаунтов, без серверов, без слежки. Всё хранится на твоём устройстве."
+  },
   "onb4Feat1": { "message": "Все данные хранятся локально в браузере" },
   "onb4Feat2": { "message": "Ноль сетевых запросов — работает офлайн" },
   "onb4Feat3": { "message": "Включи в Инкогнито для полной блокировки" },
@@ -374,9 +384,13 @@
   "gamificationLabel": { "message": "Геймификация" },
   "gamificationDesc": { "message": "XP, уровни и достижения" },
   "incognitoTitle": { "message": "Включите в Инкогнито" },
-  "incognitoDesc": { "message": "Блокировка не работает в Инкогнито. Откройте chrome://extensions, найдите AyaMir и включите «Разрешить в режиме инкогнито»." },
+  "incognitoDesc": {
+    "message": "Блокировка не работает в Инкогнито. Откройте chrome://extensions, найдите AyaMir и включите «Разрешить в режиме инкогнито»."
+  },
   "privacyTitle": { "message": "100% Приватность" },
-  "privacyDesc": { "message": "Данные не покидают браузер. Без аккаунтов, серверов и отслеживания." },
+  "privacyDesc": {
+    "message": "Данные не покидают браузер. Без аккаунтов, серверов и отслеживания."
+  },
   "scheduledBlocking": { "message": "Блокировка по расписанию" },
   "scheduledBlockingDesc": { "message": "Автоблокировка в рабочие часы" },
   "quickBlockCategories": { "message": "Быстрая блокировка" },
@@ -396,7 +410,9 @@
   "notifSnooze": { "message": "Отложить 10 мин" },
   "notifDone": { "message": "Готово" },
   "ctxSavePage": { "message": "Сохранить страницу как задачу AyaMir" },
-  "ctxSaveSelection": { "message": "Сохранить \u0022%s\u0022 как задачу AyaMir" },
+  "ctxSaveSelection": {
+    "message": "Сохранить \u0022%s\u0022 как задачу AyaMir"
+  },
   "exportData": { "message": "Экспорт данных" },
   "exportDataDesc": { "message": "Скачать все задачи, настройки и статистику" },
   "importData": { "message": "Импорт данных" },
@@ -425,7 +441,9 @@
   "dailyFocusSkip": { "message": "Пропустить" },
   "dailyFocusHelper": { "message": "Помогает сохранять фокус в течение дня" },
   "blockFocusActive": { "message": "Режим Фокуса" },
-  "blockFocusMsg": { "message": "У тебя есть задачи. Тебе точно нужен этот сайт?" },
+  "blockFocusMsg": {
+    "message": "У тебя есть задачи. Тебе точно нужен этот сайт?"
+  },
   "blockDeepWorkActive": { "message": "Deep Work активен" },
   "blockDeepWorkMsg": { "message": "Ты в сессии фокуса. Не отвлекайся." },
   "blockCloseTab": { "message": "Закрыть вкладку и работать" },
@@ -451,9 +469,13 @@
   "startDeepWork": { "message": "Начать Deep Work" },
   "endSession": { "message": "Завершить раньше" },
   "hardLockActive": { "message": "Жёсткий режим активен" },
-  "hardLockStayFocused": { "message": "Нельзя остановить до конца таймера. Держись!" },
+  "hardLockStayFocused": {
+    "message": "Нельзя остановить до конца таймера. Держись!"
+  },
   "hardLockConfirmTitle": { "message": "Жёсткий режим включён" },
-  "hardLockConfirmMsg": { "message": "Ты НЕ сможешь отменить эту сессию после старта. Уверен?" },
+  "hardLockConfirmMsg": {
+    "message": "Ты НЕ сможешь отменить эту сессию после старта. Уверен?"
+  },
   "hardLockConfirmBtn": { "message": "Начать" },
   "breakLabel": { "message": "Перерыв" },
   "completionLabel": { "message": "Выполнение" },

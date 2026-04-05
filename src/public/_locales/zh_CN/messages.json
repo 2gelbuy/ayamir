@@ -1,9 +1,9 @@
 {
   "extName": {
-    "message": "AyaMir - 番茄钟、任务管理和网站屏蔽"
+    "message": "AyaMir - Pomodoro Timer, Tasks & Site Blocker"
   },
   "extDesc": {
-    "message": "番茄钟、任务管理和网站屏蔽合一扩展。100%本地 — 无需账号、无云端、无追踪。赚取经验值，保持专注。"
+    "message": "Pomodoro timer, task manager & site blocker in one extension. 100% local — no account, no cloud, no tracking. Earn XP."
   },
   "openAyamir": {
     "message": "打开 AyaMir"
@@ -337,7 +337,9 @@
   },
   "onb1Title": { "message": "欢迎使用 AyaMir" },
   "onb1Subtitle": { "message": "守护时间，创造传奇。" },
-  "onb1Desc": { "message": "一个智能任务管理器：屏蔽干扰、追踪专注、奖励效率。" },
+  "onb1Desc": {
+    "message": "一个智能任务管理器：屏蔽干扰、追踪专注、奖励效率。"
+  },
   "onb1Feat1": { "message": "带优先级的智能任务管理" },
   "onb1Feat2": { "message": "Deep Work 专注模式 + 网站屏蔽" },
   "onb1Feat3": { "message": "经验值、等级和成就系统" },
@@ -374,9 +376,13 @@
   "gamificationLabel": { "message": "游戏化" },
   "gamificationDesc": { "message": "经验值、等级和成就" },
   "incognitoTitle": { "message": "在无痕模式中启用" },
-  "incognitoDesc": { "message": "默认情况下，网站屏蔽在无痕模式中不起作用。请前往 chrome://extensions，找到 AyaMir，并启用「允许在无痕模式中运行」。" },
+  "incognitoDesc": {
+    "message": "默认情况下，网站屏蔽在无痕模式中不起作用。请前往 chrome://extensions，找到 AyaMir，并启用「允许在无痕模式中运行」。"
+  },
   "privacyTitle": { "message": "100% 本地隐私" },
-  "privacyDesc": { "message": "您的数据永不离开浏览器。无需账号，无服务器，无追踪。" },
+  "privacyDesc": {
+    "message": "您的数据永不离开浏览器。无需账号，无服务器，无追踪。"
+  },
   "scheduledBlocking": { "message": "定时屏蔽" },
   "scheduledBlockingDesc": { "message": "工作时间内自动屏蔽" },
   "quickBlockCategories": { "message": "快速屏蔽分类" },
@@ -453,7 +459,9 @@
   "hardLockActive": { "message": "硬锁已激活" },
   "hardLockStayFocused": { "message": "计时结束前无法停止。保持专注！" },
   "hardLockConfirmTitle": { "message": "硬锁模式已开启" },
-  "hardLockConfirmMsg": { "message": "一旦开始，您将无法取消此会话。确定继续吗？" },
+  "hardLockConfirmMsg": {
+    "message": "一旦开始，您将无法取消此会话。确定继续吗？"
+  },
   "hardLockConfirmBtn": { "message": "锁定开始" },
   "breakLabel": { "message": "休息" },
   "completionLabel": { "message": "完成度" },

@@ -1,9 +1,9 @@
 {
   "extName": {
-    "message": "AyaMir - पोमोडोरो, कार्य और साइट ब्लॉकर"
+    "message": "AyaMir - Pomodoro Timer, Tasks & Site Blocker"
   },
   "extDesc": {
-    "message": "पोमोडोरो, कार्य और साइट ब्लॉकर एक एक्सटेंशन में। 100% स्थानीय — कोई खाता नहीं, कोई क्लाउड नहीं, कोई ट्रैकिंग नहीं।"
+    "message": "Pomodoro timer, task manager & site blocker in one extension. 100% local — no account, no cloud, no tracking. Earn XP."
   },
   "openAyamir": {
     "message": "AyaMir खोलें"
@@ -337,25 +337,35 @@
   },
   "onb1Title": { "message": "AyaMir में आपका स्वागत है" },
   "onb1Subtitle": { "message": "अपना समय बचाएं, विरासत बनाएं।" },
-  "onb1Desc": { "message": "एक स्मार्ट टास्क मैनेजर जो विकर्षण रोकता है, फोकस ट्रैक करता है और उत्पादकता पुरस्कृत करता है।" },
+  "onb1Desc": {
+    "message": "एक स्मार्ट टास्क मैनेजर जो विकर्षण रोकता है, फोकस ट्रैक करता है और उत्पादकता पुरस्कृत करता है।"
+  },
   "onb1Feat1": { "message": "प्राथमिकता के साथ स्मार्ट कार्य प्रबंधन" },
   "onb1Feat2": { "message": "साइट ब्लॉकिंग के साथ Deep Work सत्र" },
   "onb1Feat3": { "message": "XP, स्तर और उपलब्धियां" },
   "onb2Title": { "message": "Deep Work मोड" },
   "onb2Subtitle": { "message": "फ्लो स्टेट में प्रवेश करें।" },
-  "onb2Desc": { "message": "टाइमर सत्र। विचलित करने वाली साइटें ब्लॉक। बायपास के लिए टाइपिंग चैलेंज।" },
+  "onb2Desc": {
+    "message": "टाइमर सत्र। विचलित करने वाली साइटें ब्लॉक। बायपास के लिए टाइपिंग चैलेंज।"
+  },
   "onb2Feat1": { "message": "अनुकूलन योग्य कार्य/विश्राम अंतराल" },
   "onb2Feat2": { "message": "हार्ड लॉक — पूरा होने तक कोई बच नहीं" },
   "onb2Feat3": { "message": "सत्रों के दौरान स्वचालित साइट अवरोधन" },
   "onb3Title": { "message": "कमांड पैलेट" },
   "onb3Subtitle": { "message": "कहीं से भी कार्य जोड़ें।" },
-  "onb3Desc": { "message": "किसी भी पेज पर Ctrl+Shift+K दबाकर तुरंत कार्य जोड़ें।" },
+  "onb3Desc": {
+    "message": "किसी भी पेज पर Ctrl+Shift+K दबाकर तुरंत कार्य जोड़ें।"
+  },
   "onb3Feat1": { "message": "Ctrl+Shift+E — AyaMir खोलें" },
   "onb3Feat2": { "message": "Ctrl+Shift+K — त्वरित कार्य" },
-  "onb3Feat3": { "message": "किसी भी पेज पर राइट-क्लिक — कार्य के रूप में सहेजें" },
+  "onb3Feat3": {
+    "message": "किसी भी पेज पर राइट-क्लिक — कार्य के रूप में सहेजें"
+  },
   "onb4Title": { "message": "100% निजी" },
   "onb4Subtitle": { "message": "आपका डेटा ब्राउज़र से बाहर नहीं जाता।" },
-  "onb4Desc": { "message": "कोई अकाउंट नहीं, कोई सर्वर नहीं, कोई ट्रैकिंग नहीं। सब कुछ आपके डिवाइस पर।" },
+  "onb4Desc": {
+    "message": "कोई अकाउंट नहीं, कोई सर्वर नहीं, कोई ट्रैकिंग नहीं। सब कुछ आपके डिवाइस पर।"
+  },
   "onb4Feat1": { "message": "सभी डेटा ब्राउज़र में स्थानीय रूप से संग्रहीत" },
   "onb4Feat2": { "message": "शून्य नेटवर्क अनुरोध — ऑफ़लाइन काम करता है" },
   "onb4Feat3": { "message": "पूर्ण ब्लॉकिंग के लिए इनकॉग्निटो में सक्षम करें" },
@@ -374,11 +384,17 @@
   "gamificationLabel": { "message": "गेमिफिकेशन" },
   "gamificationDesc": { "message": "XP, स्तर और उपलब्धियां" },
   "incognitoTitle": { "message": "इनकॉग्निटो में सक्षम करें" },
-  "incognitoDesc": { "message": "इनकॉग्निटो में साइट ब्लॉकिंग डिफ़ॉल्ट रूप से काम नहीं करती। chrome://extensions पर जाएं, AyaMir खोजें और \"Allow in Incognito\" सक्षम करें।" },
+  "incognitoDesc": {
+    "message": "इनकॉग्निटो में साइट ब्लॉकिंग डिफ़ॉल्ट रूप से काम नहीं करती। chrome://extensions पर जाएं, AyaMir खोजें और \"Allow in Incognito\" सक्षम करें।"
+  },
   "privacyTitle": { "message": "100% निजी और स्थानीय" },
-  "privacyDesc": { "message": "आपका डेटा ब्राउज़र से बाहर नहीं जाता। कोई अकाउंट नहीं, कोई सर्वर नहीं, कोई ट्रैकिंग नहीं।" },
+  "privacyDesc": {
+    "message": "आपका डेटा ब्राउज़र से बाहर नहीं जाता। कोई अकाउंट नहीं, कोई सर्वर नहीं, कोई ट्रैकिंग नहीं।"
+  },
   "scheduledBlocking": { "message": "निर्धारित ब्लॉकिंग" },
-  "scheduledBlockingDesc": { "message": "काम के घंटों के दौरान स्वतः ब्लॉक करें" },
+  "scheduledBlockingDesc": {
+    "message": "काम के घंटों के दौरान स्वतः ब्लॉक करें"
+  },
   "quickBlockCategories": { "message": "त्वरित ब्लॉक श्रेणियां" },
   "catSocial": { "message": "सोशल मीडिया" },
   "catNews": { "message": "समाचार और फोरम" },
@@ -388,28 +404,40 @@
   "copyList": { "message": "सूची कॉपी करें" },
   "pasteList": { "message": "सूची पेस्ट करें" },
   "sessionDuration": { "message": "सत्र अवधि" },
-  "sessionDurationHint": { "message": "प्रत्येक फोकस सत्र कितने समय तक चलता है" },
+  "sessionDurationHint": {
+    "message": "प्रत्येक फोकस सत्र कितने समय तक चलता है"
+  },
   "breakDuration": { "message": "ब्रेक अवधि" },
   "breakDurationHint": { "message": "सत्रों के बीच विश्राम का समय" },
   "hardLockLabel": { "message": "हार्ड लॉक मोड" },
-  "hardLockDesc": { "message": "एक बार शुरू होने के बाद सत्र रद्द नहीं किया जा सकता" },
+  "hardLockDesc": {
+    "message": "एक बार शुरू होने के बाद सत्र रद्द नहीं किया जा सकता"
+  },
   "notifSnooze": { "message": "10 मिनट बाद याद दिलाएं" },
   "notifDone": { "message": "हो गया" },
   "ctxSavePage": { "message": "पेज को AyaMir टास्क में सेव करें" },
-  "ctxSaveSelection": { "message": "\u0022%s\u0022 को AyaMir टास्क में सेव करें" },
+  "ctxSaveSelection": {
+    "message": "\u0022%s\u0022 को AyaMir टास्क में सेव करें"
+  },
   "exportData": { "message": "डेटा निर्यात करें" },
   "exportDataDesc": { "message": "सभी कार्य, सेटिंग्स और आंकड़े डाउनलोड करें" },
   "importData": { "message": "डेटा आयात करें" },
   "importDataDesc": { "message": "बैकअप फ़ाइल से पुनर्स्थापित करें" },
   "resetAll": { "message": "सब कुछ रीसेट करें" },
   "resetAllDesc": { "message": "सभी डेटा हटाएं और नए सिरे से शुरू करें" },
-  "localDataNote": { "message": "सभी डेटा ब्राउज़र में स्थानीय रूप से संग्रहीत" },
+  "localDataNote": {
+    "message": "सभी डेटा ब्राउज़र में स्थानीय रूप से संग्रहीत"
+  },
   "emptyNoActive": { "message": "कोई सक्रिय कार्य नहीं" },
-  "emptyNoActiveHint": { "message": "अपना पहला कार्य जोड़ने के लिए N या / दबाएं" },
+  "emptyNoActiveHint": {
+    "message": "अपना पहला कार्य जोड़ने के लिए N या / दबाएं"
+  },
   "emptyCaughtUp": { "message": "सब पूरा हो गया!" },
   "emptyCaughtUpHint": { "message": "आपने सब कुछ पूरा कर लिया। बढ़िया।" },
   "emptyNoCompleted": { "message": "अभी तक कुछ पूरा नहीं हुआ" },
-  "emptyNoCompletedHint": { "message": "यहां देखने के लिए कोई कार्य पूरा करें" },
+  "emptyNoCompletedHint": {
+    "message": "यहां देखने के लिए कोई कार्य पूरा करें"
+  },
   "emptyNoTasks": { "message": "अभी तक कोई कार्य नहीं" },
   "emptyNoTasksHint": { "message": "शुरू करने के लिए एक कार्य जोड़ें" },
   "reminderLabel": { "message": "अनुस्मारक" },
@@ -425,12 +453,18 @@
   "dailyFocusSkip": { "message": "अभी छोड़ें" },
   "dailyFocusHelper": { "message": "इससे आप पूरे दिन फोकस बनाए रख सकते हैं" },
   "blockFocusActive": { "message": "फोकस मोड सक्रिय" },
-  "blockFocusMsg": { "message": "आपके पास पूरे करने के कार्य हैं। क्या यह साइट वाकई ज़रूरी है?" },
+  "blockFocusMsg": {
+    "message": "आपके पास पूरे करने के कार्य हैं। क्या यह साइट वाकई ज़रूरी है?"
+  },
   "blockDeepWorkActive": { "message": "Deep Work सक्रिय" },
   "blockDeepWorkMsg": { "message": "आप फोकस सत्र में हैं। सही राह पर रहें।" },
   "blockCloseTab": { "message": "टैब बंद करें और काम पर लग जाएं" },
-  "blockContinue": { "message": "मुझे काम के लिए इसकी बहुत आवश्यकता है (जारी रखें)" },
-  "blockTypePrompt": { "message": "आगे बढ़ने के लिए निम्नलिखित पाठ को बिल्कुल वैसा ही टाइप करें:" },
+  "blockContinue": {
+    "message": "मुझे काम के लिए इसकी बहुत आवश्यकता है (जारी रखें)"
+  },
+  "blockTypePrompt": {
+    "message": "आगे बढ़ने के लिए निम्नलिखित पाठ को बिल्कुल वैसा ही टाइप करें:"
+  },
   "blockTypePlaceholder": { "message": "ऊपर दिया गया पाठ टाइप करें..." },
   "blockUnlock": { "message": "साइट अनलॉक करें" },
   "shortcutNewTask": { "message": "नया कार्य" },
@@ -451,14 +485,20 @@
   "startDeepWork": { "message": "Deep Work शुरू करें" },
   "endSession": { "message": "सत्र जल्दी समाप्त करें" },
   "hardLockActive": { "message": "हार्ड लॉक सक्रिय" },
-  "hardLockStayFocused": { "message": "टाइमर समाप्त होने तक आप नहीं रुक सकते। फोकस बनाए रखें!" },
+  "hardLockStayFocused": {
+    "message": "टाइमर समाप्त होने तक आप नहीं रुक सकते। फोकस बनाए रखें!"
+  },
   "hardLockConfirmTitle": { "message": "हार्ड लॉक चालू है" },
-  "hardLockConfirmMsg": { "message": "एक बार शुरू होने के बाद आप इस सत्र को रद्द नहीं कर पाएंगे। क्या आप सुनिश्चित हैं?" },
+  "hardLockConfirmMsg": {
+    "message": "एक बार शुरू होने के बाद आप इस सत्र को रद्द नहीं कर पाएंगे। क्या आप सुनिश्चित हैं?"
+  },
   "hardLockConfirmBtn": { "message": "तय करें" },
   "breakLabel": { "message": "ब्रेक" },
   "completionLabel": { "message": "पूर्णता" },
   "sessionCompleteTitle": { "message": "सत्र पूरा हुआ!" },
-  "sessionCompleteMsg": { "message": "बहुत अच्छा काम! अब ब्रेक लेने का समय है।" },
+  "sessionCompleteMsg": {
+    "message": "बहुत अच्छा काम! अब ब्रेक लेने का समय है।"
+  },
   "feedbackSectionLabel": { "message": "हमें बेहतर बनने में मदद करें" },
   "feedbackBtn": { "message": "प्रतिक्रिया भेजें" },
   "rateBtn": { "message": "रेटिंग दें" },
