@@ -17,6 +17,15 @@ export default defineConfig({
       128: "icon/128.png",
     },
     permissions: ["storage", "notifications", "alarms", "contextMenus", "tabs"],
+    browser_specific_settings: {
+      gecko: {
+        id: "ayamir@konabayev.com",
+        strict_min_version: "109.0",
+      },
+      edge: {
+        browser_action_next_to_addressbar: false,
+      },
+    },
     commands: {
       _execute_action: {
         suggested_key: {
