@@ -32,6 +32,7 @@ VERSION
 *.sw?
 .env
 .env.production
+.env.submit
 
 # Build outputs
 .output/
