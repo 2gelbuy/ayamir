@@ -1,18 +1,11 @@
 /**
- * PostHog analytics for MiranaApps extensions.
- * Popup/newtab/options context only (not content scripts — CSP restrictive there).
- * Respects user opt-out via chrome.storage.local[analytics_opt_out] = true.
+ * Analytics facade for AyaMir.
+ * Keep this dependency-free: Chrome MV3 rejects bundled code that can load
+ * remotely hosted executable scripts.
  */
-import posthog, { type PostHog } from "posthog-js";
-
-const POSTHOG_KEY = import.meta.env.WXT_POSTHOG_KEY as string | undefined;
-const POSTHOG_HOST =
-  (import.meta.env.WXT_POSTHOG_HOST as string | undefined) ??
-  "https://us.i.posthog.com";
 const OPT_OUT_KEY = "mirana_analytics_opt_out";
 
 let initialized = false;
-let optedOut = false;
 
 async function loadOptOut(): Promise<boolean> {
   try {
@@ -23,66 +16,35 @@ async function loadOptOut(): Promise<boolean> {
   }
 }
 
-/** Initialize PostHog. Safe to call multiple times — only inits once. */
+/** Initialize analytics. Safe to call multiple times. */
 export async function initAnalytics(extensionName: string): Promise<void> {
-  if (initialized || !POSTHOG_KEY) return;
-  optedOut = await loadOptOut();
-  if (optedOut) return;
-
-  posthog.init(POSTHOG_KEY, {
-    api_host: POSTHOG_HOST,
-    capture_pageview: false,
-    persistence: "localStorage",
-    autocapture: false,
-    disable_session_recording: true,
-    loaded: (ph: PostHog) => {
-      ph.register({
-        extension_name: extensionName,
-        extension_version: chrome.runtime.getManifest().version,
-        runtime: "extension",
-      });
-    },
-  });
+  void extensionName;
+  if (initialized) return;
   initialized = true;
 }
 
-/** Track a custom event. No-op if opted out or not initialized. */
+/** Track a custom event. Disabled in this local-first build. */
 export function track(event: string, props?: Record<string, unknown>): void {
-  if (!initialized || optedOut) return;
-  try {
-    posthog.capture(event, props);
-  } catch {
-    // swallow — analytics must never break UX
-  }
+  void event;
+  void props;
 }
 
-/** Identify user when they upgrade to paid (LinkViz Pro, etc). Anonymous until called. */
+/** Identify a user. Disabled in this local-first build. */
 export function identify(
   userId: string,
   props?: Record<string, unknown>,
 ): void {
-  if (!initialized || optedOut) return;
-  try {
-    posthog.identify(userId, props);
-  } catch {}
+  void userId;
+  void props;
 }
 
-/** Set opt-out state. Stops further events + stores preference. */
+/** Set opt-out state. Kept for compatibility with existing stored settings. */
 export async function setOptOut(value: boolean): Promise<void> {
-  optedOut = value;
+  initialized = true;
   await chrome.storage.local.set({ [OPT_OUT_KEY]: value });
-  if (value && initialized) {
-    try {
-      posthog.opt_out_capturing();
-    } catch {}
-  } else if (!value && initialized) {
-    try {
-      posthog.opt_in_capturing();
-    } catch {}
-  }
 }
 
-/** Current opt-out state. Useful for Settings UI. */
+/** Current opt-out state. */
 export async function isOptedOut(): Promise<boolean> {
   return await loadOptOut();
 }

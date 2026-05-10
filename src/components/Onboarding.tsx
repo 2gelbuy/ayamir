@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Target, Brain, Zap, Shield, ArrowRight, Check } from 'lucide-react';
 import { updateSettings } from '@/lib/db';
+import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
 
 interface OnboardingProps {
@@ -67,13 +68,17 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         if (step < steps.length - 1) {
             setStep(step + 1);
         } else {
-            await updateSettings({ onboardingCompleted: true });
+            const today = new Date().toISOString().split('T')[0];
+            await updateSettings({ onboardingCompleted: true, dailyFocusDate: today });
+            track('onboarding_completed', { source: 'popup', steps_seen: steps.length });
             onComplete();
         }
     };
 
     const handleSkip = async () => {
-        await updateSettings({ onboardingCompleted: true });
+        const today = new Date().toISOString().split('T')[0];
+        await updateSettings({ onboardingCompleted: true, dailyFocusDate: today });
+        track('onboarding_skipped', { source: 'popup', step_reached: step + 1 });
         onComplete();
     };
 

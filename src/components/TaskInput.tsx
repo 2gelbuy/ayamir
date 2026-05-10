@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Clock, ChevronDown } from 'lucide-react';
 import { db, Task } from '@/lib/db';
+import { track } from '@/lib/analytics';
 
 export default function TaskInput() {
     const [title, setTitle] = useState('');
@@ -21,7 +22,13 @@ export default function TaskInput() {
         };
 
         try {
+            const existingTaskCount = await db.tasks.count();
             await db.tasks.add(newTask);
+            track(existingTaskCount === 0 ? 'first_task_added' : 'task_added', {
+                source: 'popup',
+                priority,
+                has_reminder: Boolean(startTime),
+            });
             setTitle('');
             setStartTime('');
             setShowOptions(false);

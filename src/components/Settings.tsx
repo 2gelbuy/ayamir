@@ -18,7 +18,6 @@ import {
   Star,
   ExternalLink,
   AlertTriangle,
-  BarChart3,
 } from "lucide-react";
 import {
   getSettings,
@@ -30,7 +29,6 @@ import {
 } from "@/lib/db";
 import { applyTheme } from "@/lib/theme";
 import { t } from "@/lib/i18n";
-import { isOptedOut, setOptOut } from "@/lib/analytics";
 
 interface SettingsProps {
   onClose: () => void;
@@ -63,13 +61,11 @@ export default function Settings({ onClose }: SettingsProps) {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [importError, setImportError] = useState("");
   const [pasteError, setPasteError] = useState("");
-  const [analyticsOptOut, setAnalyticsOptOut] = useState(false);
 
   useEffect(() => {
     getSettings()
       .then(setSettings)
       .catch((err) => console.error("Failed to load settings:", err));
-    isOptedOut().then(setAnalyticsOptOut);
   }, []);
 
   const handleSave = async () => {
@@ -405,31 +401,6 @@ export default function Settings({ onClose }: SettingsProps) {
               <p className="text-[11px] text-green-600/70 dark:text-green-500/70 leading-relaxed">
                 {t("privacyDesc")}
               </p>
-            </div>
-
-            {/* Anonymous usage analytics toggle */}
-            <div className="flex items-center justify-between py-2.5 px-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700">
-              <div className="flex items-start gap-2 flex-1">
-                <BarChart3 className="w-4 h-4 text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    {t("analyticsTitle", "Share anonymous usage data")}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-500 leading-relaxed mt-0.5">
-                    {t(
-                      "analyticsDesc",
-                      "Helps us improve AyaMir. No personal data, no content from your tasks.",
-                    )}
-                  </p>
-                </div>
-              </div>
-              <Toggle
-                checked={!analyticsOptOut}
-                onChange={async (v) => {
-                  await setOptOut(!v);
-                  setAnalyticsOptOut(!v);
-                }}
-              />
             </div>
 
             {/* Feedback & Rate */}

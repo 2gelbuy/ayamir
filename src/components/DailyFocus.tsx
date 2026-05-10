@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Sparkles, X, ArrowRight } from 'lucide-react';
 import { updateSettings } from '@/lib/db';
+import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
 
 interface DailyFocusProps {
@@ -21,15 +22,23 @@ export default function DailyFocus({ onClose }: DailyFocusProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const today = new Date().toISOString().split('T')[0];
+
         if (!goal.trim()) {
+            await updateSettings({
+                dailyFocusGoal: '',
+                dailyFocusDate: today,
+            });
+            track('daily_focus_skipped', { source: 'popup' });
             onClose();
             return;
         }
-        const today = new Date().toISOString().split('T')[0];
+
         await updateSettings({
             dailyFocusGoal: goal.trim(),
             dailyFocusDate: today,
         });
+        track('daily_focus_set', { source: 'popup', goal_length: goal.trim().length });
         onClose();
     };
 

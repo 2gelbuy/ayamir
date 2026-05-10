@@ -1,7 +1,7 @@
 {
   "name": "ayamir",
-  "version": "1.0.0",
-  "description": "All-in-one focus toolkit: smart tasks, Pomodoro timer, site blocker, gamification — 100% local",
+  "version": "1.0.3",
+  "description": "Pomodoro timer, task manager & site blocker. Plan tasks, block distractions, and focus with zero account or cloud.",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -20,7 +20,6 @@
     "dexie": "^4.0.10",
     "dexie-react-hooks": "^4.2.0",
     "lucide-react": "^0.468.0",
-    "posthog-js": "^1.369.3",
     "publish-browser-extension": "^4.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

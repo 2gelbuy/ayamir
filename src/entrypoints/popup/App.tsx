@@ -29,22 +29,41 @@ export default function App() {
     const closeModal = () => setActiveModal(null);
     const closeAndRefresh = () => { closeModal(); getSettings().then(setSettings); };
 
+    const focusTaskInput = () => {
+        window.setTimeout(() => {
+            const input = document.querySelector('input[placeholder]') as HTMLInputElement | null;
+            input?.focus();
+        }, 50);
+    };
+
     useEffect(() => {
         getSettings().then(s => {
             setSettings(s);
-            if (!s.onboardingCompleted) {
-                openModal('onboarding');
-            } else {
-                const today = new Date().toISOString().split('T')[0];
-                if (s.dailyFocusDate !== today) {
-                    openModal('dailyFocus');
-                }
-            }
         });
         applyTheme().then(() => {
             setIsDark(document.documentElement.classList.contains('dark'));
         });
     }, []);
+
+    useEffect(() => {
+        if (!settings) return;
+
+        const today = new Date().toISOString().split('T')[0];
+
+        if (!settings.onboardingCompleted) {
+            if (activeModal !== 'onboarding') {
+                openModal('onboarding');
+            }
+            return;
+        }
+
+        if (activeModal) return;
+
+        // Prompt for a daily focus only after the user already has something to focus on.
+        if (tasks.length > 0 && settings.dailyFocusDate !== today) {
+            openModal('dailyFocus');
+        }
+    }, [settings, tasks.length, activeModal]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -249,7 +268,11 @@ export default function App() {
                 {activeModal === 'settings' && <Settings onClose={closeAndRefresh} />}
                 {activeModal === 'stats' && <Stats onClose={closeModal} />}
                 {activeModal === 'deepWork' && <DeepWorkMode onClose={closeAndRefresh} />}
-                {activeModal === 'onboarding' && <Onboarding onComplete={() => { closeModal(); openModal('dailyFocus'); getSettings().then(setSettings); }} />}
+                {activeModal === 'onboarding' && <Onboarding onComplete={() => {
+                    closeModal();
+                    getSettings().then(setSettings);
+                    focusTaskInput();
+                }} />}
                 {activeModal === 'dailyFocus' && <DailyFocus onClose={closeAndRefresh} />}
                 {activeModal === 'keyboardHelp' && <KeyboardHelp onClose={closeModal} />}
             </Suspense>

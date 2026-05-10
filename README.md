@@ -4,7 +4,7 @@
 
 # AyaMir — Pomodoro Timer, Task Manager & Site Blocker
 
-**Free, local-first Chrome extension for deep focus. No accounts. No cloud. No tracking.**
+**Plan tasks, block distractions, and focus in one local-first extension. No accounts. No cloud. No tracking.**
 
 [![CI](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml/badge.svg)](https://github.com/2gelbuy/ayamir/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-1.0.0-teal)](https://github.com/2gelbuy/ayamir/releases/tag/v1.0.0)
