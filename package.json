@@ -1,7 +1,7 @@
 {
   "name": "ayamir",
-  "version": "1.0.3",
-  "description": "Pomodoro timer, task manager & site blocker. Plan tasks, block distractions, and focus with zero account or cloud.",
+  "version": "1.0.4",
+  "description": "Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed.",
   "type": "module",
   "scripts": {
     "dev": "wxt",

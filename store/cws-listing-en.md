@@ -1,10 +1,10 @@
 # Chrome Web Store Listing — English
 
 ## Extension Name (manifest name)
-AyaMir - Pomodoro Timer, Task Manager & Site Blocker
+AyaMir - Website Blocker, Pomodoro Timer & Task Manager
 
 ## Short Description (132 chars max)
-Pomodoro timer, task manager & site blocker. Plan tasks, block distractions, and focus with zero account or cloud.
+Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed.
 
 ## Detailed Description
 AyaMir — the free all-in-one Chrome extension that combines a Pomodoro timer, smart task manager, website blocker, and gamification system into one powerful focus toolkit. No accounts. No cloud. No tracking. Everything stays on your device.

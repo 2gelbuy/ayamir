@@ -8,7 +8,7 @@ export default defineConfig({
     name: "__MSG_extName__",
     default_locale: "en",
     description: "__MSG_extDesc__",
-    version: "1.0.3",
+    version: "1.0.4",
     homepage_url: "https://konabayev.com/ayamir/",
     icons: {
       16: "icon/16.png",
