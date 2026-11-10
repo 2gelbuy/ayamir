@@ -1,9 +1,19 @@
 {
+  "onbFirstFocus": { "message": "Set up my first focus session" },
+  "focusSitesLabel": { "message": "Sites paused during this session" },
+  "focusTimerOnly": { "message": "Timer only — no sites selected" },
+  "focusChooseSites": { "message": "Choose sites" },
+  "focusAlwaysOn": {
+    "message": "Always-on blocking is also enabled. Turn it off in Settings to unblock sites after the session."
+  },
+  "focusActionError": {
+    "message": "Could not update the session. Please try again."
+  },
   "extName": {
     "message": "AyaMir - Website Blocker, Pomodoro Timer & Task Manager"
   },
   "extDesc": {
-    "message": "Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed."
+    "message": "Block distracting websites and start a 25-minute Pomodoro session. Free, private, no account required."
   },
   "openAyamir": {
     "message": "Open AyaMir"
@@ -337,25 +347,33 @@
   },
   "onb1Title": { "message": "Welcome to AyaMir" },
   "onb1Subtitle": { "message": "Protect your time, build your legacy." },
-  "onb1Desc": { "message": "A smart task manager that blocks distractions, tracks your focus, and rewards your productivity." },
+  "onb1Desc": {
+    "message": "A smart task manager that blocks distractions, tracks your focus, and rewards your productivity."
+  },
   "onb1Feat1": { "message": "Smart task management with priorities" },
   "onb1Feat2": { "message": "Deep Work sessions with site blocking" },
   "onb1Feat3": { "message": "XP, levels, and achievements" },
   "onb2Title": { "message": "Deep Work Mode" },
   "onb2Subtitle": { "message": "Enter the flow state." },
-  "onb2Desc": { "message": "Timed focus sessions. Distracting sites get blocked. Typing challenge to bypass." },
+  "onb2Desc": {
+    "message": "Timed focus sessions. Distracting sites get blocked. Typing challenge to bypass."
+  },
   "onb2Feat1": { "message": "Customizable work/break intervals" },
   "onb2Feat2": { "message": "Hard lock mode — no escape until done" },
   "onb2Feat3": { "message": "Automatic site blocking during sessions" },
   "onb3Title": { "message": "Command Palette" },
   "onb3Subtitle": { "message": "Add tasks from anywhere." },
-  "onb3Desc": { "message": "Press Ctrl+Shift+K on any page to add a task instantly." },
+  "onb3Desc": {
+    "message": "Press Ctrl+Shift+K on any page to add a task instantly."
+  },
   "onb3Feat1": { "message": "Ctrl+Shift+E to open AyaMir" },
   "onb3Feat2": { "message": "Ctrl+Shift+K for quick task" },
   "onb3Feat3": { "message": "Right-click any page to save as task" },
   "onb4Title": { "message": "100% Private" },
   "onb4Subtitle": { "message": "Your data never leaves your browser." },
-  "onb4Desc": { "message": "No accounts, no servers, no tracking. Everything stays on your device." },
+  "onb4Desc": {
+    "message": "No accounts, no servers, no tracking. Everything stays on your device."
+  },
   "onb4Feat1": { "message": "All data stored locally in your browser" },
   "onb4Feat2": { "message": "Zero network requests — works offline" },
   "onb4Feat3": { "message": "Enable in Incognito for full site blocking" },
@@ -374,9 +392,13 @@
   "gamificationLabel": { "message": "Gamification" },
   "gamificationDesc": { "message": "XP, levels, and achievements" },
   "incognitoTitle": { "message": "Enable in Incognito" },
-  "incognitoDesc": { "message": "Site blocking doesn't work in Incognito by default. Go to chrome://extensions, find AyaMir, and enable \"Allow in Incognito\"." },
+  "incognitoDesc": {
+    "message": "Site blocking doesn't work in Incognito by default. Go to chrome://extensions, find AyaMir, and enable \"Allow in Incognito\"."
+  },
   "privacyTitle": { "message": "100% Private & Local" },
-  "privacyDesc": { "message": "Your data never leaves your browser. No accounts, no servers, no tracking." },
+  "privacyDesc": {
+    "message": "Your data never leaves your browser. No accounts, no servers, no tracking."
+  },
   "scheduledBlocking": { "message": "Scheduled Blocking" },
   "scheduledBlockingDesc": { "message": "Auto-block during work hours" },
   "quickBlockCategories": { "message": "Quick Block Categories" },
@@ -423,14 +445,22 @@
   "dailyFocusPlaceholder": { "message": "e.g. Ship the landing page..." },
   "dailyFocusLockIn": { "message": "Lock In" },
   "dailyFocusSkip": { "message": "Skip for now" },
-  "dailyFocusHelper": { "message": "This helps you stay focused throughout the day" },
+  "dailyFocusHelper": {
+    "message": "This helps you stay focused throughout the day"
+  },
   "blockFocusActive": { "message": "Focus Mode Active" },
-  "blockFocusMsg": { "message": "You have tasks to complete. Is this site really needed?" },
+  "blockFocusMsg": {
+    "message": "You have tasks to complete. Is this site really needed?"
+  },
   "blockDeepWorkActive": { "message": "Deep Work Active" },
-  "blockDeepWorkMsg": { "message": "You are in a focus session. Stay on track." },
+  "blockDeepWorkMsg": {
+    "message": "You are in a focus session. Stay on track."
+  },
   "blockCloseTab": { "message": "Close Tab & Get to Work" },
   "blockContinue": { "message": "I really need this for work (Continue)" },
-  "blockTypePrompt": { "message": "Type the following text exactly to proceed:" },
+  "blockTypePrompt": {
+    "message": "Type the following text exactly to proceed:"
+  },
   "blockTypePlaceholder": { "message": "Type the text above..." },
   "blockUnlock": { "message": "Unlock Site" },
   "shortcutNewTask": { "message": "New task" },
@@ -451,9 +481,13 @@
   "startDeepWork": { "message": "Start Deep Work" },
   "endSession": { "message": "End Session Early" },
   "hardLockActive": { "message": "Hard Lock Active" },
-  "hardLockStayFocused": { "message": "You can't stop until the timer ends. Stay focused!" },
+  "hardLockStayFocused": {
+    "message": "You can't stop until the timer ends. Stay focused!"
+  },
   "hardLockConfirmTitle": { "message": "Hard Lock is ON" },
-  "hardLockConfirmMsg": { "message": "You will NOT be able to cancel this session once it starts. Are you sure?" },
+  "hardLockConfirmMsg": {
+    "message": "You will NOT be able to cancel this session once it starts. Are you sure?"
+  },
   "hardLockConfirmBtn": { "message": "Lock In" },
   "breakLabel": { "message": "Break" },
   "completionLabel": { "message": "Completion" },

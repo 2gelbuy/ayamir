@@ -32,6 +32,7 @@ import { t } from "@/lib/i18n";
 
 interface SettingsProps {
   onClose: () => void;
+  initialSection?: "general" | "blocking" | "focus" | "data";
 }
 
 function Toggle({
@@ -52,12 +53,15 @@ function Toggle({
   );
 }
 
-export default function Settings({ onClose }: SettingsProps) {
+export default function Settings({
+  onClose,
+  initialSection = "general",
+}: SettingsProps) {
   const [settings, setSettings] = useState<SettingsType | null>(null);
   const [newDomain, setNewDomain] = useState("");
   const [activeSection, setActiveSection] = useState<
     "general" | "blocking" | "focus" | "data"
-  >("general");
+  >(initialSection);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [importError, setImportError] = useState("");
   const [pasteError, setPasteError] = useState("");

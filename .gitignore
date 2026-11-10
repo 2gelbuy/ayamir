@@ -61,3 +61,8 @@ CHANGELOG.md
 INSTALLATION.md
 e2e/
 playwright.config.ts
+
+# Local secret backups and store upload artifacts
+.env*
+!.env.example
+web-ext-artifacts/

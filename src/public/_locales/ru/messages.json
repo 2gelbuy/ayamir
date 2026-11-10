@@ -1,9 +1,19 @@
 {
+  "onbFirstFocus": { "message": "Настроить первую фокус-сессию" },
+  "focusSitesLabel": { "message": "Сайты, заблокированные на время сессии" },
+  "focusTimerOnly": { "message": "Только таймер — сайты не выбраны" },
+  "focusChooseSites": { "message": "Выбрать сайты" },
+  "focusAlwaysOn": {
+    "message": "Также включена постоянная блокировка. Выключите её в настройках, чтобы сайты открылись после сессии."
+  },
+  "focusActionError": {
+    "message": "Не удалось обновить сессию. Попробуйте ещё раз."
+  },
   "extName": {
     "message": "AyaMir - Website Blocker, Pomodoro Timer & Task Manager"
   },
   "extDesc": {
-    "message": "Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed."
+    "message": "Блокируйте отвлекающие сайты и запускайте 25-минутные сеансы Pomodoro. Бесплатно, без регистрации."
   },
   "openAyamir": {
     "message": "Открыть AyaMir"
