@@ -4,40 +4,75 @@
 AyaMir - Website Blocker, Pomodoro Timer & Task Manager
 
 ## Short Description (132 chars max)
-Block distracting websites and start a 25-minute Pomodoro session. Free, private, no account required.
+Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed.
 
 ## Detailed Description
-AyaMir pairs a Pomodoro timer with website blocking. Choose the sites to pause and start a 25-minute focus session, or use the timer without blocking. No account required. Settings and session history stay on your device.
+AyaMir — the free all-in-one Chrome extension that combines a Pomodoro timer, smart task manager, website blocker, and gamification system into one powerful focus toolkit. No accounts. No cloud. No tracking. Everything stays on your device.
 
-START YOUR FIRST FOCUS SESSION
-1. Open AyaMir and choose Focus.
-2. Use Choose sites to review the domains you want to block.
-3. Select 25 minutes and start. Choose 15, 45, 60 or 90 minutes when you need a different session length.
+Unlike StayFocusd, Cold Turkey, or Forest — AyaMir gives you task management + site blocking + focus timer + XP system all in one extension. No subscriptions, no data collection.
 
-The timer continues when you close the popup. Open it again to see the remaining time. If you have not chosen any sites, you can still use the timer on its own.
+KEY FEATURES
 
-CONTROL HOW BLOCKING WORKS
-- Block selected sites during a focus session.
-- Add custom domains or start with category presets.
-- Set a blocking schedule for the days and hours you choose.
-- Always-on blocking is a separate setting: if enabled, it keeps selected sites blocked after the focus timer ends. Turn it off in Blocking settings when you want session-only blocking.
-- Hard Lock is optional and off by default for new installs. When enabled for a session, it prevents stopping that session early.
+SMART TASK MANAGER
+- Priority-based task queue with smart sorting algorithm
+- Inline editing, snooze reminders, and scheduled tasks
+- Quick add task from ANY page — press Ctrl+Shift+K (command palette)
+- Right-click any page, link, or selected text to save as task
+- Daily focus goal — set your #1 priority each morning
 
-PLAN THE TASK YOU WANT TO FINISH
-- Add tasks with priorities and due dates.
-- Edit or snooze tasks and choose a daily focus goal.
-- Save a page, link or selected text as a task from the context menu.
-- Use the command palette to add a task without opening the full popup.
+POMODORO TIMER & DEEP WORK MODE
+- Focus timer with presets: 15 / 25 / 45 / 60 / 90 minutes
+- Circular progress ring with real-time countdown
+- Hard Lock Mode — cannot cancel once started (for serious focus)
+- Break timer with customizable duration
+- Session tracking: total hours, completed sessions
 
-SEE YOUR PROGRESS
-Review completed focus sessions and total focus time. Earn XP for tasks and sessions, unlock achievements and build a daily streak.
+WEBSITE BLOCKER & DISTRACTION BLOCKER
+- Block distracting websites during focus sessions
+- One-click category presets: Social Media (9 sites), News (7), Entertainment (7), Shopping (6)
+- Add any custom domain to your blocklist
+- Scheduled blocking — auto-block during work hours (configurable days and times)
+- Typing challenge to bypass — forces you to type a motivational quote
 
-LOCAL DATA, NO SIGN-UP
-Your tasks, settings and session history are stored locally in your browser. Focus tools work offline. Export a JSON backup and import it when you need to restore your data. No account, subscription or advertising is required. Source code is available under the MIT license.
+GAMIFICATION & MOTIVATION
+- Earn XP for completing tasks and focus sessions
+- 10 levels: Beginner to Transcendent
+- 8 achievements: Early Bird, Night Owl, Speed Demon, Perfect Timing, and more
+- Daily streaks — don't break the chain
+- Bonus XP for completing tasks on time, early morning, or late night
 
-Available in English, Russian, Spanish, Simplified Chinese and Hindi.
+100% PRIVATE — ZERO DATA COLLECTION
+- All data stored locally in IndexedDB and Chrome Storage
+- Zero network requests — works completely offline
+- No accounts, no servers, no analytics, no telemetry
+- Full data export/import (JSON backup)
+- Open source — MIT License — audit the code on GitHub
 
-Choose a task. Pause the distractions. Start one focus session.
+KEYBOARD SHORTCUTS
+- Ctrl+Shift+E — Open AyaMir popup
+- Ctrl+Shift+K — Command palette from any page
+- N or / — New task | D — Deep Work | V — Stats | S — Settings | ? — Help
+
+LANGUAGES
+Available in English, Russian, Spanish, Chinese (Simplified), and Hindi.
+
+WHO IS AYAMIR FOR?
+- Students who need to focus during study sessions
+- Remote workers fighting browser distractions
+- Developers who want a keyboard-first task manager
+- People with ADHD who benefit from structured focus sessions and gamification
+- Anyone who wants a free, private alternative to StayFocusd, Cold Turkey, Forest, or Todoist
+
+WHAT MAKES AYAMIR DIFFERENT?
+- Free — all core features at no cost, no ads
+- Unlimited sites — block as many as you want (no 3-site limit like BlockSite)
+- No account required — works in 10 seconds after install, zero setup
+- All-in-one — tasks + Pomodoro timer + site blocker + gamification
+- 100% offline — your data never leaves your browser
+- Open source — transparent, auditable, community-driven
+- Lightweight — under 700KB total, fast popup
+
+No ads. No tracking. Just focus.
 
 ## Category
 Productivity > Workflow & Planning
