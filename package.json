@@ -1,6 +1,6 @@
 {
   "name": "ayamir",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Block distracting sites, plan tasks, and run Pomodoro focus sessions. Private, offline, no account needed.",
   "type": "module",
   "scripts": {
